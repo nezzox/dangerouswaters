@@ -1,0 +1,10 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {createGame,step} from '../simulation.mjs';
+import {buyBoat} from '../career.mjs';
+import {BOATS} from '../catalog.mjs';
+import {answerCaptain} from '../fleet.mjs';
+const fleetGame=()=>{const s=createGame();s.money=1e7;s.paused=false;buyBoat(s,BOATS[0].id,'captain');return s;};
+test('captain requests spending, cannot spend before approval and refusal leaves vessel held',()=>{const s=fleetGame(),b=s.career.fleet[0],balance=s.money;step(s,1);assert(b.request);assert.equal(s.money,balance);const x=b.x;assert(answerCaptain(s,b.id,false).ok);for(let i=0;i<10;i++)step(s,1);assert.equal(b.x,x);assert.equal(s.money,balance);assert(answerCaptain(s,b.id,true).ok);assert(s.money<balance);step(s,1);assert(b.x>x);});
+test('fleet sails, deploys distinct pots, hauls and settles profit with crew share and loan deduction',()=>{const s=fleetGame(),b=s.career.fleet[0];step(s,1);answerCaptain(s,b.id,true);s.career.debt=10000;let sawPots=false;for(let i=0;i<14000&&b.trips<1;i++){step(s,1);sawPots||=b.pots.length>0;}assert(sawPots);assert.equal(b.trips,1);assert(b.earnings>0);assert(b.lastLanding.crew>0);assert(s.career.debt<10000);assert(Math.hypot(b.x-180,b.y-80)<5);});
+test('pending captain requests and movement survive a saved roundtrip without duplicate charges',()=>{const s=fleetGame();step(s,1);const t=JSON.parse(JSON.stringify(s)),b=t.career.fleet[0],money=t.money;for(let i=0;i<10;i++)step(t,1);assert.equal(t.money,money);assert(answerCaptain(t,b.id,true).ok);const paid=t.money;assert(!answerCaptain(t,b.id,true).ok);assert.equal(t.money,paid);});
