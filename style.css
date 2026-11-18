@@ -22,4 +22,6 @@
 
 .chart-areas{display:flex;gap:4px;margin-top:7px}.chart-areas button{flex:1;font:7px monospace;padding:5px 2px}.map-attribution{font:7px monospace;color:var(--muted);margin-top:9px}.map-attribution a{color:inherit}
 
-#kofi-support{position:fixed;left:50%;bottom:72px;transform:translateX(-50%);z-index:12}#kofi-support .kofi-button,#kofi-support>a{background:#000!important;color:#fff!important}@media(max-width:760px){#kofi-support{bottom:110px}}
+/* Ko-fi button and its open panel sit above the toolbar at every viewport size. */
+.floatingchat-container-wrap,.floatingchat-container-wrap-mobi{left:50%!important;right:auto!important;bottom:calc(var(--toolbar-height,69px) + 8px)!important;transform:translateX(-50%);width:195px!important;max-width:195px!important;z-index:12!important}
+.floating-chat-kofi-popup-iframe,.floating-chat-kofi-popup-iframe-mobi{left:50%!important;bottom:calc(var(--toolbar-height,69px) + 80px)!important;transform:translateX(-50%)!important;max-height:calc(100vh - var(--toolbar-height,69px) - 100px)}
