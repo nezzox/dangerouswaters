@@ -1,5 +1,5 @@
-import {hullWaterGLSL} from './deck-water.mjs?v=0.12.0-r5';
-import {seaHeightGLSL} from './sea-spectrum.mjs?v=0.12.0-r5';
+import {hullWaterGLSL} from './deck-water.mjs?v=0.12.0-r6';
+import {seaHeightGLSL} from './sea-spectrum.mjs?v=0.12.0-r6';
 // Shared atmosphere and ocean functions keep lighting and reflections consistent.
 export const common=`
 precision highp float;precision highp int;
@@ -77,6 +77,13 @@ void main(){if(uReflectionPass>.5&&vWorld.y<.04)discard;
   if(n.y>.8&&vLocal.x> -220.&&vLocal.y<2.5){base*=.8+plank*.28;float fibers=noise(uv*vec2(3.,75.));base*=.86+fibers*.18;height=fibers*.008;}
   else{float corrugation=sin(uv.x*9.);height=corrugation*.008+grain*.004;base*=.88+.12*corrugation;}
   rust=smoothstep(.65,.84,macro)*vertical*.23;
+ }else if(uKind>3.5){
+  // Coastal turf breaks into exposed rock on steeper slopes and wet shoreline.
+  float turf=fbm(vWorld.xz*.055),rock=smoothstep(.12,.55,1.-n.y);
+  vec3 grass=mix(vec3(.065,.105,.047),vec3(.13,.17,.075),turf);
+  vec3 stone=mix(vec3(.09,.10,.095),vec3(.22,.21,.18),fbm(vWorld.xz*.19));
+  base=mix(grass,stone,max(rock,1.-smoothstep(2.,9.,vWorld.y)));
+  height=(noise(vWorld.xz*1.8)-.5)*.035;rough=.96;
  }else if(uKind>2.5){height=grain*.001;rough=max(.58,rough);base*=.91+grain*.1;}
  base=mix(base,vec3(.23,.085,.032),rust);base*=1.-seam*.22;
  float wet=clamp(uWeather.z*.6+(.48-macro)*.5,0.,.8)*detail;rough=max(.085,rough*(1.-wet*.55));base*=1.-wet*.13;
