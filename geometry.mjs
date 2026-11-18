@@ -1,4 +1,4 @@
-import {HULL_STATIONS,hullWidthAt} from './fenders.mjs?v=0.12.0-r5';
+import {HULL_STATIONS,hullWidthAt} from './fenders.mjs?v=0.12.0-r6';
 const steel=[.19,.24,.25],paint=[.68,.7,.64],dark=[.045,.08,.1],glass=[.055,.13,.17],brass=[.43,.31,.13],orange=[.72,.29,.065];
 export function geometry(){const data=[];
  function tri(a,b,c,color,rough=.6,emit=0){const u=b.map((x,i)=>x-a[i]),v=c.map((x,i)=>x-a[i]),n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]],len=Math.hypot(...n);if(len<1e-8)return;for(const p of [a,b,c])data.push(...p,...n.map(x=>x/len),...color,rough,emit);}
@@ -84,7 +84,7 @@ export function buildHarbor(){const {box,tube,quad,tri,roundedBox,array}=geometr
  for(const z of [-55,90,235]){for(let x=-190;x<85;x+=2.2)box(x,2.245,z,.035,.025,6.7,[.16,.17,.15],.92);for(const x of [-35,-28,-21])for(let j=0;j<3;j++)roundedBox(x,2.8+j*.85,z,1.4,.8,1.1,.08,[.18,.32,.31],.8);for(let x=33;x<56;x+=1.5)box(x,2.26,z-2.9,.65,.025,.22,[.67,.51,.16],.85);}
  return array();}
 export function buildBuoy(){const g=geometry();g.tube([0,-.4,0],[0,.9,0],.48,orange,12);g.tube([0,.35,0],[0,.6,0],.5,paint,12);g.tube([0,.9,0],[0,2.1,0],.035,steel);g.box(.35,1.9,0,.7,.35,.025,orange);return g.array();}
-export function buildOceanGrid(size=700,segments=220){const data=new Float32Array(segments*segments*18),half=size/2;let k=0;for(let z=0;z<segments;z++)for(let x=0;x<segments;x++){const coord=v=>Math.sinh((v/segments*2-1)*3)/Math.sinh(3)*half,a=coord(x),b=coord(z),c=coord(x+1),d=coord(z+1);for(const p of [[a,0,b],[a,0,d],[c,0,b],[c,0,b],[a,0,d],[c,0,d]])for(const v of p)data[k++]=v;}return data;}
+export function buildOceanGrid(size=4000,segments=220){const data=new Float32Array(segments*segments*18),half=size/2;let k=0;for(let z=0;z<segments;z++)for(let x=0;x<segments;x++){const coord=v=>Math.sinh((v/segments*2-1)*5.5)/Math.sinh(5.5)*half,a=coord(x),b=coord(z),c=coord(x+1),d=coord(z+1);for(const p of [[a,0,b],[a,0,d],[c,0,b],[c,0,b],[a,0,d],[c,0,d]])for(const v of p)data[k++]=v;}return data;}
 
 export function buildCrewParts(role=0){
  const jacket=[[.72,.29,.065],[.12,.2,.26],[.7,.59,.16]][role%3],helmet=[[.85,.72,.16],[.82,.35,.12],[.7,.73,.65]][role%3],skin=[[.57,.42,.3],[.38,.26,.18],[.69,.51,.39]][role%3];
