@@ -13,3 +13,5 @@ test('legacy pots retain their expected catch through geographic migration',asyn
 test('ocean mesh covers distant camera rays while preserving near-vessel detail',async()=>{const {buildOceanGrid}=await import('../geometry.mjs');const mesh=buildOceanGrid();let span=0,nearest=Infinity;for(let i=0;i<mesh.length;i+=3){span=Math.max(span,Math.abs(mesh[i]),Math.abs(mesh[i+2]));if(Math.abs(mesh[i])>.01)nearest=Math.min(nearest,Math.abs(mesh[i]));}assert(span>=2000);assert(nearest<1);});
 
 test('coastal terrain faces upward for daylight shading',async()=>{const {buildGeography}=await import('../geography-mesh.mjs');const data=buildGeography(0,0);assert(data[4]>0);});
+
+test('the port shoreline has a low apron before inland relief',async()=>{const {groundHeight}=await import('../geography-mesh.mjs');assert(groundHeight(-100,0)>5);assert(groundHeight(-100,0)<10);assert(groundHeight(-100,-600)>groundHeight(-100,0));});
