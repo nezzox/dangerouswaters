@@ -1,5 +1,5 @@
-import {hullWaterGLSL} from './deck-water.mjs?v=0.12.0-r6';
-import {seaHeightGLSL} from './sea-spectrum.mjs?v=0.12.0-r6';
+import {hullWaterGLSL} from './deck-water.mjs?v=0.12.0-r8';
+import {seaHeightGLSL} from './sea-spectrum.mjs?v=0.12.0-r8';
 // Shared atmosphere and ocean functions keep lighting and reflections consistent.
 export const common=`
 precision highp float;precision highp int;
@@ -77,7 +77,7 @@ void main(){if(uReflectionPass>.5&&vWorld.y<.04)discard;
   if(n.y>.8&&vLocal.x> -220.&&vLocal.y<2.5){base*=.8+plank*.28;float fibers=noise(uv*vec2(3.,75.));base*=.86+fibers*.18;height=fibers*.008;}
   else{float corrugation=sin(uv.x*9.);height=corrugation*.008+grain*.004;base*=.88+.12*corrugation;}
   rust=smoothstep(.65,.84,macro)*vertical*.23;
- }else if(uKind>3.5){
+ }else if(uKind>3.5&&vSurface.y<-.5){
   // Coastal turf breaks into exposed rock on steeper slopes and wet shoreline.
   float turf=fbm(vWorld.xz*.055),rock=smoothstep(.12,.55,1.-n.y);
   vec3 grass=mix(vec3(.065,.105,.047),vec3(.13,.17,.075),turf);
@@ -94,7 +94,9 @@ void main(){if(uReflectionPass>.5&&vWorld.y<.04)discard;
  vec3 c=base*ambient*contact*skyVisibility+brdf(base,f0,rough,n,v,l)*vec3(2.9,2.65,2.25)*shade*(1.-uWeather.w*.65)*uDaylight;
  vec3 reflected=sky(reflect(-v,n));vec3 F=f0+(1.-f0)*pow(1.-max(.01,dot(n,v)),5.);c+=reflected*F*(1.-rough*.65)*contact;
  if(glass>.5){float interior=.25+.25*noise(vLocal.xz*5.);c=base*ambient*interior*.2+reflected*(.07+.72*pow(1.-max(0.,dot(n,v)),4.));}
- c+=base*directLamps(vWorld,n,v);c+=vColor*vSurface.y*2.*(uKind>1.5&&uKind<2.5?max(.12,1.-uDaylight):uLights);
+ // Negative surface emission marks matte earth/shore banks; buildings keep their own materials.
+ if(uKind>3.5&&vSurface.y<-.5)c=base*(ambient+vec3(1.1)*max(0.,dot(n,l))*uDaylight*(1.-uWeather.w*.65));
+ c+=base*directLamps(vWorld,n,v);c+=vColor*max(0.,vSurface.y)*2.*(uKind>1.5&&uKind<2.5?max(.12,1.-uDaylight):uLights);
  outColor=vec4(finishColor(c,vWorld),1.);}`;
 export const depthVertex=`#version 300 es
 precision highp float;layout(location=0) in vec3 aPosition;uniform mat4 uModel;uniform mat4 uLightVP;void main(){gl_Position=uLightVP*uModel*vec4(aPosition,1.);}`;
