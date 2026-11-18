@@ -23,5 +23,11 @@
 .chart-areas{display:flex;gap:4px;margin-top:7px}.chart-areas button{flex:1;font:7px monospace;padding:5px 2px}.map-attribution{font:7px monospace;color:var(--muted);margin-top:9px}.map-attribution a{color:inherit}
 
 /* Ko-fi button and its open panel sit above the toolbar at every viewport size. */
-.floatingchat-container-wrap,.floatingchat-container-wrap-mobi{left:50%!important;right:auto!important;bottom:calc(var(--toolbar-height,69px) + 8px)!important;transform:translateX(-50%);width:195px!important;max-width:195px!important;z-index:12!important}
-.floating-chat-kofi-popup-iframe,.floating-chat-kofi-popup-iframe-mobi{left:50%!important;bottom:calc(var(--toolbar-height,69px) + 80px)!important;transform:translateX(-50%)!important;max-height:calc(100vh - var(--toolbar-height,69px) - 100px)}
+.floatingchat-container-wrap,.floatingchat-container-wrap-mobi{left:50%!important;right:auto!important;bottom:0!important;transform:translateX(-50%);width:195px!important;max-width:195px!important;z-index:12!important}
+.floating-chat-kofi-popup-iframe,.floating-chat-kofi-popup-iframe-mobi{left:50%!important;bottom:calc(var(--toolbar-height,69px) + 8px)!important;transform:translateX(-50%)!important;max-height:calc(100vh - var(--toolbar-height,69px) - 100px)}
+
+/* Side panels must remain reachable above the toolbar on short screens. */
+.right-panel{bottom:calc(var(--toolbar-height,69px) + 12px);max-height:none;overflow-y:auto;overflow-x:hidden;align-content:start;grid-auto-rows:max-content;scrollbar-width:thin;scrollbar-color:#52666b transparent;overscroll-behavior:contain}
+@media(max-width:760px){.right-panel{max-height:none}}
+.right-panel{gap:8px}.right-panel .panel{padding:14px}.right-panel #chart{height:170px}
+@media(max-height:950px){.right-panel .panel{padding:10px}.right-panel #chart{height:120px}}
