@@ -1,4 +1,4 @@
-import {boatById} from './catalog.mjs?v=0.12.0-r8';
+import {boatById} from './catalog.mjs?v=0.13.0';
 export const BERTH={x:61.9,y:79,heading:0};
 export const PIERS=[-200,-55,90,235].map(y=>({x:-65,y,halfLength:155,halfWidth:3.5}));
 const angle=a=>Math.atan2(Math.sin(a),Math.cos(a));

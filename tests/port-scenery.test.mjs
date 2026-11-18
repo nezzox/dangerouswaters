@@ -1,0 +1,2 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {buildPortScenery} from '../port-scenery.mjs';
+test('industrial waterfront contains finite geometry and remains local to Dutch Harbor',()=>{const data=buildPortScenery();assert(data.length>50000);assert.equal(data.length%11,0);for(let i=0;i<data.length;i+=11){assert([...data.subarray(i,i+11)].every(Number.isFinite));assert(Math.abs(data[i])<1500);assert(Math.abs(data[i+2])<1800);assert(Math.abs(Math.hypot(data[i+3],data[i+4],data[i+5])-1)<.001);}});

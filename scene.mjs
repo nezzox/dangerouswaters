@@ -1,18 +1,19 @@
-import {buildGeography} from './geography-mesh.mjs?v=0.12.0-r8';
-import {createDeckWater,stepDeckWater} from './deck-water.mjs?v=0.12.0-r8';
-import {dockingStage} from './harbor.mjs?v=0.12.0-r8';
-import {vesselStats} from './career.mjs?v=0.12.0-r8';
-import {boatById} from './catalog.mjs?v=0.12.0-r8';
-import {createBuoyancy,stepBuoyancy} from './buoyancy.mjs?v=0.12.0-r8';
-import {buildFoam} from './foam.mjs?v=0.12.0-r8';
-import {fenderPose,createFenderMotion,stepFenderMotion,ropePoints} from './fenders.mjs?v=0.12.0-r8';
-import {inverseTransform,multiply,transform,perspective,lookAt,identity,project} from './math3d.mjs?v=0.12.0-r8';
-import {buildDeckWash,buildVessel,buildHarbor,buildBuoy,buildOceanGrid,buildCrewParts,buildDeckEquipment} from './geometry.mjs?v=0.12.0-r8';
-import {deckWorkPose} from './deck-work.mjs?v=0.12.0-r8';
-import {createCrew,commandCrew,stepCrew,crewPose} from './crew.mjs?v=0.12.0-r8';
-import * as shaders from './scene-shaders.mjs?v=0.12.0-r8';
-export {seaHeight as surfaceHeight} from './sea-spectrum.mjs?v=0.12.0-r8';
-import {seaHeight as surfaceHeight} from './sea-spectrum.mjs?v=0.12.0-r8';
+import {buildPortScenery} from './port-scenery.mjs?v=0.13.0';
+import {buildGeography} from './geography-mesh.mjs?v=0.13.0';
+import {createDeckWater,stepDeckWater} from './deck-water.mjs?v=0.13.0';
+import {dockingStage} from './harbor.mjs?v=0.13.0';
+import {vesselStats} from './career.mjs?v=0.13.0';
+import {boatById} from './catalog.mjs?v=0.13.0';
+import {createBuoyancy,stepBuoyancy} from './buoyancy.mjs?v=0.13.0';
+import {buildFoam} from './foam.mjs?v=0.13.0';
+import {fenderPose,createFenderMotion,stepFenderMotion,ropePoints} from './fenders.mjs?v=0.13.0';
+import {inverseTransform,multiply,transform,perspective,lookAt,identity,project} from './math3d.mjs?v=0.13.0';
+import {buildDeckWash,buildVessel,buildHarbor,buildBuoy,buildOceanGrid,buildCrewParts,buildDeckEquipment} from './geometry.mjs?v=0.13.0';
+import {deckWorkPose} from './deck-work.mjs?v=0.13.0';
+import {createCrew,commandCrew,stepCrew,crewPose} from './crew.mjs?v=0.13.0';
+import * as shaders from './scene-shaders.mjs?v=0.13.0';
+export {seaHeight as surfaceHeight} from './sea-spectrum.mjs?v=0.13.0';
+import {seaHeight as surfaceHeight} from './sea-spectrum.mjs?v=0.13.0';
 function ortho(l,r,b,t,n,f){return new Float32Array([2/(r-l),0,0,0,0,2/(t-b),0,0,0,0,-2/(f-n),0,-(r+l)/(r-l),-(t+b)/(t-b),-(f+n)/(f-n),1]);}
 export function createScene(canvas){
  const gl=canvas.getContext('webgl2',{alpha:false,antialias:true,powerPreference:'high-performance'});if(!gl)return null;
@@ -21,7 +22,7 @@ export function createScene(canvas){
  function mesh(data,stride=11,kind=0){const vao=gl.createVertexArray(),buffer=gl.createBuffer();gl.bindVertexArray(vao);gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,data,gl.STATIC_DRAW);const sizes=stride===11?[3,3,3,2]:[3];let offset=0;for(let i=0;i<sizes.length;i++){gl.enableVertexAttribArray(i);gl.vertexAttribPointer(i,sizes[i],gl.FLOAT,false,stride*4,offset*4);offset+=sizes[i];}const m={vao,buffer,count:data.length/stride,kind};resources.push(m);return m;}
  function destroyMesh(m){gl.deleteVertexArray(m.vao);gl.deleteBuffer(m.buffer);resources.splice(resources.indexOf(m),1);}
  let ocean,solid,depth,spray,foam,vessel,harbor,buoy,water,shadowTexture,shadowFrame;
- try{ocean=program(shaders.oceanVertex,shaders.oceanFragment);solid=program(shaders.meshVertex,shaders.meshFragment);depth=program(shaders.depthVertex,shaders.depthFragment);spray=program(shaders.sprayVertex,shaders.sprayFragment);foam=program(shaders.meshVertex,shaders.foamFragment);vessel=mesh(buildVessel(),11,1);harbor=mesh(buildHarbor(),11,2);buoy=mesh(buildBuoy());water=mesh(buildOceanGrid(),3);
+ try{ocean=program(shaders.oceanVertex,shaders.oceanFragment);solid=program(shaders.meshVertex,shaders.meshFragment);depth=program(shaders.depthVertex,shaders.depthFragment);spray=program(shaders.sprayVertex,shaders.sprayFragment);foam=program(shaders.meshVertex,shaders.foamFragment);vessel=mesh(buildVessel(),11,1);harbor=mesh(new Float32Array([...buildHarbor(),...buildPortScenery()]),11,2);buoy=mesh(buildBuoy());water=mesh(buildOceanGrid(),3);
   shadowTexture=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,shadowTexture);gl.texImage2D(gl.TEXTURE_2D,0,gl.DEPTH_COMPONENT24,2048,2048,0,gl.DEPTH_COMPONENT,gl.UNSIGNED_INT,null);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.NEAREST);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.NEAREST);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
   shadowFrame=gl.createFramebuffer();gl.bindFramebuffer(gl.FRAMEBUFFER,shadowFrame);gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.DEPTH_ATTACHMENT,gl.TEXTURE_2D,shadowTexture,0);gl.drawBuffers([gl.NONE]);gl.readBuffer(gl.NONE);if(gl.checkFramebufferStatus(gl.FRAMEBUFFER)!==gl.FRAMEBUFFER_COMPLETE)throw Error('Unable to create shadow framebuffer');gl.bindFramebuffer(gl.FRAMEBUFFER,null);
  }catch(error){for(const m of resources){gl.deleteBuffer(m.buffer);gl.deleteVertexArray(m.vao);}for(const p of programs)gl.deleteProgram(p);throw error;}

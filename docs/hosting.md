@@ -41,3 +41,6 @@ The bottom-center support button uses the owner-provided Ko-fi floating-chat wid
 
 ## GitHub Pages
 Settings → Pages uses GitHub Actions. The pages.yml workflow runs the Node test suite, packages the static game and deploys only the resulting archive contents. Pushes to main update the site after successful checks. Reverting the relevant main commit restores a prior release through the same workflow. The site URL is https://nezzox.github.io/dangerouswaters/. Browser saves are tied to the origin: export the local season under Finance & Saves and import it on Pages to continue.
+
+## Harbor and audio (0.13)
+Sound remains opt-in via SOUND ON. The new local Web Audio soundscape increases diesel and weather levels, adds layered sea/rain, and fades industrial hum with distance from harbor. Sparse synthesized gull-like calls, hull creaks and distant horns use real audio time rather than the simulation time multiplier. All sound passes through a shared mute bus and compressor; pausing or disabling sound fades the whole bus. The sounds are synthesized approximations, not field recordings.

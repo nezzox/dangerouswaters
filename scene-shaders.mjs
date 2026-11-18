@@ -1,5 +1,5 @@
-import {hullWaterGLSL} from './deck-water.mjs?v=0.12.0-r8';
-import {seaHeightGLSL} from './sea-spectrum.mjs?v=0.12.0-r8';
+import {hullWaterGLSL} from './deck-water.mjs?v=0.13.0';
+import {seaHeightGLSL} from './sea-spectrum.mjs?v=0.13.0';
 // Shared atmosphere and ocean functions keep lighting and reflections consistent.
 export const common=`
 precision highp float;precision highp int;
@@ -63,7 +63,8 @@ void main(){if(uReflectionPass>.5&&vWorld.y<.04)discard;
  vec2 uv=localN.y>.65?vLocal.xz:localN.x>.65?vLocal.zy:vLocal.xy;
  float grain=noise(uv*48.),macro=fbm(uv*.7),vertical=1.-abs(n.y),painted=step(.34,vColor.r),glass=1.-step(.145,vSurface.x),detail=step(.5,uKind)*(1.-glass);
  float rust=0.,seam=0.,height=0.;vec3 base=pow(vColor,vec3(2.2));float rough=clamp(vSurface.x,.08,.98);
- if(uKind>.5&&uKind<1.5){
+ if(vSurface.y< -1.5){base=pow(vColor,vec3(2.2))*(.82+.28*noise(vWorld.xz*8.));rough=.98;height=(grain-.5)*.001;
+ }else if(uKind>.5&&uKind<1.5){
   float drip=noise(vec2(uv.x*5.8,uv.y*.42))*noise(vec2(uv.x*18.,uv.y*.15)),salt=smoothstep(.53,.8,fbm(uv*vec2(1.8,5.)));
   rust=smoothstep(.41,.67,drip+macro*.25)*painted*vertical*.58;
   float panelX=abs(fract(vLocal.x/1.9+.2)-.5),panelY=abs(fract(vLocal.y/.85)-.5);
@@ -95,7 +96,7 @@ void main(){if(uReflectionPass>.5&&vWorld.y<.04)discard;
  vec3 reflected=sky(reflect(-v,n));vec3 F=f0+(1.-f0)*pow(1.-max(.01,dot(n,v)),5.);c+=reflected*F*(1.-rough*.65)*contact;
  if(glass>.5){float interior=.25+.25*noise(vLocal.xz*5.);c=base*ambient*interior*.2+reflected*(.07+.72*pow(1.-max(0.,dot(n,v)),4.));}
  // Negative surface emission marks matte earth/shore banks; buildings keep their own materials.
- if(uKind>3.5&&vSurface.y<-.5)c=base*(ambient+vec3(1.1)*max(0.,dot(n,l))*uDaylight*(1.-uWeather.w*.65));
+ if(vSurface.y< -1.5||(uKind>3.5&&vSurface.y<-.5))c=base*(ambient+vec3(1.1)*max(0.,dot(n,l))*uDaylight*(1.-uWeather.w*.65));
  c+=base*directLamps(vWorld,n,v);c+=vColor*max(0.,vSurface.y)*2.*(uKind>1.5&&uKind<2.5?max(.12,1.-uDaylight):uLights);
  outColor=vec4(finishColor(c,vWorld),1.);}`;
 export const depthVertex=`#version 300 es

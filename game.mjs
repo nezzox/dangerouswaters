@@ -1,14 +1,15 @@
-import {WORLD_LAND,WORLD_CENTER,WORLD_BOUNDS,PLACES,worldToGeo} from './world.mjs?v=0.12.0-r8';
-import {getLanguage,setLanguage,translateText,localizeTree} from './i18n.mjs?v=0.12.0-r8';
-import {createShop} from './shop.mjs?v=0.12.0-r8';
-import {restoreSeason,seasonJSON} from './saves.mjs?v=0.12.0-r8';
-import {vesselStats,toggleAutomation} from './career.mjs?v=0.12.0-r8';
-import {createGame,step,conditions,weatherAt,depthAt,grounds,PORT,distance,nearPort,handlePot,dock,service,rescue,clamp,potAction,POT_RANGE,jobProgress,setAutopilot,potBearing,workingSide} from './simulation.mjs?v=0.12.0-r8';
-import {createOcean,drawFallback} from './ocean.mjs?v=0.12.0-r8';
-import {createScene} from './scene.mjs?v=0.12.0-r8';
-import {createChartView,chartPoint,chartWorld,panChart,zoomChart,followVessel,updateChartFollow} from './chart.mjs?v=0.12.0-r8';
-import {createWake} from './wake.mjs?v=0.12.0-r8';
-import {advanceVoyage} from './voyage.mjs?v=0.12.0-r8';
+import {createSoundscape} from './soundscape.mjs?v=0.13.0';
+import {WORLD_LAND,WORLD_CENTER,WORLD_BOUNDS,PLACES,worldToGeo} from './world.mjs?v=0.13.0';
+import {getLanguage,setLanguage,translateText,localizeTree} from './i18n.mjs?v=0.13.0';
+import {createShop} from './shop.mjs?v=0.13.0';
+import {restoreSeason,seasonJSON} from './saves.mjs?v=0.13.0';
+import {vesselStats,toggleAutomation} from './career.mjs?v=0.13.0';
+import {createGame,step,conditions,weatherAt,depthAt,grounds,PORT,distance,nearPort,handlePot,dock,service,rescue,clamp,potAction,POT_RANGE,jobProgress,setAutopilot,potBearing,workingSide} from './simulation.mjs?v=0.13.0';
+import {createOcean,drawFallback} from './ocean.mjs?v=0.13.0';
+import {createScene} from './scene.mjs?v=0.13.0';
+import {createChartView,chartPoint,chartWorld,panChart,zoomChart,followVessel,updateChartFollow} from './chart.mjs?v=0.13.0';
+import {createWake} from './wake.mjs?v=0.13.0';
+import {advanceVoyage} from './voyage.mjs?v=0.13.0';
 const wake=createWake();
 const $=id=>document.getElementById(id),canvas=$('world'),ctx=canvas.getContext('2d'),sea=$('ocean'),chart=$('chart'),map=chart.getContext('2d');
 const sandbox=document.body.dataset.sandbox==='true';
@@ -71,7 +72,7 @@ for(const [id,key] of [['auto-deploy','autoDeploy'],['auto-haul','autoHaul']])$(
 $('fishery').onchange=e=>{if(state.deckJob){e.target.value=state.career.fishing;return;}state.career.fishing=e.target.value==='salmon'&&vesselStats(state).salmon?'salmon':'crab';save();updateUI();canvas.focus();};
 // Sound is synthesized after an explicit gesture; no sound files or network requests.
 let audio=null,soundOn=false;
-$('sound').onclick=()=>{soundOn=!soundOn;if(!audio){const ac=new AudioContext(),motor=ac.createOscillator(),gain=ac.createGain(),filter=ac.createBiquadFilter();motor.type='sawtooth';motor.frequency.value=32;filter.type='lowpass';filter.frequency.value=150;gain.gain.value=0;motor.connect(filter).connect(gain).connect(ac.destination);motor.start();const buffer=ac.createBuffer(1,ac.sampleRate*3,ac.sampleRate),data=buffer.getChannelData(0);for(let i=0;i<data.length;i++)data[i]=(Math.random()*2-1)*.3;const wind=ac.createBufferSource(),wg=ac.createGain(),wf=ac.createBiquadFilter();wind.buffer=buffer;wind.loop=true;wf.type='lowpass';wf.frequency.value=650;wg.gain.value=0;wind.connect(wf).connect(wg).connect(ac.destination);wind.start();audio={ac,motor,gain,wg};}audio.ac.resume();$('sound').textContent=soundOn?'SOUND ON':'SOUND OFF';$('sound').setAttribute('aria-pressed',String(soundOn));};
+$('sound').onclick=()=>{soundOn=!soundOn;if(!audio)audio=createSoundscape();audio.resume();$('sound').textContent=soundOn?'SOUND ON':'SOUND OFF';$('sound').setAttribute('aria-pressed',String(soundOn));};
 function updateUI(){
  const stats=vesselStats(state);$('scene').setAttribute('aria-label',`Three-dimensional view of the sea and ${stats.name}`);canvas.setAttribute('aria-label',`Sea and fishing vessel ${stats.name}`);$('speed-target').max=Math.ceil(stats.top*1.94384);$('vessel-name').textContent='F/V '+stats.name.toUpperCase();$('watermark-name').textContent='F/V '+stats.name.toUpperCase();$('vessel-type').textContent=`${stats.length.toFixed(1)} M · ${stats.type.toUpperCase()} · ${stats.crew} CREW`;
  const w=conditions(state),heading=((state.heading*180/Math.PI+90)%360+360)%360;
@@ -140,7 +141,7 @@ function frame(now){const wallDt=Math.max(0,(now-last)/1000),dt=Math.min(wallDt,
  if(started&&!state.paused){if(keys.has('KeyW')||keys.has('ArrowUp'))state.desiredKnots=clamp((state.desiredKnots||0)+dt*2,-3,Math.ceil(vesselStats(state).top*1.94384));if(keys.has('KeyS')||keys.has('ArrowDown'))state.desiredKnots=clamp((state.desiredKnots||0)-dt*2.5,-3,Math.ceil(vesselStats(state).top*1.94384));state.rudder=(keys.has('KeyD')||keys.has('ArrowRight')?1:0)-(keys.has('KeyA')||keys.has('ArrowLeft')?1:0);elapsed=advanceVoyage(state,wake,dt,timeSpeed);}
  clock+=started?elapsed:dt;
  view.x+=(state.x-view.x)*(1-Math.exp(-dt*2));view.y+=(state.y-view.y)*(1-Math.exp(-dt*2));const targetWeather=conditions(state);for(const k of ['wind','waves','fog','rain','front'])visualWeather[k]+=(targetWeather[k]-visualWeather[k])*(1-Math.exp(-dt*.4));const w=visualWeather;const renderKey=[clock,width,height,cameraZoom,cameraOverhead,state.paused,state.x,state.y,state.heading,state.deck,state.career.boat,state.lights,...[w.waves,w.fog,w.rain].map(n=>n.toFixed(2))].join('/');if(!state.paused||renderKey!==lastRenderKey){lastRenderKey=renderKey;ctx.clearRect(0,0,width,height);if(scene3D){scene3D.draw(state,w,clock,width,height,dpr,wake);drawBuoyLabels();drawLightGlows();}else{if(gpu)renderer.draw(state,w,clock,view);else drawFallback(ctx,w,clock,view,width,height);drawWakeFallback();drawGrounds();drawHarbor();drawPots(clock);drawBoat(w,clock);}atmosphere(w,clock);}
- if(audio){const enabled=soundOn&&!state.paused;audio.gain.gain.setTargetAtTime(enabled?.025+Math.abs(state.throttle)*.025:0,audio.ac.currentTime,.3);audio.motor.frequency.setTargetAtTime(28+Math.abs(state.throttle)*28,audio.ac.currentTime,.3);audio.wg.gain.setTargetAtTime(enabled?w.wind*.0015:0,audio.ac.currentTime,.5);}
+ if(audio)audio.update(state,w,soundOn);
  uiTimer+=dt;toastAge+=dt;saveTimer+=dt;if(uiTimer>.2){updateUI();uiTimer=0;$('renderer').title=`${sceneError||renderer.label} · ${Math.round(fps)} FPS`;}if(saveTimer>10&&started&&!document.hidden){save();saveTimer=0;}requestAnimationFrame(frame);
 }
 updateUI();requestAnimationFrame(frame);
