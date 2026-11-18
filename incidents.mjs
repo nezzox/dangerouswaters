@@ -1,0 +1,18 @@
+const types=[
+ ['engine','Engine room',['Fuel filter blockage','Cooling pump failure','Injector fault','Oil pressure loss','Turbo bearing seizure']],
+ ['crane','Deck hydraulics',['Hydraulic hose burst','Hauler clutch jam','Crane overload trip','Winch motor failure','Boom pivot seizure']],
+ ['net','Net equipment',['Net drum jam','Torn headline','Mesh tangled on debris','Net reel brake failure','Seine power-block fault']],
+ ['steering','Steering gear',['Rudder actuator fault','Steering oil leak','Helm cable failure','Rudder bearing jam','Steering pump trip']],
+ ['fuel','Fuel system',['Leaking return line','Water in diesel','Fuel tank vent blockage','Transfer pump leak','Contaminated reserve tank']],
+ ['hull','Hull damage',['Floating timber strike','Loose sea chest cover','Heavy wave deck flooding','Ice impact at waterline','Stern seal leak']],
+ ['catch','Catch handling',['Chiller compressor trip','Hold circulation failure','Catch bin securing failure','Contaminated catch batch','Hold temperature alarm']],
+ ['crew','Crew emergency',['Deckhand sprained wrist','Seasickness outbreak','Crew exhaustion','Galley smoke alarm','Man-overboard recovery drill alarm']],
+ ['electric','Electrical system',['Generator breaker trip','Battery bus fault','Deck lighting short','Alternator belt failure','Main switchboard fault']],
+ ['navigation','Navigation',['GPS receiver failure','Radar drive fault','Autopilot compass drift','Chart plotter blackout','Radio antenna damage']]
+];
+export const INCIDENTS=types.flatMap(([system,group,names],f)=>names.map((name,i)=>({id:`incident-${f+1}-${i+1}`,name,system,group,duration:35+i*28+f*3,cost:500+i*750+f*140,damage:system==='hull'?4+i*3:0,loss:system==='catch'?.04+i*.035:0})));
+export function randomCareer(c){c.seed=(Math.imul(1664525,c.seed)+1013904223)>>>0;return c.seed/4294967296;}
+function announce(s,message){s.message=message;s.log||=[];s.log.unshift({hour:s.hour,text:message});s.log=s.log.slice(0,8);}
+export function triggerIncident(s,id){if(s.incident)return false;const e=INCIDENTS.find(e=>e.id===id);if(!e)return false;s.incident={id:e.id,system:e.system,name:e.name,remaining:e.duration,duration:e.duration,cost:e.cost,lights:s.lights!==false};s.hull=Math.max(1,s.hull-e.damage);if(e.system==='fuel')s.fuel=Math.max(0,s.fuel-25-(e.duration/4));if(e.loss){s.cargo=Math.floor(s.cargo*(1-e.loss));s.salmon=Math.floor((s.salmon||0)*(1-e.loss));}if(['electric','navigation','steering'].includes(e.system))s.autopilot=null;if(e.system==='electric')s.lights=false;s.activity={id:(s.activity?.id||0)+1,kind:'repair'};announce(s,`${e.name}. Crew responding; repair about ${Math.ceil(e.duration)} seconds. Estimated parts ${e.cost.toLocaleString('en-US')} kr.`);return true;}
+export function tickIncidents(s,dt,stats,w){const c=s.career;if(!c)return;if(s.incident){const e=s.incident;s.activity??={id:1,kind:'repair'};e.remaining-=dt*stats.repair;if(e.remaining<=0){s.money-=e.cost*stats.serviceCost;if(e.system==='electric')s.lights=e.lights;s.incident=null;c.nextIncident=(270+randomCareer(c)*360)/stats.risk;announce(s,`${e.name}: repaired by the crew. Parts ${Math.round(e.cost*stats.serviceCost).toLocaleString('en-US')} kr.`);}return;}if(Math.hypot(s.x-160,s.y-80)<230||s.deckJob?.kind==='unload')return;c.nextIncident-=dt*(w.waves>4?1.15:1);if(c.nextIncident<=0){const eligible=INCIDENTS.filter(e=>e.system!=='net'||stats.salmon),e=eligible[Math.floor(randomCareer(c)*eligible.length)];triggerIncident(s,e.id);}}
+export const blocksDeck=s=>!!s.incident&&['crane','electric'].includes(s.incident.system);
