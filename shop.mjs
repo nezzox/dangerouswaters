@@ -1,8 +1,8 @@
-import {boatPreview} from './boat-preview.mjs?v=0.13.0';
-import {translateText,localizeTree,getLanguage,toInternalMoney} from './i18n.mjs?v=0.13.0';
-import {SKILLS,PARTS,BOATS} from './catalog.mjs?v=0.13.0';
-import {buyItem,buyBoat,vesselStats,tradeValue,inHarbor,shopReady,takeLoan,creditLimit} from './career.mjs?v=0.13.0';
-import {answerCaptain,fleetStats} from './fleet.mjs?v=0.13.0';
+import {boatPreview} from './boat-preview.mjs?v=0.14.0';
+import {translateText,localizeTree,getLanguage,toInternalMoney} from './i18n.mjs?v=0.14.0';
+import {SKILLS,PARTS,BOATS} from './catalog.mjs?v=0.14.0';
+import {buyItem,buyBoat,vesselStats,tradeValue,inHarbor,shopReady,takeLoan,creditLimit} from './career.mjs?v=0.14.0';
+import {answerCaptain,fleetStats} from './fleet.mjs?v=0.14.0';
 const kr=n=>`${Math.round(n).toLocaleString('en-US')} kr`;
 const node=(tag,text,className)=>{const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(className)el.className=className;return el;};
 export function createShop(getState,onChange){

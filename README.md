@@ -2,7 +2,7 @@
 
 Play: https://nezzox.github.io/dangerouswaters/
 
-Version 0.13 adds a Ballyhoo Road-inspired industrial waterfront and a louder, weather-driven ambient soundscape. Version 0.12 adds geographic coastlines around the Bering Sea and Dutch Harbor, smoother local coastal relief, hull-clipped ocean water with thin deck wash, previews rendered from all 100 vessel models, and a black Ko-fi support button. Harbor services provide fuel and repairs; equipment purchases belong in the shop. Terrain elevations remain illustrative.
+Version 0.14 replaces the retired timber docks with the geographic service quay and adds slow, water-only crab migration. Version 0.13 adds a Ballyhoo Road-inspired industrial waterfront and a louder, weather-driven ambient soundscape. Version 0.12 adds geographic coastlines around the Bering Sea and Dutch Harbor, smoother local coastal relief, hull-clipped ocean water with thin deck wash, previews rendered from all 100 vessel models, and a black Ko-fi support button. Harbor services provide fuel and repairs; equipment purchases belong in the shop. Terrain elevations remain illustrative.
 
 A local crab fishing game on the Bering Sea. Version 0.10 replaces the inflated patchwork water with compressed directional swell, filtered irregular wind ripples, thinner moving crest foam, and corrected overcast reflections. Boat buoyancy and suspended fenders now have damped motion, and the fender ropes are slender curved lines. Setting and hauling both work while moving below 5 knots. Three separate time buttons select ×1, ×5 or ×15, Center Vessel enables continuous chart following, full-hull harbor clearance prevents pier penetration, and animated dock staff receive crates and push a trolley.
 

@@ -1,15 +1,17 @@
-import {createSoundscape} from './soundscape.mjs?v=0.13.0';
-import {WORLD_LAND,WORLD_CENTER,WORLD_BOUNDS,PLACES,worldToGeo} from './world.mjs?v=0.13.0';
-import {getLanguage,setLanguage,translateText,localizeTree} from './i18n.mjs?v=0.13.0';
-import {createShop} from './shop.mjs?v=0.13.0';
-import {restoreSeason,seasonJSON} from './saves.mjs?v=0.13.0';
-import {vesselStats,toggleAutomation} from './career.mjs?v=0.13.0';
-import {createGame,step,conditions,weatherAt,depthAt,grounds,PORT,distance,nearPort,handlePot,dock,service,rescue,clamp,potAction,POT_RANGE,jobProgress,setAutopilot,potBearing,workingSide} from './simulation.mjs?v=0.13.0';
-import {createOcean,drawFallback} from './ocean.mjs?v=0.13.0';
-import {createScene} from './scene.mjs?v=0.13.0';
-import {createChartView,chartPoint,chartWorld,panChart,zoomChart,followVessel,updateChartFollow} from './chart.mjs?v=0.13.0';
-import {createWake} from './wake.mjs?v=0.13.0';
-import {advanceVoyage} from './voyage.mjs?v=0.13.0';
+import {clipChartWater} from './chart-water.mjs?v=0.14.0';
+import {groundsAt} from './fishing-grounds.mjs?v=0.14.0';
+import {createSoundscape} from './soundscape.mjs?v=0.14.0';
+import {WORLD_LAND,WORLD_CENTER,WORLD_BOUNDS,PLACES,worldToGeo} from './world.mjs?v=0.14.0';
+import {getLanguage,setLanguage,translateText,localizeTree} from './i18n.mjs?v=0.14.0';
+import {createShop} from './shop.mjs?v=0.14.0';
+import {restoreSeason,seasonJSON} from './saves.mjs?v=0.14.0';
+import {vesselStats,toggleAutomation} from './career.mjs?v=0.14.0';
+import {createGame,step,conditions,weatherAt,depthAt,PORT,distance,nearPort,handlePot,dock,service,rescue,clamp,potAction,POT_RANGE,jobProgress,setAutopilot,potBearing,workingSide} from './simulation.mjs?v=0.14.0';
+import {createOcean,drawFallback} from './ocean.mjs?v=0.14.0';
+import {createScene} from './scene.mjs?v=0.14.0';
+import {createChartView,chartPoint,chartWorld,panChart,zoomChart,followVessel,updateChartFollow} from './chart.mjs?v=0.14.0';
+import {createWake} from './wake.mjs?v=0.14.0';
+import {advanceVoyage} from './voyage.mjs?v=0.14.0';
 const wake=createWake();
 const $=id=>document.getElementById(id),canvas=$('world'),ctx=canvas.getContext('2d'),sea=$('ocean'),chart=$('chart'),map=chart.getContext('2d');
 const sandbox=document.body.dataset.sandbox==='true';
@@ -98,7 +100,7 @@ function drawChart(){
  map.fillStyle='#34433a';map.strokeStyle='#729082';map.lineWidth=.7;for(const land of WORLD_LAND){if(land.left>hi.x||land.right<lo.x||land.top>hi.y||land.bottom<lo.y)continue;map.beginPath();for(const ring of [land.outer,...land.holes]){ring.forEach((v,i)=>{const p=point(v.x,v.y);i?map.lineTo(p.x,p.y):map.moveTo(p.x,p.y);});map.closePath();}map.fill('evenodd');map.stroke();}
  const nw=point(WORLD_BOUNDS.left,WORLD_BOUNDS.top),se=point(WORLD_BOUNDS.right,WORLD_BOUNDS.bottom);map.strokeStyle='#8ba6a066';map.setLineDash([5,5]);map.strokeRect(nw.x,nw.y,se.x-nw.x,se.y-nw.y);map.setLineDash([]);
  for(const place of PLACES){if(place.name==='Dutch Harbor')continue;if(scale<.0004&&['Unalaska','Amaknak Island','Unalaska Island','Akutan','Akutan Island','Unimak Island'].includes(place.name))continue;if(scale>.001&&place.name!=='Dutch Harbor'&&Math.hypot(place.x-state.x,place.y-state.y)>20000)continue;const p=point(place.x,place.y);if(p.x<0||p.x>cw||p.y<0||p.y>ch)continue;map.fillStyle='#afc1b3';map.font='8px monospace';map.fillText(place.name,p.x+4,p.y-4);}
- for(const g of grounds){const p=point(g.x,g.y);map.strokeStyle='#6d9c8d77';map.setLineDash([3,4]);map.beginPath();map.ellipse(p.x,p.y,4000*scale,2600*scale,-.4,0,Math.PI*2);map.stroke();map.setLineDash([]);map.fillStyle='#80a99b';map.font='7px monospace';if(scale>.0002)map.fillText(g.name,p.x-25,p.y+2600*scale+10);}
+ map.save();clipChartWater(map,point,cw,ch);for(const g of groundsAt(state.hour)){const p=point(g.x,g.y);map.strokeStyle='#6d9c8d77';map.setLineDash([3,4]);map.beginPath();map.ellipse(p.x,p.y,g.rx*scale,g.ry*scale,g.angle,0,Math.PI*2);map.fillStyle='#6d9c8d18';map.fill();map.stroke();map.setLineDash([]);map.fillStyle='#80a99b';map.font='7px monospace';if(scale>.0002)map.fillText(g.name,p.x-25,p.y+5);}map.restore();
  const port=point(PORT.x,PORT.y);map.fillStyle='#d8d9c8';map.fillRect(port.x-3,port.y-3,6,6);map.font='7px monospace';map.fillText('DUTCH HARBOR',port.x-28,port.y+13);
  for(const pot of state.pots){const p=point(pot.x,pot.y),ready=distance(state,pot)<POT_RANGE&&workingSide(state,pot);map.strokeStyle=ready?'#9dd7ae':'#e4ac6477';map.beginPath();map.arc(p.x,p.y,POT_RANGE*scale,0,Math.PI*2);map.stroke();map.fillStyle=ready?'#9dd7ae':'#e4ac64';map.beginPath();map.arc(p.x,p.y,2.5,0,Math.PI*2);map.fill();if(scale>.12){map.font='8px monospace';map.fillText(String(pot.id),p.x+5,p.y-5);}}
  for(const fleet of state.career.fleet){map.fillStyle=fleet.color;map.strokeStyle=fleet.color;for(const pot of fleet.pots){const p=point(pot.x,pot.y);map.beginPath();map.arc(p.x,p.y,2,0,Math.PI*2);map.fill();}const p=point(fleet.x,fleet.y);map.save();map.translate(p.x,p.y);map.rotate(fleet.heading);map.beginPath();map.moveTo(6,0);map.lineTo(-4,-3);map.lineTo(-4,3);map.closePath();map.fill();map.restore();if(scale>.08){map.font='8px monospace';map.fillText(fleet.name,p.x+7,p.y-5);}}
@@ -108,7 +110,7 @@ function drawChart(){
  $('chart-status').textContent=state.autopilot?`AUTOPILOT · ${Math.round(distance(state,state.autopilot))} M TO DESTINATION`:`SCROLL: ZOOM · DRAG: PAN · RIGHT CLICK: AP`;$('ap-cancel').disabled=!state.autopilot;map.fillStyle='#9db3b3';map.font='7px monospace';const bar=Math.min(70,cw/3),meters=Math.round(bar/scale);map.fillRect(10,ch-12,bar,1);map.fillText(meters>=1852?`${(meters/1852).toFixed(1)} NM`:`${meters} M`,10,ch-17);
 }
 function drawHarbor(){ctx.fillStyle='#34433a';ctx.strokeStyle='#729082';for(const land of WORLD_LAND){ctx.beginPath();for(const ring of [land.outer,...land.holes]){ring.forEach((v,i)=>{const p=pos(v.x,v.y);i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y);});ctx.closePath();}ctx.fill('evenodd');ctx.stroke();}}
-function drawGrounds(){for(const g of grounds){const p=pos(g.x,g.y);if(p.x< -200||p.x>width+200||p.y< -200||p.y>height+200)continue;ctx.save();ctx.strokeStyle='#8db8a626';ctx.setLineDash([3,15]);ctx.beginPath();ctx.ellipse(p.x,p.y,220*view.scale,160*view.scale,-.4,0,Math.PI*2);ctx.stroke();ctx.fillStyle='#b8d0bd77';ctx.textAlign='center';ctx.font='9px monospace';ctx.fillText(g.name,p.x,p.y-170*view.scale);ctx.restore();}}
+function drawGrounds(){ctx.save();clipChartWater(ctx,pos,width,height);for(const g of groundsAt(state.hour)){const p=pos(g.x,g.y);if(p.x< -200||p.x>width+200||p.y< -200||p.y>height+200)continue;ctx.save();ctx.strokeStyle='#8db8a626';ctx.setLineDash([3,15]);ctx.beginPath();ctx.ellipse(p.x,p.y,g.rx*view.scale,g.ry*view.scale,g.angle,0,Math.PI*2);ctx.stroke();ctx.fillStyle='#b8d0bd77';ctx.textAlign='center';ctx.font='9px monospace';ctx.fillText(g.name,p.x,p.y);ctx.restore();}ctx.restore();}
 function drawPots(t){for(const pot of state.pots){const p=pos(pot.x,pot.y);ctx.save();ctx.translate(p.x,p.y+Math.sin(t*2+pot.id)*2);ctx.save();ctx.strokeStyle=distance(state,pot)<POT_RANGE?'#a8dcb7aa':'#e4ac6455';ctx.setLineDash([5,6]);ctx.beginPath();ctx.arc(0,0,POT_RANGE*view.scale,0,Math.PI*2);ctx.stroke();ctx.restore();ctx.strokeStyle='#cdbd9b66';ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(-12,20);ctx.stroke();ctx.shadowBlur=8;ctx.shadowColor='#edb56d66';ctx.fillStyle='#e5a352';ctx.beginPath();ctx.ellipse(0,0,5,8,Math.sin(t)*.1,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.fillStyle='#f2e4bf';ctx.fillRect(-3,-2,6,3);ctx.fillStyle='#d3d9c8';ctx.font='8px monospace';ctx.fillText(`${String(pot.id).padStart(2,'0')} · ${(state.hour-pot.setAt).toFixed(1)} h`,10,-5);ctx.restore();}}
 function drawWakeFallback(){for(const p of wake.points){const screen=pos(p.x,p.z),age=wake.time-p.born;ctx.save();ctx.translate(screen.x,screen.y);ctx.rotate(p.heading);ctx.strokeStyle=`rgba(190,215,217,${Math.max(0,1-age/42)*.2})`;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(0,0,10+age*.4,4+age*.6,0,0,Math.PI*2);ctx.stroke();ctx.restore();}}
 function boatPath(){ctx.beginPath();ctx.moveTo(54,0);ctx.bezierCurveTo(43,-10,31,-15,13,-16);ctx.lineTo(-49,-16);ctx.lineTo(-55,-11);ctx.lineTo(-55,11);ctx.lineTo(-49,16);ctx.lineTo(13,16);ctx.bezierCurveTo(31,15,43,10,54,0);ctx.closePath();}

@@ -6,6 +6,14 @@ export function setLanguage(value){language=value==='sv'?'sv':'en';return langua
 export const toInternalMoney=(amount,locale=language)=>amount*(locale==='sv'?1:10);
 export function formatMoney(amount,locale=language){const sv=locale==='sv',n=amount/(sv?1:10),fraction=Math.abs(n-Math.round(n))>.000001;return new Intl.NumberFormat(sv?'sv-SE':'en-US',{style:'currency',currency:sv?'SEK':'USD',minimumFractionDigits:fraction?2:0,maximumFractionDigits:2}).format(n);}
 const sv={
+ 'Crab grounds migrate slowly over game days and remain in water.':'Krabbfälten vandrar långsamt över speldagarna och håller sig i vattnet.',
+ 'Clearing the quay':'Lämnar kajkanten',
+ 'Closing alongside the quay':'Lägger till vid kajen',
+ 'Aligning clear of the quay':'Riktar in båten utanför kajen',
+ 'Approaching the service quay':'Närmar sig servicekajen',
+ 'Aligning alongside the quay':'Riktar in längs kajen',
+ 'No clear approach to the service quay. Move farther offshore.':'Ingen fri väg till servicekajen. Gå längre ut från land.',
+
  'Dutch Harbor':'Dutch Harbor',
 
  'BERING SEA':'BERINGS HAV','ISLANDS':'ÖAR','Chart area':'Kartområde','Preview of':'Förhandsvisning av','Preview unavailable':'Förhandsvisning saknas','No navigable route to destination. Choose a point in open water.':'Ingen farbar rutt till destinationen. Välj en punkt på öppet vatten.','Geographic chart updated. Fishing gear preserved; positions on land moved to nearby water.':'Det geografiska sjökortet är uppdaterat. Redskapen är bevarade; positioner på land har flyttats till närliggande vatten.',

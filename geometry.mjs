@@ -1,4 +1,4 @@
-import {HULL_STATIONS,hullWidthAt} from './fenders.mjs?v=0.13.0';
+import {HULL_STATIONS,hullWidthAt} from './fenders.mjs?v=0.14.0';
 const steel=[.19,.24,.25],paint=[.68,.7,.64],dark=[.045,.08,.1],glass=[.055,.13,.17],brass=[.43,.31,.13],orange=[.72,.29,.065];
 export function geometry(){const data=[];
  function tri(a,b,c,color,rough=.6,emit=0){const u=b.map((x,i)=>x-a[i]),v=c.map((x,i)=>x-a[i]),n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]],len=Math.hypot(...n);if(len<1e-8)return;for(const p of [a,b,c])data.push(...p,...n.map(x=>x/len),...color,rough,emit);}
@@ -73,16 +73,6 @@ export function buildVessel(potCount=8,design={}){const paint=design.color?[.42+
  box(10,2.1,0,.9,.5,1.1,steel);tube([9.4,2.3,-.5],[11.7,1.3,-.5],.05,steel);
  for(let i=0;i<24;i++){const a=i*Math.PI/12,b=(i+1)*Math.PI/12;tube([8.25+Math.cos(a)*.5,1.84,1.1+Math.sin(a)*.5],[8.25+Math.cos(b)*.5,1.84,1.1+Math.sin(b)*.5],.07,[.48,.45,.29],5);}
  return g.array();}
-export function buildHarbor(){const {box,tube,quad,tri,roundedBox,array}=geometry();
- for(let i=0;i<4;i++){const z=-200+i*145;box(-65,1.3,z,310,1.6,7,[.25,.23,.18],.8);box(-65,2.16,z,310,.14,6.8,[.36,.33,.25],.85);for(let x=-210;x<90;x+=25){tube([x,-4,z-2.5],[x,2.2,z-2.5],.3,[.19,.21,.18]);tube([x,-4,z+2.5],[x,2.2,z+2.5],.3,[.19,.21,.18]);}tube([80,2.,z],[80,9.,z],.1,steel);box(80,9.1,z,.8,.2,.5,[1.,.71,.35],.4,1.3);}
- for(let i=0;i<5;i++){const z=-300+i*125;box(-260,7,z,40,12,26,[.26,.3,.27],.9);quad([-282,13,z-15],[-282,17,z],[-238,17,z],[-238,13,z-15],[.25,.29,.29],.7);quad([-282,17,z],[-282,13,z+15],[-238,13,z+15],[-238,17,z],[.3,.34,.34],.7);tri([-239.9,13,z-13],[-239.9,17,z],[-239.9,13,z+13],[.26,.3,.27]);for(let zz=z-13;zz<=z+13;zz+=2)box(-239.9,8,zz,.12,10,.06,[.15,.19,.17]);box(-239.75,5,z, .15,7,8,[.14,.17,.17]);for(let j=0;j<6;j++)box(-239.8,7,z-10+j*4,.1,2,2,glass,.1);}
- // Pier fittings, receiving shed, cold store and lattice cargo cranes.
- for(const z of [-200,-55,90,235]){for(let x=-200;x<88;x+=8){box(x,2.25,z, .12,.06,6.8,[.19,.2,.18]);if(x%16===-8){tube([x,2.2,z+3],[x,2.65,z+3],.15,steel,12);tube([x-.4,2.6,z+3],[x+.4,2.6,z+3],.08,steel);}}for(let x=-180;x<80;x+=12)tube([x,.3,z-3.7],[x,1.7,z-3.7],.42,dark,16);}
- box(49,2.9,90,3,1.5,3,[.28,.34,.32]);box(49,3.7,90,3.3,.1,3.3,steel);box(10,4.5,90,22,4.5,6,[.33,.37,.35]);box(10,6.9,90,24,.35,7,steel);for(let x=0;x<21;x+=4)box(x,4.8,86.95,2.8,1.4,.1,glass,.1);
- for(const z of [-55,90,235]){const x=60;box(x,2.5,z,5,1,5,steel);for(const dx of [-1.5,1.5])for(const dz of [-1.5,1.5])tube([x+dx,3,z+dz],[x+dx*.4,18,z+dz*.4],.18,orange,10);for(let y=4;y<17;y+=2){tube([x-1, y,z-1],[x+1,y+2,z+1],.09,steel);tube([x+1,y,z-1],[x-1,y+2,z+1],.09,steel);}box(x,16,z,3,3,3,orange);box(x+.2,16.4,z-1.55,1.9,1.1,.1,glass,.08);if(z!==90){tube([x,18,z],[x-9,18,z+5],.35,orange,12);tube([x-9,18,z+5],[x,21,z],.06,steel);}}
- for(let i=0;i<12;i++){const x=-270-(i%3)*25,z=-380+Math.floor(i/3)*190;box(x,4,z,20,4,9,i%2?[.24,.33,.34]:[.4,.2,.13]);for(let j=-9;j<10;j+=1.2)box(x+j,4,z+4.55,.08,3.8,.08,steel);}
- for(const z of [-55,90,235]){for(let x=-190;x<85;x+=2.2)box(x,2.245,z,.035,.025,6.7,[.16,.17,.15],.92);for(const x of [-35,-28,-21])for(let j=0;j<3;j++)roundedBox(x,2.8+j*.85,z,1.4,.8,1.1,.08,[.18,.32,.31],.8);for(let x=33;x<56;x+=1.5)box(x,2.26,z-2.9,.65,.025,.22,[.67,.51,.16],.85);}
- return array();}
 export function buildBuoy(){const g=geometry();g.tube([0,-.4,0],[0,.9,0],.48,orange,12);g.tube([0,.35,0],[0,.6,0],.5,paint,12);g.tube([0,.9,0],[0,2.1,0],.035,steel);g.box(.35,1.9,0,.7,.35,.025,orange);return g.array();}
 export function buildOceanGrid(size=4000,segments=220){const data=new Float32Array(segments*segments*18),half=size/2;let k=0;for(let z=0;z<segments;z++)for(let x=0;x<segments;x++){const coord=v=>Math.sinh((v/segments*2-1)*5.5)/Math.sinh(5.5)*half,a=coord(x),b=coord(z),c=coord(x+1),d=coord(z+1);for(const p of [[a,0,b],[a,0,d],[c,0,b],[c,0,b],[a,0,d],[c,0,d]])for(const v of p)data[k++]=v;}return data;}
 
