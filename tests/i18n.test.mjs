@@ -1,0 +1,10 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {translateText,formatMoney,toInternalMoney,setLanguage,getLanguage} from '../i18n.mjs';
+import {SKILLS,PARTS,BOATS} from '../catalog.mjs';
+import {INCIDENTS} from '../incidents.mjs';
+import {createGame} from '../simulation.mjs';
+test('English uses USD and Swedish uses SEK at a fixed game exchange rate without changing the saved balance',()=>{const s=createGame(),money=s.money;assert.equal(formatMoney(48000,'en'),'$4,800');assert.match(formatMoney(48000,'sv'),/48\s*000\s*kr/);assert.equal(formatMoney(9.5,'en'),'$0.95');for(let i=0;i<10;i++){setLanguage('sv');translateText('Balance 48,000 kr');setLanguage('en');translateText('Balance 48,000 kr');}assert.equal(s.money,money);assert.equal(toInternalMoney(1000,'en'),10000);assert.equal(toInternalMoney(1000,'sv'),1000);});
+test('money in purchases, receipts, refunds and negative balances is consistently localized',()=>{for(const text of ['BUY · 4,500 kr','Loan 10,000 kr received.','Payment +1,201 kr.','Balance -500 kr','9.50 kr / liter'])assert(!/\bkr\b/.test(translateText(text,'en')),text);assert.match(translateText('BUY · 4,500 kr','en'),/\$450/);assert.match(translateText('Balance -500 kr','en'),/-\$50/);});
+test('catalog descriptions and all 50 incident names have Swedish translations',()=>{for(const x of [...SKILLS,...PARTS,...BOATS])assert.notEqual(translateText(x.description,'sv'),x.description,x.id);for(const x of INCIDENTS)assert.notEqual(translateText(x.name,'sv'),x.name,x.id);assert.equal(translateText('HARBOR SHOP','sv'),'HAMNBUTIK');assert.equal(translateText('Pause game','sv'),'Pausa spelet');});
+test('invalid language falls back to English and proper vessel names are preserved',()=>{setLanguage('invalid');assert.equal(getLanguage(),'en');assert.equal(translateText('Nordvind','sv'),'Nordvind');assert.match(translateText('Backing into the berth · 40 s','sv'),/Backar in/);});
