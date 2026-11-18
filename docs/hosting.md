@@ -54,3 +54,5 @@ EXPAND on the chart opens a larger native dialog and pauses the simulation until
 A/D taps change the rudder by two degrees; holding a key continues adjusting at 12 degrees per real second. Release retains the selected angle, bounded to ±35 degrees. Use X or CENTER to zero it, or use the rudder slider for precise settings. The indicator also displays autopilot rudder commands. Weather selection has been removed from the player interface; new and imported seasons use dynamic weather. Developer-only visual fixtures can still force weather to reproduce rendering issues.
 
 0.15.1: Auto set uses the displayed 80 m interaction ring. Auto haul searches all soaked pots on the working side instead of being blocked by a nearer fresh pot. Both retain the below-5-knot, equipment, crew and cargo checks.
+
+0.15.2: Routine player and hired-captain fuel consumption doubled from 1/50 to 1/25 of the original rate. Hull wear and incident frequency are unchanged.
