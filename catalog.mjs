@@ -1,6 +1,6 @@
 // Five cumulative ranks per discipline/system: all 300 entries have gameplay effects.
 export const SKILL_SYSTEMS=[
- ['autoDeploy','Automatic pot setting','Automation',4500,'Unlock auto set; higher ranks tighten safe spacing by 10 m'],
+ ['autoDeploy','Automatic pot setting','Automation',4500,'Automatically set pots after clearing the buoy range ring'],
  ['autoHaul','Automatic pot retrieval','Automation',6500,'Unlock auto haul; higher ranks reduce minimum soak by 0.2 h'],
  ['work','Deck teamwork','Crew',3500,'All deck operations 8% faster per rank'],
  ['deploy','Pot rigging','Crew',2800,'Setting pots 10% faster per rank'],
