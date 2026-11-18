@@ -1,0 +1,6 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {inverseTransform,identity,multiply,transform} from '../math3d.mjs';
+import {insideHullWater,createDeckWater,stepDeckWater} from '../deck-water.mjs';
+test('inverse hull transform remains correct with heave, pitch, roll and nonuniform ship scale',()=>{const m=transform(183,2,-847,.6,.2,-.3);for(let i=0;i<3;i++){m[i]*=1.8;m[4+i]*=1.2;m[8+i]*=1.1;}const result=multiply(m,inverseTransform(m));for(let i=0;i<16;i++)assert(Math.abs(result[i]-identity()[i])<.001);});
+test('ocean is excluded from the hull interior but not the outside waves or above the bow tip',()=>{assert(insideHullWater([-6,3,0]));assert(!insideHullWater([-6,3,5]));assert(!insideHullWater([12,3,1]));assert(!insideHullWater([14,3,0]));});
+test('green water only enters over the rail, stays thin and drains after the crest passes',()=>{const water=createDeckWater();for(let i=0;i<100;i++)stepDeckWater(water,0,0,.05);assert.equal(water.port,0);for(let i=0;i<100;i++)stepDeckWater(water,1.5,0,.05);assert(water.port>0&&water.port<=.09);assert.equal(water.starboard,0);const wet=water.port;for(let i=0;i<300;i++)stepDeckWater(water,0,0,.05);assert(water.port<wet*.01);const before={...water};stepDeckWater(water,2,2,0);assert.deepEqual(water,before);});
