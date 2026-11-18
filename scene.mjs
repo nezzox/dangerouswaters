@@ -1,18 +1,18 @@
-import {buildGeography} from './geography-mesh.mjs?v=0.12.0-r6';
-import {createDeckWater,stepDeckWater} from './deck-water.mjs?v=0.12.0-r6';
-import {dockingStage} from './harbor.mjs?v=0.12.0-r6';
-import {vesselStats} from './career.mjs?v=0.12.0-r6';
-import {boatById} from './catalog.mjs?v=0.12.0-r6';
-import {createBuoyancy,stepBuoyancy} from './buoyancy.mjs?v=0.12.0-r6';
-import {buildFoam} from './foam.mjs?v=0.12.0-r6';
-import {fenderPose,createFenderMotion,stepFenderMotion,ropePoints} from './fenders.mjs?v=0.12.0-r6';
-import {inverseTransform,multiply,transform,perspective,lookAt,identity,project} from './math3d.mjs?v=0.12.0-r6';
-import {buildDeckWash,buildVessel,buildHarbor,buildBuoy,buildOceanGrid,buildCrewParts,buildDeckEquipment} from './geometry.mjs?v=0.12.0-r6';
-import {deckWorkPose} from './deck-work.mjs?v=0.12.0-r6';
-import {createCrew,commandCrew,stepCrew,crewPose} from './crew.mjs?v=0.12.0-r6';
-import * as shaders from './scene-shaders.mjs?v=0.12.0-r6';
-export {seaHeight as surfaceHeight} from './sea-spectrum.mjs?v=0.12.0-r6';
-import {seaHeight as surfaceHeight} from './sea-spectrum.mjs?v=0.12.0-r6';
+import {buildGeography} from './geography-mesh.mjs?v=0.12.0-r8';
+import {createDeckWater,stepDeckWater} from './deck-water.mjs?v=0.12.0-r8';
+import {dockingStage} from './harbor.mjs?v=0.12.0-r8';
+import {vesselStats} from './career.mjs?v=0.12.0-r8';
+import {boatById} from './catalog.mjs?v=0.12.0-r8';
+import {createBuoyancy,stepBuoyancy} from './buoyancy.mjs?v=0.12.0-r8';
+import {buildFoam} from './foam.mjs?v=0.12.0-r8';
+import {fenderPose,createFenderMotion,stepFenderMotion,ropePoints} from './fenders.mjs?v=0.12.0-r8';
+import {inverseTransform,multiply,transform,perspective,lookAt,identity,project} from './math3d.mjs?v=0.12.0-r8';
+import {buildDeckWash,buildVessel,buildHarbor,buildBuoy,buildOceanGrid,buildCrewParts,buildDeckEquipment} from './geometry.mjs?v=0.12.0-r8';
+import {deckWorkPose} from './deck-work.mjs?v=0.12.0-r8';
+import {createCrew,commandCrew,stepCrew,crewPose} from './crew.mjs?v=0.12.0-r8';
+import * as shaders from './scene-shaders.mjs?v=0.12.0-r8';
+export {seaHeight as surfaceHeight} from './sea-spectrum.mjs?v=0.12.0-r8';
+import {seaHeight as surfaceHeight} from './sea-spectrum.mjs?v=0.12.0-r8';
 function ortho(l,r,b,t,n,f){return new Float32Array([2/(r-l),0,0,0,0,2/(t-b),0,0,0,0,-2/(f-n),0,-(r+l)/(r-l),-(t+b)/(t-b),-(f+n)/(f-n),1]);}
 export function createScene(canvas){
  const gl=canvas.getContext('webgl2',{alpha:false,antialias:true,powerPreference:'high-performance'});if(!gl)return null;
