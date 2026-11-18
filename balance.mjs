@@ -1,0 +1,5 @@
+// Voyage balance: preserve upgrades/weather effects while reducing routine losses.
+export const FUEL_SCALE=1/50;
+export const SEA_WEAR_SCALE=1/50;
+export const INCIDENT_INTERVAL_SCALE=50;
+export const INCIDENT_SCHEDULE_VERSION=2;

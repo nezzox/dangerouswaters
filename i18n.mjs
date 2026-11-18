@@ -6,6 +6,11 @@ export function setLanguage(value){language=value==='sv'?'sv':'en';return langua
 export const toInternalMoney=(amount,locale=language)=>amount*(locale==='sv'?1:10);
 export function formatMoney(amount,locale=language){const sv=locale==='sv',n=amount/(sv?1:10),fraction=Math.abs(n-Math.round(n))>.000001;return new Intl.NumberFormat(sv?'sv-SE':'en-US',{style:'currency',currency:sv?'SEK':'USD',minimumFractionDigits:fraction?2:0,maximumFractionDigits:2}).format(n);}
 const sv={
+ 'Route planner':'Ruttplanering','Enlarge chart':'Förstora sjökort','Minimize chart':'Förminska sjökort','Close chart planner':'Stäng ruttplanering','EXPAND':'FÖRSTORA','MINIMIZE':'FÖRMINSKA',
+ 'Scroll to zoom · Drag to pan · Right-click to replace route · Shift + right-click to add a waypoint':'Rulla för zoom · Dra för panorering · Högerklicka för ny rutt · Shift + högerklick lägger till en ruttpunkt',
+ 'Waypoint added to autopilot route.':'Ruttpunkt tillagd i autopilotens rutt.','WAYPOINTS':'RUTTPUNKTER',
+ 'Rudder angle in degrees':'Rodervinkel i grader','X: center rudder':'X: centrera rodret','SET RUDDER':'STÄLL RODER','CENTER':'CENTRERA',
+
  'Crab grounds migrate slowly over game days and remain in water.':'Krabbfälten vandrar långsamt över speldagarna och håller sig i vattnet.',
  'Clearing the quay':'Lämnar kajkanten',
  'Closing alongside the quay':'Lägger till vid kajen',

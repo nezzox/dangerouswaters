@@ -44,3 +44,11 @@ Settings → Pages uses GitHub Actions. The pages.yml workflow runs the Node tes
 
 ## Harbor and audio (0.13)
 Sound remains opt-in via SOUND ON. The new local Web Audio soundscape increases diesel and weather levels, adds layered sea/rain, and fades industrial hum with distance from harbor. Sparse synthesized gull-like calls, hull creaks and distant horns use real audio time rather than the simulation time multiplier. All sound passes through a shared mute bus and compressor; pausing or disabling sound fades the whole bus. The sounds are synthesized approximations, not field recordings.
+
+## Voyage balance (0.14.1)
+Player and captain fuel consumption, including idle use, is now 1/50 of the previous rate. Distance-based captain fuel reserves use the same factor. Passive sea wear is also 1/50; collision impacts and incident damage retain their severity. Incident initial timers and repair-to-next-incident intervals are 50 times longer. Existing saves migrate their pending schedule once, postponing imminent events without changing money, inventory or current repairs. An obsolete x=-220 western damage barrier has been removed; geographic collision remains active.
+
+## Route planner and helm (0.15)
+EXPAND on the chart opens a larger native dialog and pauses the simulation until it closes, preserving the prior pause state. The same chart canvas, pan/zoom/follow controls and coordinate mapping are reused at its actual displayed resolution. Right-click replaces the autopilot route. Shift+right-click appends a water-routed leg from the previous destination; Shift+Enter does the same from the keyboard. The chart draws the actual planned sea path and numbered user waypoints. Manual helm input cancels the route.
+
+A/D taps change the rudder by two degrees; holding a key continues adjusting at 12 degrees per real second. Release retains the selected angle, bounded to ±35 degrees. Use X or CENTER to zero it, or use the rudder slider for precise settings. The indicator also displays autopilot rudder commands. Weather selection has been removed from the player interface; new and imported seasons use dynamic weather. Developer-only visual fixtures can still force weather to reproduce rendering issues.
