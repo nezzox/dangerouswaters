@@ -1,0 +1,3 @@
+export function createBuoyancy(height=0,pitch=0,roll=0){return {height,pitch,roll,vy:0,vp:0,vr:0};}
+// Damped heave/pitch/roll response avoids locking a rigid vessel to every short crest.
+export function stepBuoyancy(body,target,dt){dt=Math.max(0,Math.min(dt,1.5));const count=Math.ceil(dt/.025);for(let i=0;i<count;i++){const h=dt/count;for(const [key,velocity,k,damping,limit] of [['height','vy',12,5,Infinity],['pitch','vp',9,4,.4],['roll','vr',7,3.4,.5]]){body[velocity]+=((target[key]-body[key])*k-body[velocity]*damping)*h;body[key]+=body[velocity]*h;if(Math.abs(body[key])>limit){body[key]=Math.sign(body[key])*limit;body[velocity]=0;}}}return body;}
