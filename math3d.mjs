@@ -1,0 +1,8 @@
+export const identity=()=>new Float32Array([1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]);
+export function multiply(a,b){const o=new Float32Array(16);for(let c=0;c<4;c++)for(let r=0;r<4;r++)for(let k=0;k<4;k++)o[c*4+r]+=a[k*4+r]*b[c*4+k];return o;}
+export function transform(x,y,z,heading=0,pitch=0,roll=0){const c=Math.cos(heading),s=Math.sin(heading),p=Math.cos(pitch),q=Math.sin(pitch),r=Math.cos(roll),v=Math.sin(roll);const yaw=new Float32Array([c,0,s,0,0,1,0,0,-s,0,c,0,x,y,z,1]);const rz=new Float32Array([p,q,0,0,-q,p,0,0,0,0,1,0,0,0,0,1]);const rx=new Float32Array([1,0,0,0,0,r,v,0,0,-v,r,0,0,0,0,1]);return multiply(multiply(yaw,rz),rx);}
+export function perspective(fov,aspect,near,far){const f=1/Math.tan(fov/2),nf=1/(near-far);return new Float32Array([f/aspect,0,0,0,0,f,0,0,0,0,(far+near)*nf,-1,0,0,2*far*near*nf,0]);}
+export function lookAt(eye,target,up=[0,1,0]){const norm=a=>{const l=Math.hypot(...a)||1;return a.map(x=>x/l);},cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],dot=(a,b)=>a.reduce((v,x,i)=>v+x*b[i],0);const z=norm(eye.map((v,i)=>v-target[i])),x=norm(cross(up,z)),y=cross(z,x);return new Float32Array([x[0],y[0],z[0],0,x[1],y[1],z[1],0,x[2],y[2],z[2],0,-dot(x,eye),-dot(y,eye),-dot(z,eye),1]);}
+export function project(m,p,width,height){const v=[...p,1],o=[0,0,0,0];for(let r=0;r<4;r++)for(let k=0;k<4;k++)o[r]+=m[k*4+r]*v[k];return {x:(o[0]/o[3]*.5+.5)*width,y:(.5-o[1]/o[3]*.5)*height,visible:o[3]>0};}
+// Inverse of orthogonal rotation + independent column scales + translation.
+export function inverseTransform(m){const out=identity();for(let c=0;c<3;c++){const length=m[c*4]**2+m[c*4+1]**2+m[c*4+2]**2;for(let r=0;r<3;r++)out[r*4+c]=m[c*4+r]/length;out[12+c]=-(out[c]*m[12]+out[4+c]*m[13]+out[8+c]*m[14]);}return out;}
