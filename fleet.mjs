@@ -1,8 +1,8 @@
-import {FUEL_SCALE,SEA_WEAR_SCALE} from './balance.mjs?v=0.15.3';
-import {groundsAt} from './fishing-grounds.mjs?v=0.15.3';
-import {nearestWater,geoToWorld} from './world.mjs?v=0.15.3';
-import {planSeaRoute} from './navigation.mjs?v=0.15.3';
-import {vesselStats,settleLanding} from './career.mjs?v=0.15.3';
+import {FUEL_SCALE,SEA_WEAR_SCALE} from './balance.mjs?v=0.15.4';
+import {groundsAt} from './fishing-grounds.mjs?v=0.15.4';
+import {nearestWater,geoToWorld} from './world.mjs?v=0.15.4';
+import {planSeaRoute} from './navigation.mjs?v=0.15.4';
+import {vesselStats,settleLanding} from './career.mjs?v=0.15.4';
 export function fleetStats(s,b){return vesselStats({...b,career:{boat:b.boat,parts:b.parts,skills:s.career.skills}});}
 function radio(s,text){s.message=text;s.log.unshift({hour:s.hour,text});s.log=s.log.slice(0,8);}
 function requestService(s,b,stats){const fuel=Math.max(0,stats.tank-b.fuel),repair=Math.max(0,100-b.hull),bait=b.fishing==='salmon'?0:stats.potCapacity*stats.baitCost,cost=Math.ceil((fuel*9.5+repair*160)*stats.serviceCost+bait);b.phase='service';b.request={cost,fuel,repair,bait,status:'pending'};radio(s,`Captain of ${b.name}: permission for ${cost.toLocaleString('en-US')} kr of fuel, repairs and trip supplies? Open Fleet & finance.`);}

@@ -58,3 +58,5 @@ A/D taps change the rudder by two degrees; holding a key continues adjusting at 
 0.15.2: Routine player and hired-captain fuel consumption doubled from 1/50 to 1/25 of the original rate. Hull wear and incident frequency are unchanged.
 
 0.15.3: Random incident intervals reduced from 50 to 25 times the original intervals. Version-2 incident timers are halved once when loading a save.
+
+0.15.4: Routine diesel consumption is 1/10 of the original rate (2.5x the previous rate). Passive sea hull wear is 1/40 of original (25% more than before). Incident frequency unchanged.
