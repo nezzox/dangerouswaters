@@ -1,4 +1,4 @@
-import {SKILLS,PARTS,BOATS,SKILL_SYSTEMS,PART_SYSTEMS,boatById} from './catalog.mjs?v=0.12.0-r5';
+import {SKILLS,PARTS,BOATS,SKILL_SYSTEMS,PART_SYSTEMS,boatById} from './catalog.mjs?v=0.12.0-r6';
 const finite=(n,f=0)=>Number.isFinite(n)?n:f,clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 export const inHarbor=s=>Math.hypot(s.x-160,s.y-80)<230;
 export const shopReady=s=>inHarbor(s)&&Math.abs(s.speed)<1&&!s.deckJob&&!s.incident;
