@@ -1,10 +1,10 @@
-import {WORLD_VERSION,WORLD_BOUNDS,FISHING_GROUNDS,isLand,inWorld} from './world.mjs?v=0.12.0-r5';
-import {planSeaRoute} from './navigation.mjs?v=0.12.0-r5';
-import {tickFleet} from './fleet.mjs?v=0.12.0-r5';
-import {ensureCareer,vesselStats,settleLanding} from './career.mjs?v=0.12.0-r5';
-import {tickIncidents,blocksDeck} from './incidents.mjs?v=0.12.0-r5';
-import {BERTH,buildDockRoute,dockRouteDuration,dockingPose,vesselIntersectsHarbor} from './harbor.mjs?v=0.12.0-r5';
-export {BERTH} from './harbor.mjs?v=0.12.0-r5';
+import {WORLD_VERSION,WORLD_BOUNDS,FISHING_GROUNDS,isLand,inWorld} from './world.mjs?v=0.12.0-r6';
+import {planSeaRoute} from './navigation.mjs?v=0.12.0-r6';
+import {tickFleet} from './fleet.mjs?v=0.12.0-r6';
+import {ensureCareer,vesselStats,settleLanding} from './career.mjs?v=0.12.0-r6';
+import {tickIncidents,blocksDeck} from './incidents.mjs?v=0.12.0-r6';
+import {BERTH,buildDockRoute,dockRouteDuration,dockingPose,vesselIntersectsHarbor} from './harbor.mjs?v=0.12.0-r6';
+export {BERTH} from './harbor.mjs?v=0.12.0-r6';
 export const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 export const PORT={x:160,y:80};
 export const DECK_LIMIT_KNOTS=5;
