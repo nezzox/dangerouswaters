@@ -1,4 +1,4 @@
-import {routeOnDeck,canStand,CREW_SPACING,CABIN_DOOR} from './deck-layout.mjs?v=0.15.2';
+import {routeOnDeck,canStand,CREW_SPACING,CABIN_DOOR} from './deck-layout.mjs?v=0.15.3';
 const jobs={
  deploy:{label:'Setting pot',duration:14,targets:[[-3.8,2.65],[-5.2,1.5],[-.45,1.2]]},
  haul:{label:'Hauling and sorting',duration:32,targets:[[-3.8,2.65],[-3.4,1.2],[-.45,1.05]]},

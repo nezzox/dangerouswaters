@@ -56,3 +56,5 @@ A/D taps change the rudder by two degrees; holding a key continues adjusting at 
 0.15.1: Auto set uses the displayed 80 m interaction ring. Auto haul searches all soaked pots on the working side instead of being blocked by a nearer fresh pot. Both retain the below-5-knot, equipment, crew and cargo checks.
 
 0.15.2: Routine player and hired-captain fuel consumption doubled from 1/50 to 1/25 of the original rate. Hull wear and incident frequency are unchanged.
+
+0.15.3: Random incident intervals reduced from 50 to 25 times the original intervals. Version-2 incident timers are halved once when loading a save.
