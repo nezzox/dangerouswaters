@@ -84,3 +84,5 @@ Sources: https://open-meteo.com/en/docs and https://open-meteo.com/en/docs/marin
 0.17.3: Renderer label in the bottom-right toolbar opens a code prompt. The user-requested developer phrase credits 50,000 USD (500,000 saved SEK units), repeatedly usable for testing. This is a local development aid; it is not a secure authorization mechanism.
 
 0.17.4: Crab pots hold at most 90 kg, including catch bonuses. Rich habitat fills at 3.6 kg per effective soak hour; habitat abundance is squared so poor areas fill far more slowly. The 6/24/36-hour stages and permanent retained catch remain. Operation tests use explicit rich-habitat fixtures rather than relying on baseline catch outside grounds.
+
+0.17.5: Fleet & Finance displays a high-contrast envelope badge for unread captain radio messages or pending approvals. Viewing Fleet clears unread messages; pending requests remain marked until answered. Unread flags persist with vessel saves.

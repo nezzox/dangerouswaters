@@ -1,13 +1,15 @@
-import {potCatchAt} from './pot-soak.mjs?v=0.17.4';
-import {prepareRareCatch,awardRareCatch,rareValue} from './rare-catch.mjs?v=0.17.4';
-import {FUEL_SCALE,SEA_WEAR_SCALE} from './balance.mjs?v=0.17.4';
-import {groundsAt} from './fishing-grounds.mjs?v=0.17.4';
-import {nearestWater,geoToWorld} from './world.mjs?v=0.17.4';
-import {planSeaRoute} from './navigation.mjs?v=0.17.4';
-import {vesselStats,settleLanding} from './career.mjs?v=0.17.4';
+import {potCatchAt} from './pot-soak.mjs?v=0.17.5';
+import {prepareRareCatch,awardRareCatch,rareValue} from './rare-catch.mjs?v=0.17.5';
+import {FUEL_SCALE,SEA_WEAR_SCALE} from './balance.mjs?v=0.17.5';
+import {groundsAt} from './fishing-grounds.mjs?v=0.17.5';
+import {nearestWater,geoToWorld} from './world.mjs?v=0.17.5';
+import {planSeaRoute} from './navigation.mjs?v=0.17.5';
+import {vesselStats,settleLanding} from './career.mjs?v=0.17.5';
 export function fleetStats(s,b){return vesselStats({...b,career:{boat:b.boat,parts:b.parts,skills:s.career.skills}});}
-function radio(s,text){s.message=text;s.log.unshift({hour:s.hour,text});s.log=s.log.slice(0,8);}
-function requestService(s,b,stats){const fuel=Math.max(0,stats.tank-b.fuel),repair=Math.max(0,100-b.hull),bait=b.fishing==='salmon'?0:stats.potCapacity*stats.baitCost,cost=Math.ceil((fuel*9.5+repair*160)*stats.serviceCost+bait);b.phase='service';b.request={cost,fuel,repair,bait,status:'pending'};radio(s,`Captain of ${b.name}: permission for ${cost.toLocaleString('en-US')} kr of fuel, repairs and trip supplies? Open Fleet & finance.`);}
+export const fleetNoticeCount=s=>(s.career?.fleet||[]).filter(b=>b.unreadMessage||b.request?.status==='pending').length;
+export function readFleetMessages(s){for(const b of s.career?.fleet||[])b.unreadMessage=false;}
+function radio(s,b,text){b.unreadMessage=true;s.message=text;s.log.unshift({hour:s.hour,text});s.log=s.log.slice(0,8);}
+function requestService(s,b,stats){const fuel=Math.max(0,stats.tank-b.fuel),repair=Math.max(0,100-b.hull),bait=b.fishing==='salmon'?0:stats.potCapacity*stats.baitCost,cost=Math.ceil((fuel*9.5+repair*160)*stats.serviceCost+bait);b.phase='service';b.request={cost,fuel,repair,bait,status:'pending'};radio(s,b,`Captain of ${b.name}: permission for ${cost.toLocaleString('en-US')} kr of fuel, repairs and trip supplies? Open Fleet & finance.`);}
 export function answerCaptain(s,id,approve){const b=s.career?.fleet.find(b=>b.id===id);if(!b?.request)return {ok:false,message:'No outstanding request.'};if(!approve){b.request.status='declined';return {ok:true,message:`${b.name} holding in harbor. You can approve later.`};}if(s.money<b.request.cost)return {ok:false,message:'Insufficient funds. Captain remains in harbor.'};const cost=b.request.cost;s.money-=cost;b.expenses=(b.expenses||0)+cost;const stats=fleetStats(s,b);b.fuel=stats.tank;b.hull=100;b.request=null;b.phase='outbound';b.groundTarget=null;b.waypoint=0;b.timer=0;return {ok:true,message:`${b.name}: supplies authorized. Departing for the grounds.`};}
 const move=(b,x,y,speed,dt)=>{const dx=x-b.x,dy=y-b.y,d=Math.hypot(dx,dy);if(d<.01)return true;b.heading=Math.atan2(dy,dx);const travel=Math.min(d,speed*dt);b.x+=dx/d*travel;b.y+=dy/d*travel;return travel>=d;};
 function navigate(b,x,y,speed,dt){const target=nearestWater(x,y),key=target.x.toFixed(1)+'/'+target.y.toFixed(1);if(b.navigation?.key!==key){const route=planSeaRoute(b,target);b.navigation=route?{key,route,index:0}:null;if(!route)return false;}const n=b.navigation,p=n.route[n.index];if(move(b,p.x,p.y,b.fuel>0?speed:0,dt)){if(n.index<n.route.length-1)n.index++;else return true;}return false;}
@@ -23,7 +25,7 @@ export function tickFleet(s,dt,w){for(const [i,b] of s.career.fleet.entries()){
  else if(b.phase==='haul'){const pot=b.pots[0];if(!pot){b.phase='return';b.waypoint=0;b.timer=0;}else if(navigate(b,pot.x,pot.y,Math.min(speed,2.3),dt)){pot.haul=(pot.haul||0)+dt;if(pot.haul>=32/(stats.work*stats.haul)){const kg=potCatchAt(pot,s.hour,stats.crabYield);const room=stats.capacity-b.cargo-b.salmon;b.cargo+=Math.max(0,Math.min(room,kg));if(room>0)fleetRare(s,b,prepareRareCatch(s,pot,'crab',kg));b.pots.shift();}}}
  else if(b.phase==='net'){if(b.timer>120/(stats.work*stats.netWork)){b.salmon=Math.min(stats.capacity,Math.round(250*stats.salmonYield));fleetRare(s,b,prepareRareCatch(s,{},'salmon',b.salmon));b.phase='return';b.waypoint=0;b.timer=0;}}
  else if(b.phase==='return'){const points=[[180,80]],p=points[b.waypoint||0];if(navigate(b,...p,speed,dt)){b.waypoint=(b.waypoint||0)+1;if(b.waypoint>=points.length){b.phase='landing';b.timer=0;}}}
- else if(b.phase==='landing'&&b.timer>=40/stats.unload){const gross=(b.cargo*65+b.salmon*42)*stats.priceBonus+rareValue(b),crew=Math.max(0,gross-b.expenses)*stats.crewShare,receipt=settleLanding(s,gross-crew);b.lastLanding={gross,crew,expenses:b.expenses,repaid:receipt.repaid,profit:gross-crew-b.expenses};b.earnings+=b.lastLanding.profit;b.trips++;b.cargo=0;b.salmon=0;b.rareHold={};b.expenses=0;b.phase='service';b.timer=0;radio(s,`${b.name} landed catch: ${Math.round(gross).toLocaleString('en-US')} kr, crew ${Math.round(crew).toLocaleString('en-US')} kr. Captain preparing the next trip.`);}
+ else if(b.phase==='landing'&&b.timer>=40/stats.unload){const gross=(b.cargo*65+b.salmon*42)*stats.priceBonus+rareValue(b),crew=Math.max(0,gross-b.expenses)*stats.crewShare,receipt=settleLanding(s,gross-crew);b.lastLanding={gross,crew,expenses:b.expenses,repaid:receipt.repaid,profit:gross-crew-b.expenses};b.earnings+=b.lastLanding.profit;b.trips++;b.cargo=0;b.salmon=0;b.rareHold={};b.expenses=0;b.phase='service';b.timer=0;radio(s,b,`${b.name} landed catch: ${Math.round(gross).toLocaleString('en-US')} kr, crew ${Math.round(crew).toLocaleString('en-US')} kr. Captain preparing the next trip.`);}
 }}
 
-function fleetRare(s,b,id){const r=awardRareCatch(s,b,id);if(r)radio(s,`SPECIAL CATCH · ${b.name}: ${r.name}. Bonus ${r.value.toLocaleString('en-US')} kr on landing.`);}
+function fleetRare(s,b,id){const r=awardRareCatch(s,b,id);if(r)radio(s,b,`SPECIAL CATCH · ${b.name}: ${r.name}. Bonus ${r.value.toLocaleString('en-US')} kr on landing.`);}
