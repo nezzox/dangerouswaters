@@ -49,3 +49,5 @@
 .controls .footer-action{display:inline-flex;align-items:center;gap:4px;padding:5px 8px;font:inherit;white-space:nowrap}.controls .footer-action kbd{margin:0}.controls{flex-wrap:wrap}
 
 .weather .weather-source{font:8px monospace;color:#a8cabb;min-height:0;margin:10px 0 0}.weather-details{font:9px monospace;color:#a7bfbe;line-height:1.6}.weather-attribution{display:block;font:8px monospace;margin-top:8px;color:#8da6a8}.weather small{line-height:1.5}
+
+.weather-modes{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:12px}.weather-modes button{font:8px monospace;padding:7px 4px}.weather-modes button[aria-pressed=true]{background:#31463e;border-color:#8eb4a3;color:#d4e7d9}

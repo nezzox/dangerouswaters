@@ -1,21 +1,21 @@
-import {fuelBurnRate} from './fuel-economy.mjs?v=0.17.0';
-import {prepareRareCatch,awardRareCatch,rareValue,rareById} from './rare-catch.mjs?v=0.17.0';
-import {SEA_WEAR_SCALE} from './balance.mjs?v=0.17.0';
-import {crabAbundance,soakedAbundance,salmonAbundance} from './fishing-grounds.mjs?v=0.17.0';
-export {groundsAt} from './fishing-grounds.mjs?v=0.17.0';
-import {WORLD_VERSION,WORLD_BOUNDS,FISHING_GROUNDS,isLand,inWorld} from './world.mjs?v=0.17.0';
-import {planSeaRoute} from './navigation.mjs?v=0.17.0';
-import {tickFleet} from './fleet.mjs?v=0.17.0';
-import {ensureCareer,vesselStats,settleLanding} from './career.mjs?v=0.17.0';
-import {tickIncidents,blocksDeck} from './incidents.mjs?v=0.17.0';
-import {BERTH,buildDockRoute,dockRouteDuration,dockingPose,vesselIntersectsHarbor,castOffPosition,buildCastOffRoute} from './harbor.mjs?v=0.17.0';
-export {BERTH} from './harbor.mjs?v=0.17.0';
+import {fuelBurnRate} from './fuel-economy.mjs?v=0.17.1';
+import {prepareRareCatch,awardRareCatch,rareValue,rareById} from './rare-catch.mjs?v=0.17.1';
+import {SEA_WEAR_SCALE} from './balance.mjs?v=0.17.1';
+import {crabAbundance,soakedAbundance,salmonAbundance} from './fishing-grounds.mjs?v=0.17.1';
+export {groundsAt} from './fishing-grounds.mjs?v=0.17.1';
+import {WORLD_VERSION,WORLD_BOUNDS,FISHING_GROUNDS,isLand,inWorld} from './world.mjs?v=0.17.1';
+import {planSeaRoute} from './navigation.mjs?v=0.17.1';
+import {tickFleet} from './fleet.mjs?v=0.17.1';
+import {ensureCareer,vesselStats,settleLanding} from './career.mjs?v=0.17.1';
+import {tickIncidents,blocksDeck} from './incidents.mjs?v=0.17.1';
+import {BERTH,buildDockRoute,dockRouteDuration,dockingPose,vesselIntersectsHarbor,castOffPosition,buildCastOffRoute} from './harbor.mjs?v=0.17.1';
+export {BERTH} from './harbor.mjs?v=0.17.1';
 export const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 export const PORT={x:BERTH.x,y:BERTH.y};
 export const DECK_LIMIT_KNOTS=5;
 export const grounds=FISHING_GROUNDS;
 export const distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
-export function createGame(){return ensureCareer({version:1,worldVersion:WORLD_VERSION,x:180,y:100,heading:-Math.PI/2,speed:0,throttle:0,rudder:0,hour:6.4,money:48000,fuel:500,hull:100,cargo:0,capacity:900,deck:8,pots:[],nextPot:1,engine:0,hold:0,gear:0,paused:true,desiredKnots:0,deckJob:null,autopilot:null,lights:true,moored:null,weatherOverride:null,message:'Welcome aboard F/V Nordvind.',log:[],landed:0});}
+export function createGame(){return ensureCareer({version:1,worldVersion:WORLD_VERSION,x:180,y:100,heading:-Math.PI/2,speed:0,throttle:0,rudder:0,hour:6.4,money:48000,fuel:500,hull:100,cargo:0,capacity:900,deck:8,pots:[],nextPot:1,engine:0,hold:0,gear:0,paused:true,desiredKnots:0,deckJob:null,autopilot:null,lights:true,moored:null,weatherOverride:null,weatherMode:'live',message:'Welcome aboard F/V Nordvind.',log:[],landed:0});}
 function crewActivity(s,kind){s.activity={id:(s.activity?.id||0)+1,kind};}
 export const POT_RANGE=80;
 export function potBearing(s,p){const dx=p.x-s.x,dy=p.y-s.y;return {along:dx*Math.cos(s.heading)+dy*Math.sin(s.heading),starboard:-dx*Math.sin(s.heading)+dy*Math.cos(s.heading)};}
@@ -31,7 +31,7 @@ export function weatherAt(hour){
  const front=(Math.sin(hour*.53-3.4)+1)/2, gust=Math.sin(hour*1.71)*2.5;
  return {wind:clamp(7+front*34+gust,4,48),waves:.4+front*4.7,fog:clamp((Math.sin(hour*.31+1.1)-.25)*1.25,0,.92),rain:clamp((front-.35)*1.5,0,1),front};
 }
-export function conditions(s){if(!s.weatherOverride&&s.realWeather?.value&&['wind','waves','rain','fog','front'].every(k=>Number.isFinite(s.realWeather.value[k])))return s.realWeather.value;return s.weatherOverride==='calm'?{wind:7,waves:.5,fog:0,rain:0,front:0}:s.weatherOverride==='rough'?{wind:42,waves:5.5,fog:.13,rain:.95,front:1}:s.weatherOverride==='fog'?{wind:12,waves:1.1,fog:.9,rain:.15,front:.2}:weatherAt(s.hour);}
+export function conditions(s){if(s.weatherMode!=='dynamic'&&!s.weatherOverride&&s.realWeather?.value&&['wind','waves','rain','fog','front'].every(k=>Number.isFinite(s.realWeather.value[k])))return s.realWeather.value;return s.weatherOverride==='calm'?{wind:7,waves:.5,fog:0,rain:0,front:0}:s.weatherOverride==='rough'?{wind:42,waves:5.5,fog:.13,rain:.95,front:1}:s.weatherOverride==='fog'?{wind:12,waves:1.1,fog:.9,rain:.15,front:.2}:weatherAt(s.hour);}
 export function depthAt(x,y){return Math.round(55+Math.min(180,Math.hypot(x,y)*.055)+24*Math.sin(x*.002)*Math.cos(y*.003));}
 export function abundanceAt(x,y,hour=0){return crabAbundance(x,y,hour);}
 export function catchAt(p,hour){if(isLand(p.x,p.y))return 0;const soak=Math.max(0,hour-p.setAt);return Math.round((18+soakedAbundance(p,hour)*54)*(1-Math.exp(-soak/1.8))*Math.exp(-Math.max(0,soak-9)*.08));}
@@ -92,3 +92,5 @@ export function tickAutomation(s){const c=s.career;if(!c||c.fishing!=='crab'||s.
 export function vesselOnLand(s){const stats=vesselStats(s),c=Math.cos(s.heading),n=Math.sin(s.heading),length=stats.length*.52,width=stats.beam*.49;for(const x of [-length,0,length])for(const z of [-width,0,width])if(isLand(s.x+c*x-n*z,s.y+n*x+c*z))return true;return false;}
 
 function revealRare(s,id,species){const r=rareById(id);if(r?.species===species&&awardRareCatch(s,s,id))notify(s,`SPECIAL CATCH · ${r.name} · ${r.tier} · Bonus ${r.value.toLocaleString('en-US')} kr on landing!`);}
+
+export function setWeatherMode(s,mode){s.weatherMode=mode==='dynamic'?'dynamic':'live';s.weatherOverride=null;if(s.weatherMode==='dynamic'){s.realWeather=null;s.weatherStatus='dynamic';}}
