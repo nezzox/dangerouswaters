@@ -45,3 +45,5 @@
 @media(max-height:950px){.sonar-panel{top:85px}}@media(max-width:1100px){.sonar-panel{right:250px;width:230px}}@media(max-width:760px){.sonar-panel{position:static;width:100%;padding:10px}.sonar-panel p{font-size:8px}.sonar-panel small{font-size:8px}}
 
 .fuel-economy{margin:8px 0 12px;font:9px monospace;color:var(--muted)}.fuel-economy>div{display:flex;justify-content:space-between;gap:6px}.fuel-economy strong{font-weight:400;color:#afcbbb}.fuel-economy small{display:block;font-size:8px;margin-top:5px}.fuel-economy[data-band=moderate] strong{color:#e4c788}.fuel-economy[data-band=high] strong{color:#e9a182}.fuel-economy[data-band=moderate] meter::-webkit-meter-optimum-value{background:#e4c788}.fuel-economy[data-band=high] meter::-webkit-meter-optimum-value{background:#d18b6f}#undock-quick{border-color:#9ec5b2;color:#c7e8d0}#undock-quick:disabled{opacity:.45}#undock{display:block;width:100%;padding:12px;margin:10px 0;border-color:#8eb4a3}
+
+.controls .footer-action{display:inline-flex;align-items:center;gap:4px;padding:5px 8px;font:inherit;white-space:nowrap}.controls .footer-action kbd{margin:0}.controls{flex-wrap:wrap}

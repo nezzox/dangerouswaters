@@ -1,5 +1,6 @@
-import {routeOnDeck,canStand,CREW_SPACING,CABIN_DOOR} from './deck-layout.mjs?v=0.16.1';
+import {routeOnDeck,canStand,CREW_SPACING,CABIN_DOOR} from './deck-layout.mjs?v=0.16.2';
 const jobs={
+ undock:{label:'Letting go mooring lines',duration:30,targets:[[-10.8,2.8],[-3.8,2.8],[-.45,1.1]]},
  deploy:{label:'Setting pot',duration:14,targets:[[-3.8,2.65],[-5.2,1.5],[-.45,1.2]]},
  haul:{label:'Hauling and sorting',duration:32,targets:[[-3.8,2.65],[-3.4,1.2],[-.45,1.05]]},
  unload:{label:'Unloading catch',duration:11,targets:[[-10.8,1.5],[-7.8,1.5],[-3.6,1.5]]},

@@ -1,6 +1,6 @@
-import {boatById} from './catalog.mjs?v=0.16.1';
-import {isLand} from './world.mjs?v=0.16.1';
-import {planSeaRoute} from './navigation.mjs?v=0.16.1';
+import {boatById} from './catalog.mjs?v=0.16.2';
+import {isLand} from './world.mjs?v=0.16.2';
+import {planSeaRoute} from './navigation.mjs?v=0.16.2';
 // Shared frame on the new geographic quay. Positive inland points onto its apron.
 export const QUAY={x:47.3186402115,y:-70.0756194544,tx:-.811539539913,ty:.584297505692,deck:6.8};
 QUAY.heading=Math.atan2(QUAY.ty,QUAY.tx);
@@ -34,3 +34,5 @@ export function castOffPosition(s){
  }
  return null;
 }
+// Three pilot-assisted phases: let go, translate broadside, then turn in clear water.
+export function buildCastOffRoute(s,target=castOffPosition(s)){if(!target)return [];const start={x:s.x,y:s.y,heading:s.heading},sideways={x:target.x,y:target.y,heading:s.heading},end={...target,heading:s.heading+angle(target.heading-s.heading)};return [{from:start,to:{...start},duration:2,label:'Letting go mooring lines'},{from:{...start},to:sideways,duration:Math.max(8,Math.hypot(target.x-s.x,target.y-s.y)*1.5),label:'Moving clear of the quay'},{from:{...sideways},to:end,duration:Math.max(4,Math.abs(end.heading-start.heading)/.12),label:'Turning toward open water'}];}
