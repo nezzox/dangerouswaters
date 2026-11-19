@@ -1,5 +1,5 @@
-import {PORT_PIERS} from './port-data.mjs?v=0.17.1';
-import {COAST_DATA} from './coast-data.mjs?v=0.17.1';
+import {PORT_PIERS} from './port-data.mjs?v=0.17.3';
+import {COAST_DATA} from './coast-data.mjs?v=0.17.3';
 export const WORLD_VERSION=2;
 export const GEO_ORIGIN={lon:-166.524,lat:53.9034};
 const meters=111319.490793,cos=Math.cos(GEO_ORIGIN.lat*Math.PI/180);
