@@ -1,16 +1,16 @@
-import {potCatchAt} from './pot-soak.mjs?v=0.17.3';
-import {fuelBurnRate} from './fuel-economy.mjs?v=0.17.3';
-import {prepareRareCatch,awardRareCatch,rareValue,rareById} from './rare-catch.mjs?v=0.17.3';
-import {SEA_WEAR_SCALE} from './balance.mjs?v=0.17.3';
-import {crabAbundance,salmonAbundance} from './fishing-grounds.mjs?v=0.17.3';
-export {groundsAt} from './fishing-grounds.mjs?v=0.17.3';
-import {WORLD_VERSION,WORLD_BOUNDS,FISHING_GROUNDS,isLand,inWorld} from './world.mjs?v=0.17.3';
-import {planSeaRoute} from './navigation.mjs?v=0.17.3';
-import {tickFleet} from './fleet.mjs?v=0.17.3';
-import {ensureCareer,vesselStats,settleLanding} from './career.mjs?v=0.17.3';
-import {tickIncidents,blocksDeck} from './incidents.mjs?v=0.17.3';
-import {BERTH,buildDockRoute,dockRouteDuration,dockingPose,vesselIntersectsHarbor,castOffPosition,buildCastOffRoute} from './harbor.mjs?v=0.17.3';
-export {BERTH} from './harbor.mjs?v=0.17.3';
+import {potCatchAt} from './pot-soak.mjs?v=0.17.4';
+import {fuelBurnRate} from './fuel-economy.mjs?v=0.17.4';
+import {prepareRareCatch,awardRareCatch,rareValue,rareById} from './rare-catch.mjs?v=0.17.4';
+import {SEA_WEAR_SCALE} from './balance.mjs?v=0.17.4';
+import {crabAbundance,salmonAbundance} from './fishing-grounds.mjs?v=0.17.4';
+export {groundsAt} from './fishing-grounds.mjs?v=0.17.4';
+import {WORLD_VERSION,WORLD_BOUNDS,FISHING_GROUNDS,isLand,inWorld} from './world.mjs?v=0.17.4';
+import {planSeaRoute} from './navigation.mjs?v=0.17.4';
+import {tickFleet} from './fleet.mjs?v=0.17.4';
+import {ensureCareer,vesselStats,settleLanding} from './career.mjs?v=0.17.4';
+import {tickIncidents,blocksDeck} from './incidents.mjs?v=0.17.4';
+import {BERTH,buildDockRoute,dockRouteDuration,dockingPose,vesselIntersectsHarbor,castOffPosition,buildCastOffRoute} from './harbor.mjs?v=0.17.4';
+export {BERTH} from './harbor.mjs?v=0.17.4';
 export const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 export const PORT={x:BERTH.x,y:BERTH.y};
 export const DECK_LIMIT_KNOTS=5;
@@ -73,7 +73,7 @@ export function handlePot(s,potId=null){
  if(Math.abs(s.speed)*1.94384>=DECK_LIMIT_KNOTS)return notify(s,'Slow below 5 knots before setting or hauling pots.');
  if(nearPort(s))return notify(s,'Leave the harbor area before setting pots.');
  const action=potAction(s,p=>potId===null||p.id===potId);
- if(action.inRange){if(!action.canHaul)return notify(s,`Bring the buoy to the ${stats.hauler==='both'?'port or starboard':stats.hauler} working area.`);if(s.cargo+(s.salmon||0)>=stats.capacity)return notify(s,'The hold is full. Return to unload.');const p=action.pot;s.deckJob={kind:'haul',grapple:true,elapsed:0,duration:32/(stats.work*stats.haul),side:potBearing(s,p).starboard<0?-1:1,layout:stats.hauler,potId:p.id,catchKg:Math.round(catchAt(p,s.hour)*stats.crabYield),x:p.x,y:p.y};s.deckJob.rareId=prepareRareCatch(s,p,'crab',s.deckJob.catchKg);crewActivity(s,'haul');return notify(s,`Hauling pot ${p.id}. Throwing the hook, retrieving the buoy and lifting at the starboard hauler.`);}
+ if(action.inRange){if(!action.canHaul)return notify(s,`Bring the buoy to the ${stats.hauler==='both'?'port or starboard':stats.hauler} working area.`);if(s.cargo+(s.salmon||0)>=stats.capacity)return notify(s,'The hold is full. Return to unload.');const p=action.pot;s.deckJob={kind:'haul',grapple:true,elapsed:0,duration:32/(stats.work*stats.haul),side:potBearing(s,p).starboard<0?-1:1,layout:stats.hauler,potId:p.id,catchKg:catchAt(p,s.hour,stats.crabYield),x:p.x,y:p.y};s.deckJob.rareId=prepareRareCatch(s,p,'crab',s.deckJob.catchKg);crewActivity(s,'haul');return notify(s,`Hauling pot ${p.id}. Throwing the hook, retrieving the buoy and lifting at the starboard hauler.`);}
  if(s.deck<=0)return notify(s,'All pots are at sea. Return to a buoy to haul.');
  if(s.money<stats.baitCost)return notify(s,`You need ${stats.baitCost} kr for bait.`);
  crewActivity(s,'deploy');s.money-=stats.baitCost;s.deck--;s.deckJob={kind:'deploy',baitCost:stats.baitCost,layout:stats.hauler,elapsed:0,duration:14/(stats.work*stats.deploy),x:s.x,y:s.y};notify(s,'Deck crew rigging the line and lowering the pot.');
