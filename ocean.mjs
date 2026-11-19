@@ -6,7 +6,8 @@ struct VOut { @builtin(position) position:vec4<f32> }
  let p=array<vec2<f32>,3>(vec2<f32>(-1.,-1.),vec2<f32>(3.,-1.),vec2<f32>(-1.,3.));
  var o:VOut;o.position=vec4<f32>(p[i],0.,1.);return o;
 }
-fn height(p:vec2<f32>,t:f32)->f32{
+fn height(raw:vec2<f32>,t:f32)->f32{
+ let a=u.weather.w;let p=vec2<f32>(raw.x*cos(a)+raw.y*sin(a),-raw.x*sin(a)+raw.y*cos(a));
  return sin(dot(p,vec2<f32>(.052,.025))-t*1.3)*.62+sin(dot(p,vec2<f32>(-.032,.071))-t*.95)*.35+sin(dot(p,vec2<f32>(.14,.09))-t*2.1)*.14+sin(dot(p,vec2<f32>(.31,-.18))+t*1.7)*.055;
 }
 @fragment fn fs(@builtin(position) frag:vec4<f32>)->@location(0) vec4<f32>{
@@ -40,7 +41,7 @@ export async function createOcean(canvas){
   const buffer=device.createBuffer({size:64,usage:GPUBufferUsage.UNIFORM|GPUBufferUsage.COPY_DST});const bind=device.createBindGroup({layout:pipeline.getBindGroupLayout(0),entries:[{binding:0,resource:{buffer}}]});
   context.configure({device,format,alphaMode:'opaque'});
   const fail=()=>{stopped=true;canvas.style.opacity='0';canvas.dispatchEvent(new Event('oceanlost'));};device.lost.then(fail);device.addEventListener('uncapturederror',fail);
-  return {label:'WEBGPU',gpu:true,draw(s,w,t,view){if(stopped)return;const data=new Float32Array([canvas.width,canvas.height,t,0,s.x,s.y,s.heading,Math.abs(s.speed),w.waves,w.fog,w.rain,0,view.x,view.y,view.scale*view.dpr,0]);device.queue.writeBuffer(buffer,0,data);const encoder=device.createCommandEncoder(),pass=encoder.beginRenderPass({colorAttachments:[{view:context.getCurrentTexture().createView(),clearValue:{r:.03,g:.1,b:.13,a:1},loadOp:'clear',storeOp:'store'}]});pass.setPipeline(pipeline);pass.setBindGroup(0,bind);pass.draw(3);pass.end();device.queue.submit([encoder.finish()]);}};
+  return {label:'WEBGPU',gpu:true,draw(s,w,t,view){if(stopped)return;const data=new Float32Array([canvas.width,canvas.height,t,0,s.x,s.y,s.heading,Math.abs(s.speed),w.waves,w.fog,w.rain,Number.isFinite(w.waveDirection)?w.waveDirection*Math.PI/180+Math.PI/2-Math.atan2(.025,.052):0,view.x,view.y,view.scale*view.dpr,0]);device.queue.writeBuffer(buffer,0,data);const encoder=device.createCommandEncoder(),pass=encoder.beginRenderPass({colorAttachments:[{view:context.getCurrentTexture().createView(),clearValue:{r:.03,g:.1,b:.13,a:1},loadOp:'clear',storeOp:'store'}]});pass.setPipeline(pipeline);pass.setBindGroup(0,bind);pass.draw(3);pass.end();device.queue.submit([encoder.finish()]);}};
  }catch{return {label:'RESERV · 2D',gpu:false,draw(){}};}
 }
 let grainCanvas;
@@ -48,11 +49,12 @@ export function drawFallback(ctx,w,t,view,width,height){
  const grad=ctx.createLinearGradient(0,0,width,height);grad.addColorStop(0,w.fog>.6?'#3a565d':'#153b46');grad.addColorStop(.45,'#10333f');grad.addColorStop(1,'#092630');ctx.fillStyle=grad;ctx.fillRect(0,0,width,height);
  if(!grainCanvas){grainCanvas=document.createElement('canvas');grainCanvas.width=grainCanvas.height=128;const g=grainCanvas.getContext('2d'),image=g.createImageData(128,128);let seed=391;for(let i=0;i<image.data.length;i+=4){seed=(seed*1664525+1013904223)>>>0;const c=seed>>>24;image.data[i]=c*.62;image.data[i+1]=c*.85;image.data[i+2]=c;image.data[i+3]=24;}g.putImageData(image,0,0);}
  ctx.save();ctx.translate(-(view.x*view.scale)%128,-(view.y*view.scale)%128);ctx.fillStyle=ctx.createPattern(grainCanvas,'repeat');ctx.fillRect(-128,-128,width+256,height+256);ctx.restore();
- const size=26+w.waves*3,shiftX=view.x*view.scale,shiftY=view.y*view.scale;
- for(let row=-5;row<height/size+6;row++){
-  const baseline=row*size-((shiftY*.75)%(size));ctx.beginPath();
-  for(let x=-25;x<width+25;x+=12){const wx=x+shiftX,y=baseline+Math.sin(wx*.012+row*.73-t*.7)*(3+w.waves*1.8)+Math.sin(wx*.039-row*.41+t*.3)*2; if(x===-25)ctx.moveTo(x,y);else ctx.lineTo(x,y);}
+ const padding=Math.hypot(width,height);ctx.save();ctx.translate(width/2,height/2);ctx.rotate(Number.isFinite(w.waveDirection)?w.waveDirection*Math.PI/180:0);ctx.translate(-width/2,-height/2);const size=26+w.waves*3,shiftX=view.x*view.scale,shiftY=view.y*view.scale;
+ for(let row=-Math.ceil(padding/size);row<(height+padding)/size;row++){
+  const baseline=row*size+(t*5)%size-((shiftY*.75)%(size));ctx.beginPath();
+  for(let x=-padding;x<width+padding;x+=12){const wx=x+shiftX,y=baseline+Math.sin(wx*.012+row*.73-t*.7)*(3+w.waves*1.8)+Math.sin(wx*.039-row*.41+t*.3)*2; if(x===-padding)ctx.moveTo(x,y);else ctx.lineTo(x,y);}
   ctx.strokeStyle=`rgba(117,170,174,${.07+Math.sin(row*2.3)**2*.09})`;ctx.lineWidth=1+Math.sin(row*.5)**2;ctx.stroke();
   if(row%3===0){ctx.beginPath();const x=((row*349.7-shiftX*.4+t*8)%(width+400)+width+400)%(width+400)-200;ctx.moveTo(x,baseline+4);ctx.bezierCurveTo(x+22,baseline-2,x+48,baseline+8,x+84,baseline+2);ctx.strokeStyle=`rgba(184,208,200,${.12+w.waves*.015})`;ctx.lineWidth=1;ctx.stroke();}
  }
+ ctx.restore();
 }

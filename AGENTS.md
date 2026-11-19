@@ -4,6 +4,6 @@ Keep the game local and dependency-free. Start with `./start.sh`; test with `nod
 
 Game direction: serious, challenging northern crab fishing. An overhead vessel, harsh but varied weather, finding crab grounds, setting and hauling pots, selling catch and upgrading the vessel. Avoid cartoon visuals. Prioritize boat handling, readable navigation and meaningful risk.
 
-Keep simulation rules in `simulation.mjs` independently testable. The primary renderer is dependency-free WebGL 2 in scene.mjs. Preserve the legacy WebGPU ocean and automatic Canvas fallback. Keep buoyancy and ocean wave heights consistent. No external assets, CDN requests or AI API calls. Clearly document provisional systems; do not claim physical realism for approximations.
+Keep simulation rules in `simulation.mjs` independently testable. The primary renderer is dependency-free WebGL 2 in scene.mjs. Preserve the legacy WebGPU ocean and automatic Canvas fallback. Keep buoyancy and ocean wave heights consistent. No external assets, CDN requests or AI API calls. User-authorized exceptions: the Ko-fi donation widget and live Open-Meteo weather/marine JSON requests; keep these isolated, bounded and resilient offline. Clearly document provisional systems; do not claim physical realism for approximations.
 
 Verify gameplay in the browser, check console errors, and run the simulation tests. Preserve user saves; changing the save format requires an explicit migration or a new version key.

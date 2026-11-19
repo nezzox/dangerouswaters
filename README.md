@@ -92,3 +92,5 @@ Bering Sea coastlines and real coordinates now replace the fictional rectangular
 Ocean/foam no longer intersects the hull interior; rail overtopping creates a thin draining deck sheet. All 100 vessel configurations have actual 3D-model previews in the catalog and exchange review. Paused frames are retained while menus are open so preview generation does not compete with continuous ocean rendering.
 
 Version 0.16.0 adds special collector catches, a persistent collection, 16 migrating grounds and unlockable potential forecasts.
+
+Version 0.17.0 follows live Open-Meteo model weather at the vessel position, with directional waves and offline dynamic fallback.
