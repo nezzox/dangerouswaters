@@ -1,4 +1,4 @@
-import {seaHeight,SWELL,seaField} from './sea-spectrum.mjs?v=0.15.4';
+import {seaHeight,SWELL,seaField} from './sea-spectrum.mjs?v=0.15.5';
 const clamp=(x,a,b)=>Math.max(a,Math.min(b,x)),hash=(x,z)=>{const n=Math.sin(x*127.1+z*311.7)*43758.5453;return n-Math.floor(n);};
 // Raised, broken foam ribbons ride on the same swell as the boat. Not a fluid solver.
 export function buildFoam(wake,boat,weather,time){const data=[];

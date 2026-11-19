@@ -60,3 +60,5 @@ A/D taps change the rudder by two degrees; holding a key continues adjusting at 
 0.15.3: Random incident intervals reduced from 50 to 25 times the original intervals. Version-2 incident timers are halved once when loading a save.
 
 0.15.4: Routine diesel consumption is 1/10 of the original rate (2.5x the previous rate). Passive sea hull wear is 1/40 of original (25% more than before). Incident frequency unchanged.
+
+0.15.5: Undock in harbor services moves a stationary vessel offshore and points it away from the quay. Giving speed or engaging autopilot while moored also invokes this assist. Clearance scales with hull size; this is a positional gameplay assist, not a thruster physics simulation. Fuel use increased 10%; incident frequency unchanged.

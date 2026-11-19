@@ -1,0 +1,11 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {createGame,undock,step,BERTH,setAutopilot} from '../simulation.mjs';
+import {vesselIntersectsHarbor,quayPoint} from '../harbor.mjs';
+import {BOATS} from '../catalog.mjs';
+const moored=()=>{const s=createGame();Object.assign(s,BERTH,{moored:{...BERTH},paused:false,weatherOverride:'calm'});return s;};
+test('undocking moves offshore and gives every boat room to turn without changing its inventory',()=>{for(const boat of BOATS){const s=moored();s.career.boat=boat.id;const before=[s.money,s.fuel,s.hull,s.cargo,s.deck];assert(undock(s));assert(!s.moored);assert(Math.hypot(s.x-BERTH.x,s.y-BERTH.y)>10);for(let a=0;a<Math.PI*2;a+=.1)assert(!vesselIntersectsHarbor({...s,heading:a}));assert.deepEqual([s.money,s.fuel,s.hull,s.cargo,s.deck],before);}});
+test('setting speed while moored clears the quay before manual steering',()=>{const s=moored();s.desiredKnots=3;step(s,1);assert(Math.hypot(s.x-BERTH.x,s.y-BERTH.y)>10);s.rudder=1;for(let i=0;i<30;i++)step(s,1);assert(s.speed>.5);assert.equal(s.hull,100);});
+test('autopilot also casts off before planning its route',()=>{const s=moored(),goal=quayPoint(0,-200);assert(setAutopilot(s,goal.x,goal.y));assert(!s.moored);assert(Math.hypot(s.x-BERTH.x,s.y-BERTH.y)>10);assert(s.autopilot);});
+test('undock cannot interrupt work or move a vessel at sea or at speed',()=>{for(const adjust of [s=>s.deckJob={kind:'unload'},s=>s.speed=2,s=>{s.x=1000;s.y=500;s.moored=null;}]){const s=moored();adjust(s);const before=JSON.stringify(s);assert(!undock(s));assert.equal(JSON.stringify(s),before);}});
+test('cast-off position survives saving without snapping back to the quay',async()=>{const {restoreSeason,seasonJSON}=await import('../saves.mjs');const s=moored();undock(s);const restored=restoreSeason(JSON.parse(seasonJSON(s)));assert(!restored.moored);assert.equal(restored.x,s.x);assert.equal(restored.y,s.y);restored.paused=false;step(restored,1);assert(!vesselIntersectsHarbor(restored));});

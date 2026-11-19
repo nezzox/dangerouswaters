@@ -1,6 +1,6 @@
-import {boatById} from './catalog.mjs?v=0.15.4';
-import {isLand} from './world.mjs?v=0.15.4';
-import {planSeaRoute} from './navigation.mjs?v=0.15.4';
+import {boatById} from './catalog.mjs?v=0.15.5';
+import {isLand} from './world.mjs?v=0.15.5';
+import {planSeaRoute} from './navigation.mjs?v=0.15.5';
 // Shared frame on the new geographic quay. Positive inland points onto its apron.
 export const QUAY={x:47.3186402115,y:-70.0756194544,tx:-.811539539913,ty:.584297505692,deck:6.8};
 QUAY.heading=Math.atan2(QUAY.ty,QUAY.tx);
@@ -23,3 +23,14 @@ export function dockRouteDuration(route){return route.reduce((sum,l)=>sum+l.dura
 export function dockingPose(route,elapsed){let time=elapsed;for(const leg of route){if(time>leg.duration){time-=leg.duration;continue;}const t=Math.max(0,Math.min(1,time/leg.duration)),u=t*t*(3-2*t),a=leg.from,b=leg.to,dx=b.x-a.x,dy=b.y-a.y,heading=a.heading+(b.heading-a.heading)*u;return {x:a.x+dx*u,y:a.y+dy*u,heading,speed:(dx*Math.cos(heading)+dy*Math.sin(heading))*6*t*(1-t)/leg.duration};}return {...(route.at(-1)?.to||BERTH),speed:0};}
 
 export function dockingStage(route,elapsed){let time=elapsed;for(const leg of route){if(time>leg.duration){time-=leg.duration;continue;}return leg.label||'Approaching the unloading berth';}return 'Securing mooring lines';}
+
+// Pilot/thruster assist: move broadside offshore before allowing a turn.
+export function castOffPosition(s){
+ const boat=boatById(s.career?.boat),offshore=(s.x-QUAY.x)*QUAY.ty-(s.y-QUAY.y)*QUAY.tx;
+ if(Math.hypot(s.x-BERTH.x,s.y-BERTH.y)>120||offshore>Math.max(25,boat.length*.7))return null;
+ for(let d=12;d<=140;d+=2){const at={...s,x:s.x+QUAY.ty*d,y:s.y-QUAY.tx*d};let clear=true;
+  for(let a=0;a<Math.PI*2;a+=Math.PI/24)if(vesselIntersectsHarbor({...at,heading:a})){clear=false;break;}
+  if(clear)return {x:at.x,y:at.y,heading:Math.atan2(-QUAY.tx,QUAY.ty)};
+ }
+ return null;
+}

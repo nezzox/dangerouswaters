@@ -6,6 +6,8 @@ export function setLanguage(value){language=value==='sv'?'sv':'en';return langua
 export const toInternalMoney=(amount,locale=language)=>amount*(locale==='sv'?1:10);
 export function formatMoney(amount,locale=language){const sv=locale==='sv',n=amount/(sv?1:10),fraction=Math.abs(n-Math.round(n))>.000001;return new Intl.NumberFormat(sv?'sv-SE':'en-US',{style:'currency',currency:sv?'SEK':'USD',minimumFractionDigits:fraction?2:0,maximumFractionDigits:2}).format(n);}
 const sv={
+ 'UNDOCK · CLEAR THE QUAY':'KASTA LOSS · LÄMNA KAJEN',
+ 'Cast off. Harbor assist moved the vessel clear of the quay.':'Losskastat. Hamnassistansen har flyttat båten fri från kajen.',
  'Route planner':'Ruttplanering','Enlarge chart':'Förstora sjökort','Minimize chart':'Förminska sjökort','Close chart planner':'Stäng ruttplanering','EXPAND':'FÖRSTORA','MINIMIZE':'FÖRMINSKA',
  'Scroll to zoom · Drag to pan · Right-click to replace route · Shift + right-click to add a waypoint':'Rulla för zoom · Dra för panorering · Högerklicka för ny rutt · Shift + högerklick lägger till en ruttpunkt',
  'Waypoint added to autopilot route.':'Ruttpunkt tillagd i autopilotens rutt.','WAYPOINTS':'RUTTPUNKTER',
@@ -53,7 +55,7 @@ const sv={
  'Take command. The sea is waiting.':'Ta befälet. Havet väntar.','Nordvind, harbor clearance received. Safe fishing.':'Nordvind, hamntillstånd bekräftat. Gott fiske.',
  'Deck crew standing by':'Däcksbesättningen redo','Bracing in heavy seas':'Tar stöd i den hårda sjön','Clearing the deck':'Röjer däcket','Hauling and sorting':'Halar och sorterar',
  'Setting pot':'Sätter tina','Unloading catch':'Lossar fångsten','Bunkering diesel':'Bunkrar diesel','Repairing hull':'Reparerar skrovet','Installing equipment':'Installerar utrustning','A deckhand is seasick':'En däcksman är sjösjuk',
- 'resting in the cabin · watch on deck':'vilar i hytten · vakt på däck','MOORED · SET TARGET SPEED TO CAST OFF':'FÖRTÖJD · GE FART FÖR ATT KASTA LOSS',
+ 'resting in the cabin · watch on deck':'vilar i hytten · vakt på däck','MOORED · UNDOCK OR SET TARGET SPEED TO CAST OFF':'FÖRTÖJD · GE FART FÖR ATT KASTA LOSS',
  'Approaching the unloading berth':'Går in mot lossningskajen','Harbor crane unloading the hold':'Hamnkranen tömmer lastrummet','Aligning for the berth':'Riktar in båten mot kajen','Backing into the berth':'Backar in till kajen','Clearing the pier':'Går fri från bryggan','Repositioning clear of the pier':'Flyttar båten fri från bryggan','Securing mooring lines':'Förtöjer båten',
  'DOCKING / UNLOADING':'TILLÄGGNING / LOSSNING','HAULING':'HALAR','SETTING':'SÄTTER','NET WORK':'NÄTARBETE','SPACE · SET NEW POT':'SPACE · SÄTT NY TINA','SPACE · HAUL POT':'SPACE · HALA TINA',
  'SPACE · SET SALMON NET':'SPACE · SÄTT LAXNÄT','SPACE · RETRIEVE SALMON NET':'SPACE · TA UPP LAXNÄT','SALMON NET':'LAXNÄT','H SOAK':'TIM I VATTNET','NEAREST':'NÄRMASTE','BUOY':'BOJ','APPROACH':'NÄRMA DIG','WORKING AREA':'ARBETSOMRÅDE',
