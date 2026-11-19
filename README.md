@@ -90,3 +90,5 @@ Validation: 71 tests, including direct docking, mooring hold/restart, zero-lengt
 Bering Sea coastlines and real coordinates now replace the fictional rectangular coast. The chart zooms from Dutch Harbor through the Aleutians to the regional sea. Locally bundled Natural Earth and OpenStreetMap data drive coast/terrain/land collision, Dutch Harbor building/road/pier footprints and sea-route planning. Old seasons migrate without losing inventory or balance. The service facility, relief and bathymetry remain interpreted gameplay scenery, not a surveyed replica: see [sources and geographic limits](docs/geography.md).
 
 Ocean/foam no longer intersects the hull interior; rail overtopping creates a thin draining deck sheet. All 100 vessel configurations have actual 3D-model previews in the catalog and exchange review. Paused frames are retained while menus are open so preview generation does not compete with continuous ocean rendering.
+
+Version 0.16.0 adds special collector catches, a persistent collection, 16 migrating grounds and unlockable potential forecasts.

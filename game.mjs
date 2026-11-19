@@ -1,17 +1,20 @@
-import {clipChartWater} from './chart-water.mjs?v=0.15.5';
-import {groundsAt} from './fishing-grounds.mjs?v=0.15.5';
-import {createSoundscape} from './soundscape.mjs?v=0.15.5';
-import {WORLD_LAND,WORLD_CENTER,WORLD_BOUNDS,PLACES,worldToGeo} from './world.mjs?v=0.15.5';
-import {getLanguage,setLanguage,translateText,localizeTree} from './i18n.mjs?v=0.15.5';
-import {createShop} from './shop.mjs?v=0.15.5';
-import {restoreSeason,seasonJSON} from './saves.mjs?v=0.15.5';
-import {vesselStats,toggleAutomation} from './career.mjs?v=0.15.5';
-import {createGame,step,conditions,weatherAt,depthAt,PORT,distance,nearPort,handlePot,dock,undock,canUndock,service,rescue,clamp,potAction,POT_RANGE,jobProgress,setAutopilot,setRudder,potBearing,workingSide} from './simulation.mjs?v=0.15.5';
-import {createOcean,drawFallback} from './ocean.mjs?v=0.15.5';
-import {createScene} from './scene.mjs?v=0.15.5';
-import {createChartView,chartPoint,chartWorld,panChart,zoomChart,followVessel,updateChartFollow} from './chart.mjs?v=0.15.5';
-import {createWake} from './wake.mjs?v=0.15.5';
-import {advanceVoyage} from './voyage.mjs?v=0.15.5';
+import {scanSonar,drawSonar} from './sonar.mjs?v=0.16.0';
+import {rareCount,rareValue} from './rare-catch.mjs?v=0.16.0';
+import {clipChartWater} from './chart-water.mjs?v=0.16.0';
+import {groundsAt,groundReport} from './fishing-grounds.mjs?v=0.16.0';
+import {createSoundscape} from './soundscape.mjs?v=0.16.0';
+import {WORLD_LAND,WORLD_CENTER,WORLD_BOUNDS,PLACES,worldToGeo} from './world.mjs?v=0.16.0';
+import {getLanguage,setLanguage,translateText,localizeTree} from './i18n.mjs?v=0.16.0';
+import {createShop} from './shop.mjs?v=0.16.0';
+import {restoreSeason,seasonJSON} from './saves.mjs?v=0.16.0';
+import {vesselStats,toggleAutomation} from './career.mjs?v=0.16.0';
+import {createGame,step,conditions,weatherAt,depthAt,PORT,distance,nearPort,handlePot,dock,undock,canUndock,service,rescue,clamp,potAction,POT_RANGE,jobProgress,setAutopilot,setRudder,potBearing,workingSide} from './simulation.mjs?v=0.16.0';
+import {createOcean,drawFallback} from './ocean.mjs?v=0.16.0';
+import {createScene} from './scene.mjs?v=0.16.0';
+import {createChartView,chartPoint,chartWorld,panChart,zoomChart,followVessel,updateChartFollow} from './chart.mjs?v=0.16.0';
+import {createWake} from './wake.mjs?v=0.16.0';
+import {advanceVoyage} from './voyage.mjs?v=0.16.0';
+let sonarFrame='';
 const wake=createWake();
 const $=id=>document.getElementById(id),canvas=$('world'),ctx=canvas.getContext('2d'),sea=$('ocean'),chart=$('chart'),map=chart.getContext('2d');
 const sandbox=document.body.dataset.sandbox==='true';
@@ -61,7 +64,7 @@ chart.addEventListener('pointermove',e=>{if(!chartDrag)return;const p=chartCurso
 for(const event of ['pointerup','pointercancel','lostpointercapture'])chart.addEventListener(event,()=>{chartDrag=null;chart.dataset.dragging='false';if(event==='pointerup')focusChartTarget();});
 chart.addEventListener('contextmenu',e=>{e.preventDefault();const p=chartCursor(e),target=chartWorld(chartView,p.x,p.y,chart.width,chart.height);if(!setAutopilot(state,target.x,target.y,e.shiftKey))state.message='No navigable route to destination. Choose a point in open water.';save();updateUI();});
 chart.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','+','=','-','Home','Enter'].includes(e.key))return;e.stopPropagation();const pan=35;if(e.key==='ArrowLeft')panChart(chartView,pan,0);else if(e.key==='ArrowRight')panChart(chartView,-pan,0);else if(e.key==='ArrowUp')panChart(chartView,0,pan);else if(e.key==='ArrowDown')panChart(chartView,0,-pan);else if(e.key==='+'||e.key==='=')zoomChart(chartView,1.3,chart.width/2,chart.height/2,chart.width,chart.height);else if(e.key==='-')zoomChart(chartView,1/1.3,chart.width/2,chart.height/2,chart.width,chart.height);else if(e.key==='Home'){followVessel(chartView,state);}else if(e.key==='Enter')setAutopilot(state,chartView.x,chartView.y,e.shiftKey);else return;e.preventDefault();drawChart();});
-for(const b of document.querySelectorAll('[data-chart-area]'))b.onclick=()=>{chartView.follow=false;if(b.dataset.chartArea==='harbor'){chartView.x=0;chartView.y=-1000;chartView.scale=.035;}else if(b.dataset.chartArea==='region'){chartView.x=-15000;chartView.y=5000;chartView.scale=.0012;}else{chartView.x=WORLD_CENTER.x;chartView.y=WORLD_CENTER.y;chartView.scale=.00007;}drawChart();focusChartTarget();};
+for(const b of document.querySelectorAll('[data-chart-area]'))b.onclick=()=>{chartView.follow=false;if(b.dataset.chartArea==='harbor'){chartView.x=0;chartView.y=-1000;chartView.scale=.035;}else if(b.dataset.chartArea==='region'){chartView.x=-15000;chartView.y=5000;chartView.scale=.0012;}else{chartView.x=WORLD_CENTER.x;chartView.y=WORLD_CENTER.y;chartView.scale=Math.min(chart.width/(WORLD_BOUNDS.right-WORLD_BOUNDS.left),chart.height/(WORLD_BOUNDS.bottom-WORLD_BOUNDS.top))*.88;}drawChart();focusChartTarget();};
 $('chart-center').onclick=()=>{followVessel(chartView,state);drawChart();};
 $('ap-cancel').onclick=()=>{state.autopilot=null;state.rudder=0;state.message='Autopilot disengaged. Manual helm control.';updateUI();save();};
 $('speed-target').addEventListener('pointerup',()=>canvas.focus({preventScroll:true}));
@@ -77,6 +80,7 @@ $('sell').onclick=()=>{dock(state);if(state.deckJob?.kind==='unload'){harborWasP
 $('new-season').onclick=()=>{state=createGame();saved=false;harborWasPaused=false;setTimeSpeed(1);view.x=state.x;view.y=state.y;followVessel(chartView,state);save();$('harbor').close();updateUI();};
 $('rescue').onclick=()=>{rescue(state);harborWasPaused=false;$('harbor').close();save();updateUI();};
 const company=createShop(()=>state,(action,data)=>{if(action==='export'){const url=URL.createObjectURL(new Blob([seasonJSON(state)],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download='dangerous-waters-season.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}else if(action==='import'){const loaded=restoreSeason(data);if(!loaded){company.status('Invalid or incompatible season. Your current save is unchanged.');return;}state=loaded;followVessel(chartView,state);company.render();company.status('Season imported.');}save();updateUI();});
+$('rare-catch-open').onclick=()=>company.open('collection');
 for(const select of document.querySelectorAll('[data-language]')){select.value=getLanguage();select.onchange=()=>{setLanguage(select.value);state.language=getLanguage();document.documentElement.lang=getLanguage();for(const other of document.querySelectorAll('[data-language]'))other.value=getLanguage();if(!sandbox)try{localStorage.setItem('dangerous-waters-language',getLanguage());}catch{}company.refresh();updateUI();save();};}
 $('shop-toggle').onclick=()=>{keys.clear();company.open('skills');};$('fleet-toggle').onclick=()=>{keys.clear();company.open('fleet');};
 for(const [id,key] of [['auto-deploy','autoDeploy'],['auto-haul','autoHaul']])$(id).onclick=()=>{state.message=toggleAutomation(state,key).message;save();updateUI();canvas.focus();};
@@ -85,6 +89,7 @@ $('fishery').onchange=e=>{if(state.deckJob){e.target.value=state.career.fishing;
 let audio=null,soundOn=false;
 $('sound').onclick=()=>{soundOn=!soundOn;if(!audio)audio=createSoundscape();audio.resume();$('sound').textContent=soundOn?'SOUND ON':'SOUND OFF';$('sound').setAttribute('aria-pressed',String(soundOn));};
 function updateUI(){
+ updateSonar();
  const stats=vesselStats(state);$('scene').setAttribute('aria-label',`Three-dimensional view of the sea and ${stats.name}`);canvas.setAttribute('aria-label',`Sea and fishing vessel ${stats.name}`);$('speed-target').max=Math.ceil(stats.top*1.94384);$('vessel-name').textContent='F/V '+stats.name.toUpperCase();$('watermark-name').textContent='F/V '+stats.name.toUpperCase();$('vessel-type').textContent=`${stats.length.toFixed(1)} M · ${stats.type.toUpperCase()} · ${stats.crew} CREW`;
  const w=conditions(state),heading=((state.heading*180/Math.PI+90)%360+360)%360;
  const crewStatus=state.moored?'Secured alongside. Hold empty. Ready for service.':state.incident?`${state.incident.name} · repair ${Math.ceil(state.incident.remaining/stats.repair)}s`:scene3D?.crewStatus||'Deck crew standing by';if($('crew-status').textContent!==crewStatus)$('crew-status').textContent=crewStatus;
@@ -94,6 +99,7 @@ function updateUI(){
  $('wind').textContent=Math.round(w.wind);$('waves').textContent=w.waves.toFixed(1);$('visibility').textContent=(8*(1-w.fog)+.2).toFixed(1);$('weather-title').textContent=w.fog>.65?'Dense fog':w.waves>4?'Heavy seas':w.waves>2?'Building seas':'Slight seas';
  const forecast=weatherAt(state.hour+3);$('forecast').textContent=state.weatherOverride?'Manual weather preview. Select Dynamic for seasonal weather.':forecast.wind>w.wind+5?'A front is approaching. Winds increasing within three hours.':forecast.wind<w.wind-5?'Winds expected to ease. A calmer window is opening.':'Steady conditions for the next few hours. Keep watch.';
  const strip=$('weather-strip');if(!strip.children.length)for(let i=0;i<24;i++)strip.append(document.createElement('i'));[...strip.children].forEach((el,i)=>{const f=weatherAt(state.hour+i/4);el.style.height=(f.wind/48*100)+'%';el.style.background=f.wind>30?'#d5a366':'#799a93';});
+ $('rare-catch-open').textContent=`SPECIAL CATCHES · ${rareCount(state)} ABOARD · ${money(rareValue(state))}`;
  $('cargo').textContent=state.cargo+state.salmon;$('catch-split').textContent=`${state.cargo} / ${state.salmon} kg`;$('cargo-meter').max=state.capacity;$('cargo-meter').value=state.cargo+state.salmon;$('deck').textContent=`${state.deck} / ${stats.potCapacity}`;$('pots').textContent=state.pots.length;$('money').textContent=money(state.money);$('depth').textContent=`DEPTH ${depthAt(state.x,state.y)} M`;const geo=worldToGeo(state.x,state.y);$('coordinates').textContent=`${geo.lat.toFixed(4)}° N ${Math.abs(geo.lon).toFixed(4)}° ${geo.lon<0?'W':'E'}`;$('sea-position').textContent=`${depthAt(state.x,state.y)} M DEPTH · ${Math.round(distance(state,PORT))} M TO HARBOR`;
  const ready=nearPort(state)&&Math.abs(state.speed)<1&&!state.deckJob&&!state.incident;$('shop-toggle').hidden=!nearPort(state);$('shop-toggle').disabled=!ready;$('fleet-alert').textContent=state.career.fleet.filter(b=>b.request?.status==='pending').length||state.career.fleet.length;$('fishery').value=state.career.fishing;$('fishery').querySelector('[value=salmon]').disabled=!stats.salmon;$('fishery').disabled=!!state.deckJob;for(const [id,key,label] of [['auto-deploy','autoDeploy','AUTO SET'],['auto-haul','autoHaul','AUTO HAUL']]){const b=$(id),unlocked=!!state.career.skills[key];b.disabled=!unlocked||state.career.fishing!=='crab';b.textContent=`${label} · ${!unlocked?'LOCKED':state.career[key]?'ON':'OFF'}`;b.setAttribute('aria-pressed',String(state.career[key]));}$('dock-status').textContent=ready?`You are in the service area. Balance ${money(state.money)}.`:`${Math.round(distance(state,PORT))} meters to harbor. Slow below 2 knots for service.`;
  for(const b of document.querySelectorAll('[data-service]')){b.disabled=!ready;b.querySelector('small').textContent=b.dataset.service==='fuel'?`${(9.5*stats.serviceCost).toFixed(2)} kr / liter · fill to ${stats.tank} L`:`${Math.round(160*stats.serviceCost)} kr / percentage point`;}$('sell').disabled=!ready;$('undock').disabled=!canUndock(state);
@@ -103,13 +109,14 @@ function updateUI(){
  drawChart();document.documentElement.lang=getLanguage();localizeTree(document.body);
 }
 function drawChart(){
+ const reports=groundsAt(state.hour).map(g=>`${g.name} · ${groundForecast(g)||'Unlock Crab grounds knowledge / Salmon reading in the harbor shop.'}`).join('\n');if($('ground-reports').textContent!==reports)$('ground-reports').textContent=reports;
  updateChartFollow(chartView,state);$('chart-center').setAttribute('aria-pressed',String(chartView.follow));
  const cw=chart.width,ch=chart.height,scale=chartView.scale,point=(x,y)=>chartPoint(chartView,x,y,cw,ch);map.fillStyle='#11272e';map.fillRect(0,0,cw,ch);map.strokeStyle='#28424a';map.lineWidth=.5;const spacing=scale>.25?100:scale>.02?1000:scale>.001?10000:scale>.0002?100000:500000,lo=chartWorld(chartView,0,0,cw,ch),hi=chartWorld(chartView,cw,ch,cw,ch);
  for(let x=Math.floor(lo.x/spacing)*spacing;x<hi.x;x+=spacing){const p=point(x,0);map.beginPath();map.moveTo(p.x,0);map.lineTo(p.x,ch);map.stroke();}for(let y=Math.floor(lo.y/spacing)*spacing;y<hi.y;y+=spacing){const p=point(0,y);map.beginPath();map.moveTo(0,p.y);map.lineTo(cw,p.y);map.stroke();}
  map.fillStyle='#34433a';map.strokeStyle='#729082';map.lineWidth=.7;for(const land of WORLD_LAND){if(land.left>hi.x||land.right<lo.x||land.top>hi.y||land.bottom<lo.y)continue;map.beginPath();for(const ring of [land.outer,...land.holes]){ring.forEach((v,i)=>{const p=point(v.x,v.y);i?map.lineTo(p.x,p.y):map.moveTo(p.x,p.y);});map.closePath();}map.fill('evenodd');map.stroke();}
  const nw=point(WORLD_BOUNDS.left,WORLD_BOUNDS.top),se=point(WORLD_BOUNDS.right,WORLD_BOUNDS.bottom);map.strokeStyle='#8ba6a066';map.setLineDash([5,5]);map.strokeRect(nw.x,nw.y,se.x-nw.x,se.y-nw.y);map.setLineDash([]);
  for(const place of PLACES){if(place.name==='Dutch Harbor')continue;if(scale<.0004&&['Unalaska','Amaknak Island','Unalaska Island','Akutan','Akutan Island','Unimak Island'].includes(place.name))continue;if(scale>.001&&place.name!=='Dutch Harbor'&&Math.hypot(place.x-state.x,place.y-state.y)>20000)continue;const p=point(place.x,place.y);if(p.x<0||p.x>cw||p.y<0||p.y>ch)continue;map.fillStyle='#afc1b3';map.font='8px monospace';map.fillText(place.name,p.x+4,p.y-4);}
- map.save();clipChartWater(map,point,cw,ch);for(const g of groundsAt(state.hour)){const p=point(g.x,g.y);map.strokeStyle='#6d9c8d77';map.setLineDash([3,4]);map.beginPath();map.ellipse(p.x,p.y,g.rx*scale,g.ry*scale,g.angle,0,Math.PI*2);map.fillStyle='#6d9c8d18';map.fill();map.stroke();map.setLineDash([]);map.fillStyle='#80a99b';map.font='7px monospace';if(scale>.0002)map.fillText(g.name,p.x-25,p.y+5);}map.restore();
+ map.save();clipChartWater(map,point,cw,ch);for(const g of groundsAt(state.hour)){const p=point(g.x,g.y);map.strokeStyle='#6d9c8d77';map.setLineDash([3,4]);map.beginPath();map.ellipse(p.x,p.y,g.rx*scale,g.ry*scale,g.angle,0,Math.PI*2);map.fillStyle='#6d9c8d18';map.fill();map.stroke();map.setLineDash([]);map.fillStyle='#80a99b';map.font=($('chart-dialog').open?'11px':'9px')+' monospace';if(scale>.0002){map.fillText(g.name,p.x-25,p.y+5);const reports=groundForecast(g);if(reports)map.fillText(reports,p.x-35,p.y+16);}}map.restore();
  const port=point(PORT.x,PORT.y);map.fillStyle='#d8d9c8';map.fillRect(port.x-3,port.y-3,6,6);map.font='7px monospace';map.fillText('DUTCH HARBOR',port.x-28,port.y+13);
  for(const pot of state.pots){const p=point(pot.x,pot.y),ready=distance(state,pot)<POT_RANGE&&workingSide(state,pot);map.strokeStyle=ready?'#9dd7ae':'#e4ac6477';map.beginPath();map.arc(p.x,p.y,POT_RANGE*scale,0,Math.PI*2);map.stroke();map.fillStyle=ready?'#9dd7ae':'#e4ac64';map.beginPath();map.arc(p.x,p.y,2.5,0,Math.PI*2);map.fill();if(scale>.12){map.font='8px monospace';map.fillText(String(pot.id),p.x+5,p.y-5);}}
  for(const fleet of state.career.fleet){map.fillStyle=fleet.color;map.strokeStyle=fleet.color;for(const pot of fleet.pots){const p=point(pot.x,pot.y);map.beginPath();map.arc(p.x,p.y,2,0,Math.PI*2);map.fill();}const p=point(fleet.x,fleet.y);map.save();map.translate(p.x,p.y);map.rotate(fleet.heading);map.beginPath();map.moveTo(6,0);map.lineTo(-4,-3);map.lineTo(-4,3);map.closePath();map.fill();map.restore();if(scale>.08){map.font='8px monospace';map.fillText(fleet.name,p.x+7,p.y-5);}}
@@ -157,3 +164,8 @@ function frame(now){const wallDt=Math.max(0,(now-last)/1000),dt=Math.min(wallDt,
  uiTimer+=dt;toastAge+=dt;saveTimer+=dt;if(uiTimer>.2){updateUI();uiTimer=0;$('renderer').title=`${sceneError||renderer.label} · ${Math.round(fps)} FPS`;}if(saveTimer>10&&started&&!document.hidden){save();saveTimer=0;}requestAnimationFrame(frame);
 }
 updateUI();requestAnimationFrame(frame);
+
+function groundForecast(g){return ['crab','salmon'].map(species=>{const report=groundReport(g,species,state.career.skills[species]||0,state.hour);return report?`${species==='crab'?'C':'S'} EST. ${report.low}–${report.high}%`:'';}).filter(Boolean).join(' · ');}
+
+function updateSonar(){const scan=scanSonar(state),panel=$('sonar-panel');panel.hidden=!scan;if(!scan)return;const right=document.querySelector('.right-panel');if(innerWidth<=760){if(panel.parentElement!==right)right.insertBefore(panel,right.querySelector('.catch'));}else if(panel.parentElement!==document.body)document.body.append(panel);
+ const key=[scan.grade,scan.tick,state.x.toFixed(1),state.y.toFixed(1),state.heading.toFixed(2)].join('/');if(key===sonarFrame)return;sonarFrame=key;drawSonar($('sonar-screen'),scan);$('sonar-grade').textContent=`${scan.grade}/5 · ${scan.name}`;$('sonar-depth').textContent=`DEPTH ${scan.depth} M · RANGE ±${scan.radius} M`;$('sonar-readings').textContent=`CRAB ${scan.crab.low}–${scan.crab.high}% · FISH ${scan.salmon.low}–${scan.salmon.high}%`;$('sonar-screen').setAttribute('aria-label',`Bottom sonar: ${scan.depth} meters deep. Crab signal ${scan.crab.low} to ${scan.crab.high} percent. Fish signal ${scan.salmon.low} to ${scan.salmon.high} percent.`);}

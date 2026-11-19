@@ -6,6 +6,11 @@ export function setLanguage(value){language=value==='sv'?'sv':'en';return langua
 export const toInternalMoney=(amount,locale=language)=>amount*(locale==='sv'?1:10);
 export function formatMoney(amount,locale=language){const sv=locale==='sv',n=amount/(sv?1:10),fraction=Math.abs(n-Math.round(n))>.000001;return new Intl.NumberFormat(sv?'sv-SE':'en-US',{style:'currency',currency:sv?'SEK':'USD',minimumFractionDigits:fraction?2:0,maximumFractionDigits:2}).format(n);}
 const sv={
+ 'BOTTOM SONAR':'BOTTENSONAR','FISHING INTELLIGENCE':'FISKEPROGNOS','Interpreted signal · not a guaranteed catch':'Tolkad signal · ingen garanterad fångst','C = crab · S = salmon · Estimated potential, not guaranteed catch':'C = krabba · S = lax · Uppskattad potential, ingen fångstgaranti',
+ 'Unlock live bottom sonar; five grades improve range, resolution and signal accuracy; crab yield +5% per grade':'Lås upp bottensonar; fem nivåer förbättrar räckvidd, upplösning och träffsäkerhet; krabbfångst +5 % per nivå',
+ 'SPECIAL CATCHES':'SPECIALFÅNGSTER','ABOARD':'OMBORD','Special catch collection':'Samling av specialfångster','BONUS':'BONUS','Rare':'Sällsynt','Exceptional':'Exceptionell','Epic':'Episk','Legendary':'Legendarisk','Mythic':'Mytisk',
+ 'Unlock crab ground potential forecasts; higher ranks narrow uncertainty and add 6% yield per rank':'Lås upp prognoser för krabbfält; högre nivå minskar osäkerheten och ökar fångsten med 6 % per nivå',
+ 'Unlock salmon ground potential forecasts; higher ranks narrow uncertainty and add 8% yield per rank':'Lås upp prognoser för laxfält; högre nivå minskar osäkerheten och ökar fångsten med 8 % per nivå',
  'UNDOCK · CLEAR THE QUAY':'KASTA LOSS · LÄMNA KAJEN',
  'Cast off. Harbor assist moved the vessel clear of the quay.':'Losskastat. Hamnassistansen har flyttat båten fri från kajen.',
  'Route planner':'Ruttplanering','Enlarge chart':'Förstora sjökort','Minimize chart':'Förminska sjökort','Close chart planner':'Stäng ruttplanering','EXPAND':'FÖRSTORA','MINIMIZE':'FÖRMINSKA',

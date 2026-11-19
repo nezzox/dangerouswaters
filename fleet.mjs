@@ -1,8 +1,9 @@
-import {FUEL_SCALE,SEA_WEAR_SCALE} from './balance.mjs?v=0.15.5';
-import {groundsAt} from './fishing-grounds.mjs?v=0.15.5';
-import {nearestWater,geoToWorld} from './world.mjs?v=0.15.5';
-import {planSeaRoute} from './navigation.mjs?v=0.15.5';
-import {vesselStats,settleLanding} from './career.mjs?v=0.15.5';
+import {prepareRareCatch,awardRareCatch,rareValue} from './rare-catch.mjs?v=0.16.0';
+import {FUEL_SCALE,SEA_WEAR_SCALE} from './balance.mjs?v=0.16.0';
+import {groundsAt} from './fishing-grounds.mjs?v=0.16.0';
+import {nearestWater,geoToWorld} from './world.mjs?v=0.16.0';
+import {planSeaRoute} from './navigation.mjs?v=0.16.0';
+import {vesselStats,settleLanding} from './career.mjs?v=0.16.0';
 export function fleetStats(s,b){return vesselStats({...b,career:{boat:b.boat,parts:b.parts,skills:s.career.skills}});}
 function radio(s,text){s.message=text;s.log.unshift({hour:s.hour,text});s.log=s.log.slice(0,8);}
 function requestService(s,b,stats){const fuel=Math.max(0,stats.tank-b.fuel),repair=Math.max(0,100-b.hull),bait=b.fishing==='salmon'?0:stats.potCapacity*stats.baitCost,cost=Math.ceil((fuel*9.5+repair*160)*stats.serviceCost+bait);b.phase='service';b.request={cost,fuel,repair,bait,status:'pending'};radio(s,`Captain of ${b.name}: permission for ${cost.toLocaleString('en-US')} kr of fuel, repairs and trip supplies? Open Fleet & finance.`);}
@@ -18,8 +19,10 @@ export function tickFleet(s,dt,w){for(const [i,b] of s.career.fleet.entries()){
  if(b.phase==='outbound'){const points=[[350,80],[ground.x,ground.y]],p=points[b.waypoint||0];if(navigate(b,...p,speed,dt)){b.waypoint=(b.waypoint||0)+1;if(b.waypoint>=points.length){b.phase=b.fishing==='salmon'&&stats.salmon?'net':'deploy';b.timer=0;}}}
  else if(b.phase==='deploy'){const n=b.pots.length,target={x:ground.x+(n%10)*165,y:ground.y+Math.floor(n/10)*165},arrived=navigate(b,target.x,target.y,Math.min(speed,2.3),dt);if(arrived&&b.timer>=14/stats.work){b.pots.push({id:n+1,x:b.x,y:b.y,setAt:s.hour});b.timer=0;if(b.pots.length>=stats.potCapacity){b.phase='soak';b.timer=0;}}}
  else if(b.phase==='soak'){if(b.timer>=112.5){b.phase='haul';b.timer=0;}}
- else if(b.phase==='haul'){const pot=b.pots[0];if(!pot){b.phase='return';b.waypoint=0;b.timer=0;}else if(navigate(b,pot.x,pot.y,Math.min(speed,2.3),dt)){pot.haul=(pot.haul||0)+dt;if(pot.haul>=32/(stats.work*stats.haul)){const soak=Math.max(0,s.hour-pot.setAt),kg=Math.round(60*(1-Math.exp(-soak/1.8))*stats.crabYield);b.cargo=Math.min(stats.capacity,b.cargo+kg);b.pots.shift();}}}
- else if(b.phase==='net'){if(b.timer>120/(stats.work*stats.netWork)){b.salmon=Math.min(stats.capacity,Math.round(250*stats.salmonYield));b.phase='return';b.waypoint=0;b.timer=0;}}
+ else if(b.phase==='haul'){const pot=b.pots[0];if(!pot){b.phase='return';b.waypoint=0;b.timer=0;}else if(navigate(b,pot.x,pot.y,Math.min(speed,2.3),dt)){pot.haul=(pot.haul||0)+dt;if(pot.haul>=32/(stats.work*stats.haul)){const soak=Math.max(0,s.hour-pot.setAt),kg=Math.round(60*(1-Math.exp(-soak/1.8))*stats.crabYield);const room=stats.capacity-b.cargo-b.salmon;b.cargo+=Math.max(0,Math.min(room,kg));if(room>0)fleetRare(s,b,prepareRareCatch(s,pot,'crab',kg));b.pots.shift();}}}
+ else if(b.phase==='net'){if(b.timer>120/(stats.work*stats.netWork)){b.salmon=Math.min(stats.capacity,Math.round(250*stats.salmonYield));fleetRare(s,b,prepareRareCatch(s,{},'salmon',b.salmon));b.phase='return';b.waypoint=0;b.timer=0;}}
  else if(b.phase==='return'){const points=[[180,80]],p=points[b.waypoint||0];if(navigate(b,...p,speed,dt)){b.waypoint=(b.waypoint||0)+1;if(b.waypoint>=points.length){b.phase='landing';b.timer=0;}}}
- else if(b.phase==='landing'&&b.timer>=40/stats.unload){const gross=(b.cargo*65+b.salmon*42)*stats.priceBonus,crew=Math.max(0,gross-b.expenses)*stats.crewShare,receipt=settleLanding(s,gross-crew);b.lastLanding={gross,crew,expenses:b.expenses,repaid:receipt.repaid,profit:gross-crew-b.expenses};b.earnings+=b.lastLanding.profit;b.trips++;b.cargo=0;b.salmon=0;b.expenses=0;b.phase='service';b.timer=0;radio(s,`${b.name} landed catch: ${Math.round(gross).toLocaleString('en-US')} kr, crew ${Math.round(crew).toLocaleString('en-US')} kr. Captain preparing the next trip.`);}
+ else if(b.phase==='landing'&&b.timer>=40/stats.unload){const gross=(b.cargo*65+b.salmon*42)*stats.priceBonus+rareValue(b),crew=Math.max(0,gross-b.expenses)*stats.crewShare,receipt=settleLanding(s,gross-crew);b.lastLanding={gross,crew,expenses:b.expenses,repaid:receipt.repaid,profit:gross-crew-b.expenses};b.earnings+=b.lastLanding.profit;b.trips++;b.cargo=0;b.salmon=0;b.rareHold={};b.expenses=0;b.phase='service';b.timer=0;radio(s,`${b.name} landed catch: ${Math.round(gross).toLocaleString('en-US')} kr, crew ${Math.round(crew).toLocaleString('en-US')} kr. Captain preparing the next trip.`);}
 }}
+
+function fleetRare(s,b,id){const r=awardRareCatch(s,b,id);if(r)radio(s,`SPECIAL CATCH · ${b.name}: ${r.name}. Bonus ${r.value.toLocaleString('en-US')} kr on landing.`);}
