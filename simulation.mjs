@@ -1,14 +1,15 @@
-import {prepareRareCatch,awardRareCatch,rareValue,rareById} from './rare-catch.mjs?v=0.16.0';
-import {FUEL_SCALE,SEA_WEAR_SCALE} from './balance.mjs?v=0.16.0';
-import {crabAbundance,soakedAbundance,salmonAbundance} from './fishing-grounds.mjs?v=0.16.0';
-export {groundsAt} from './fishing-grounds.mjs?v=0.16.0';
-import {WORLD_VERSION,WORLD_BOUNDS,FISHING_GROUNDS,isLand,inWorld} from './world.mjs?v=0.16.0';
-import {planSeaRoute} from './navigation.mjs?v=0.16.0';
-import {tickFleet} from './fleet.mjs?v=0.16.0';
-import {ensureCareer,vesselStats,settleLanding} from './career.mjs?v=0.16.0';
-import {tickIncidents,blocksDeck} from './incidents.mjs?v=0.16.0';
-import {BERTH,buildDockRoute,dockRouteDuration,dockingPose,vesselIntersectsHarbor,castOffPosition} from './harbor.mjs?v=0.16.0';
-export {BERTH} from './harbor.mjs?v=0.16.0';
+import {fuelBurnRate} from './fuel-economy.mjs?v=0.16.1';
+import {prepareRareCatch,awardRareCatch,rareValue,rareById} from './rare-catch.mjs?v=0.16.1';
+import {SEA_WEAR_SCALE} from './balance.mjs?v=0.16.1';
+import {crabAbundance,soakedAbundance,salmonAbundance} from './fishing-grounds.mjs?v=0.16.1';
+export {groundsAt} from './fishing-grounds.mjs?v=0.16.1';
+import {WORLD_VERSION,WORLD_BOUNDS,FISHING_GROUNDS,isLand,inWorld} from './world.mjs?v=0.16.1';
+import {planSeaRoute} from './navigation.mjs?v=0.16.1';
+import {tickFleet} from './fleet.mjs?v=0.16.1';
+import {ensureCareer,vesselStats,settleLanding} from './career.mjs?v=0.16.1';
+import {tickIncidents,blocksDeck} from './incidents.mjs?v=0.16.1';
+import {BERTH,buildDockRoute,dockRouteDuration,dockingPose,vesselIntersectsHarbor,castOffPosition} from './harbor.mjs?v=0.16.1';
+export {BERTH} from './harbor.mjs?v=0.16.1';
 export const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 export const PORT={x:BERTH.x,y:BERTH.y};
 export const DECK_LIMIT_KNOTS=5;
@@ -56,7 +57,7 @@ export function step(s,dt){
  s.x+=Math.cos(s.heading)*s.speed*dt;s.y+=Math.sin(s.heading)*s.speed*dt;
  if(!nearPort(s)){s.x+=Math.sin(s.hour*.6)*dt*.16*w.waves;s.y+=dt*.055*w.waves;}
  if((!vesselIntersectsHarbor(previous)&&vesselIntersectsHarbor(s))||(!vesselOnLand(previous)&&vesselOnLand(s))){const impact=Math.abs(s.speed);s.x=previous.x;s.y=previous.y;s.heading=previous.heading;s.speed*=.15;s.hull=Math.max(0,s.hull-Math.max(0,impact-.8)*.08);}
- s.fuel=Math.max(0,s.fuel-dt*(.012+Math.abs(s.throttle)*.09)*power*stats.fuelUse*FUEL_SCALE);
+ s.fuel=Math.max(0,s.fuel-dt*fuelBurnRate(s.throttle,stats.fuelUse)*power);
  if(w.waves>3.5&&Math.abs(s.speed)>3)s.hull=Math.max(0,s.hull-dt*(w.waves-3.5)*.016*(Math.abs(s.speed)-3)/stats.protection*SEA_WEAR_SCALE);
  if(!inWorld(s.x,s.y)){s.x=clamp(s.x,WORLD_BOUNDS.left,WORLD_BOUNDS.right);s.y=clamp(s.y,WORLD_BOUNDS.top,WORLD_BOUNDS.bottom);s.speed=0;s.desiredKnots=0;}
  tickAutomation(s);
