@@ -7,8 +7,10 @@ import zipfile
 
 root = Path(__file__).resolve().parent
 version = json.loads((root / 'package.json').read_text())['version']
-files = [root / 'index.html', root / 'style.css', root / '.nojekyll', *sorted(root.glob('*.mjs'))]
+files = [root / 'index.html', root / 'style.css', root / '.nojekyll', root / 'intro.mp4', *sorted(root.glob('*.mjs'))]
 for path in files:
+    if path.suffix == '.mp4':
+        continue
     for target in re.findall(r'''(?:from\s+|src=|href=)["'](\.?\.?/)?([^"']+\.(?:mjs|css))(?:\?[^"']*)?["']''', path.read_text()):
         assert (path.parent / ''.join(target)).is_file(), (path.name, target)
 output = root / 'dist' / f'dangerous-waters-{version}-web.zip'

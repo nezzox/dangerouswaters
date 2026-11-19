@@ -86,3 +86,5 @@ Sources: https://open-meteo.com/en/docs and https://open-meteo.com/en/docs/marin
 0.17.4: Crab pots hold at most 90 kg, including catch bonuses. Rich habitat fills at 3.6 kg per effective soak hour; habitat abundance is squared so poor areas fill far more slowly. The 6/24/36-hour stages and permanent retained catch remain. Operation tests use explicit rich-habitat fixtures rather than relying on baseline catch outside grounds.
 
 0.17.5: Fleet & Finance displays a high-contrast envelope badge for unread captain radio messages or pending approvals. Viewing Fleet clears unread messages; pending requests remain marked until answered. Unread flags persist with vessel saves.
+
+0.17.6: The supplied DangerousWaters.mp4 is bundled as intro.mp4 (40 seconds, H.264/AAC, 720p, fast-start). It loads only after starting a new season, including Start over; continuing a saved season bypasses it. Skip, Escape, natural completion or a media error enter the game without running the simulation behind the film. Native video controls support pause, volume and playback retry.

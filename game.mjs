@@ -1,25 +1,26 @@
-import {fleetNoticeCount} from './fleet.mjs?v=0.17.5';
-import {redeemDeveloperCode} from './developer-code.mjs?v=0.17.5';
-import {potSoakStage} from './pot-soak.mjs?v=0.17.5';
-import {createLiveWeather} from './live-weather.mjs?v=0.17.5';
-import {dockingStage} from './harbor.mjs?v=0.17.5';
-import {fuelEconomy} from './fuel-economy.mjs?v=0.17.5';
-import {scanSonar,drawSonar} from './sonar.mjs?v=0.17.5';
-import {rareCount,rareValue} from './rare-catch.mjs?v=0.17.5';
-import {clipChartWater} from './chart-water.mjs?v=0.17.5';
-import {groundsAt,groundReport} from './fishing-grounds.mjs?v=0.17.5';
-import {createSoundscape} from './soundscape.mjs?v=0.17.5';
-import {WORLD_LAND,WORLD_CENTER,WORLD_BOUNDS,PLACES,worldToGeo} from './world.mjs?v=0.17.5';
-import {getLanguage,setLanguage,translateText,localizeTree} from './i18n.mjs?v=0.17.5';
-import {createShop} from './shop.mjs?v=0.17.5';
-import {restoreSeason,seasonJSON} from './saves.mjs?v=0.17.5';
-import {vesselStats,toggleAutomation} from './career.mjs?v=0.17.5';
-import {createGame,step,conditions,weatherAt,setWeatherMode,depthAt,PORT,distance,nearPort,handlePot,dock,undock,canUndock,service,rescue,clamp,potAction,POT_RANGE,jobProgress,setAutopilot,setRudder,potBearing,workingSide} from './simulation.mjs?v=0.17.5';
-import {createOcean,drawFallback} from './ocean.mjs?v=0.17.5';
-import {createScene} from './scene.mjs?v=0.17.5';
-import {createChartView,chartPoint,chartWorld,panChart,zoomChart,followVessel,updateChartFollow} from './chart.mjs?v=0.17.5';
-import {createWake} from './wake.mjs?v=0.17.5';
-import {advanceVoyage} from './voyage.mjs?v=0.17.5';
+import {createIntro} from './intro.mjs?v=0.17.6';
+import {fleetNoticeCount} from './fleet.mjs?v=0.17.6';
+import {redeemDeveloperCode} from './developer-code.mjs?v=0.17.6';
+import {potSoakStage} from './pot-soak.mjs?v=0.17.6';
+import {createLiveWeather} from './live-weather.mjs?v=0.17.6';
+import {dockingStage} from './harbor.mjs?v=0.17.6';
+import {fuelEconomy} from './fuel-economy.mjs?v=0.17.6';
+import {scanSonar,drawSonar} from './sonar.mjs?v=0.17.6';
+import {rareCount,rareValue} from './rare-catch.mjs?v=0.17.6';
+import {clipChartWater} from './chart-water.mjs?v=0.17.6';
+import {groundsAt,groundReport} from './fishing-grounds.mjs?v=0.17.6';
+import {createSoundscape} from './soundscape.mjs?v=0.17.6';
+import {WORLD_LAND,WORLD_CENTER,WORLD_BOUNDS,PLACES,worldToGeo} from './world.mjs?v=0.17.6';
+import {getLanguage,setLanguage,translateText,localizeTree} from './i18n.mjs?v=0.17.6';
+import {createShop} from './shop.mjs?v=0.17.6';
+import {restoreSeason,seasonJSON} from './saves.mjs?v=0.17.6';
+import {vesselStats,toggleAutomation} from './career.mjs?v=0.17.6';
+import {createGame,step,conditions,weatherAt,setWeatherMode,depthAt,PORT,distance,nearPort,handlePot,dock,undock,canUndock,service,rescue,clamp,potAction,POT_RANGE,jobProgress,setAutopilot,setRudder,potBearing,workingSide} from './simulation.mjs?v=0.17.6';
+import {createOcean,drawFallback} from './ocean.mjs?v=0.17.6';
+import {createScene} from './scene.mjs?v=0.17.6';
+import {createChartView,chartPoint,chartWorld,panChart,zoomChart,followVessel,updateChartFollow} from './chart.mjs?v=0.17.6';
+import {createWake} from './wake.mjs?v=0.17.6';
+import {advanceVoyage} from './voyage.mjs?v=0.17.6';
 let sonarFrame='';
 const wake=createWake();
 const $=id=>document.getElementById(id),canvas=$('world'),ctx=canvas.getContext('2d'),sea=$('ocean'),chart=$('chart'),map=chart.getContext('2d');
@@ -50,11 +51,12 @@ addEventListener('beforeunload',save);
 function togglePause(){if(!started||$('harbor').open||$('career').open||$('chart-dialog').open)return;state.paused=!state.paused;keys.clear();save();updateUI();}
 function keyboardCode(e){return ({a:'KeyA',d:'KeyD',w:'KeyW',s:'KeyS',x:'KeyX',e:'KeyE',u:'KeyU'})[e.key?.toLowerCase()]||e.code||e.key;}
 function centerRudder(){for(const code of ['KeyA','KeyD','ArrowLeft','ArrowRight'])keys.delete(code);setRudder(state,0);}
-addEventListener('keydown',e=>{const code=keyboardCode(e);if($('code-dialog').open)return;if(($('career').open||$('harbor').open||$('chart-dialog').open)&&code!=='Escape')return;if(code!=='Escape'&&(e.target.closest('select,textarea,input:not([type=range]),[contenteditable=true]')||(e.target.closest('button')&&code==='Enter')))return;if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(code))e.preventDefault();if(e.repeat)return;if(code==='Escape'){if($('chart-dialog').open){e.preventDefault();$('chart-dialog').close();}else if($('career').open)$('career').close();else if($('harbor').open)$('harbor').close();else togglePause();return;}if(!started||state.paused||$('harbor').open||$('career').open)return;keys.add(code);if(['KeyA','KeyD','ArrowLeft','ArrowRight'].includes(code))setRudder(state,state.rudder*35+(['KeyA','ArrowLeft'].includes(code)?-2:2));if(code==='KeyX')centerRudder();if(code==='Space'){handlePot(state);save();}if(code==='KeyE'){dock(state);save();}if(code==='KeyU')castOffFromControls();});
+addEventListener('keydown',e=>{const code=keyboardCode(e);if($('intro').open||$('code-dialog').open)return;if(($('career').open||$('harbor').open||$('chart-dialog').open)&&code!=='Escape')return;if(code!=='Escape'&&(e.target.closest('select,textarea,input:not([type=range]),[contenteditable=true]')||(e.target.closest('button')&&code==='Enter')))return;if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(code))e.preventDefault();if(e.repeat)return;if(code==='Escape'){if($('chart-dialog').open){e.preventDefault();$('chart-dialog').close();}else if($('career').open)$('career').close();else if($('harbor').open)$('harbor').close();else togglePause();return;}if(!started||state.paused||$('harbor').open||$('career').open)return;keys.add(code);if(['KeyA','KeyD','ArrowLeft','ArrowRight'].includes(code))setRudder(state,state.rudder*35+(['KeyA','ArrowLeft'].includes(code)?-2:2));if(code==='KeyX')centerRudder();if(code==='Space'){handlePot(state);save();}if(code==='KeyE'){dock(state);save();}if(code==='KeyU')castOffFromControls();});
 addEventListener('keyup',e=>keys.delete(keyboardCode(e))); addEventListener('blur',()=>{keys.clear();if(started)state.paused=true;});
 if(sandbox)document.querySelector('.intro-foot').textContent='ISOLATED CAREER CHECK · NO SAVING';
 $('start').textContent=saved?'CONTINUE YOUR SEASON →':'TAKE COMMAND →';
-$('start').onclick=()=>{$('welcome').close();started=true;state.paused=false;canvas.setAttribute('tabindex','0');canvas.focus();updateUI();};$('welcome').showModal();
+const intro=createIntro({dialog:$('intro'),video:$('intro-video'),skip:$('intro-skip'),onFinish:()=>{started=true;state.paused=false;canvas.setAttribute('tabindex','0');canvas.focus();updateUI();}});
+$('start').onclick=()=>{$('welcome').close();if(saved){started=true;state.paused=false;canvas.setAttribute('tabindex','0');canvas.focus();updateUI();}else intro.start();};$('welcome').showModal();
 $('pause').onclick=togglePause;
 const chartPanel=document.querySelector('.chart-panel'),chartHome=document.createComment('chart-home');chartPanel.before(chartHome);let chartWasPaused=true;
 const focusChartTarget=()=>($('chart-dialog').open?chart:canvas).focus({preventScroll:true});
@@ -89,7 +91,7 @@ function castOffFromControls(){if(undock(state)){state.paused=false;keys.clear()
 $('undock-quick').onclick=castOffFromControls;
 $('undock').onclick=()=>{if(undock(state)){harborWasPaused=false;$('harbor').close();}save();updateUI();};
 $('sell').onclick=()=>{dock(state);if(state.deckJob?.kind==='unload'){harborWasPaused=false;$('harbor').close();}save();updateUI();};for(const b of document.querySelectorAll('[data-service]'))b.onclick=()=>{service(state,b.dataset.service);save();updateUI();};
-$('new-season').onclick=()=>{state=createGame();saved=false;harborWasPaused=false;setTimeSpeed(1);view.x=state.x;view.y=state.y;followVessel(chartView,state);save();$('harbor').close();updateUI();};
+$('new-season').onclick=()=>{state=createGame();saved=false;harborWasPaused=false;setTimeSpeed(1);view.x=state.x;view.y=state.y;followVessel(chartView,state);save();$('harbor').close();started=false;state.paused=true;intro.start();updateUI();};
 $('rescue').onclick=()=>{rescue(state);harborWasPaused=false;$('harbor').close();save();updateUI();};
 const company=createShop(()=>state,(action,data)=>{if(action==='export'){const url=URL.createObjectURL(new Blob([seasonJSON(state)],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download='dangerous-waters-season.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}else if(action==='import'){const loaded=restoreSeason(data);if(!loaded){company.status('Invalid or incompatible season. Your current save is unchanged.');return;}state=loaded;followVessel(chartView,state);company.render();company.status('Season imported.');}save();updateUI();});
 $('rare-catch-open').onclick=()=>company.open('collection');
@@ -173,7 +175,7 @@ function frame(now){weatherPoll+=1;if(state.weatherMode!=='dynamic'&&(weatherPol
  if(started&&!state.paused){if(keys.has('KeyW')||keys.has('ArrowUp'))state.desiredKnots=clamp((state.desiredKnots||0)+dt*2,-3,Math.ceil(vesselStats(state).top*1.94384));if(keys.has('KeyS')||keys.has('ArrowDown'))state.desiredKnots=clamp((state.desiredKnots||0)-dt*2.5,-3,Math.ceil(vesselStats(state).top*1.94384));const helm=(keys.has('KeyD')||keys.has('ArrowRight')?1:0)-(keys.has('KeyA')||keys.has('ArrowLeft')?1:0);if(helm)setRudder(state,state.rudder*35+helm*dt*12);elapsed=advanceVoyage(state,wake,dt,timeSpeed);}
  clock+=started?elapsed:dt;
  view.x+=(state.x-view.x)*(1-Math.exp(-dt*2));view.y+=(state.y-view.y)*(1-Math.exp(-dt*2));const targetWeather={...conditions(state)};for(const k of ['wind','waves','fog','rain','front','snow']){if(Number.isFinite(targetWeather[k]))visualWeather[k]=(visualWeather[k]??targetWeather[k])+(targetWeather[k]-(visualWeather[k]??targetWeather[k]))*(1-Math.exp(-dt*.25));else delete visualWeather[k];}for(const k of ['windDirection','waveDirection'])if(Number.isFinite(targetWeather[k])){const from=visualWeather[k]??targetWeather[k],delta=(targetWeather[k]-from+540)%360-180;visualWeather[k]=(from+delta*(1-Math.exp(-dt*.04))+360)%360;}else delete visualWeather[k];if(Number.isFinite(targetWeather.wavePeriod))visualWeather.wavePeriod=(visualWeather.wavePeriod??targetWeather.wavePeriod)+(targetWeather.wavePeriod-(visualWeather.wavePeriod??targetWeather.wavePeriod))*(1-Math.exp(-dt*.25));const w=visualWeather;const renderKey=[clock,width,height,cameraZoom,cameraOverhead,state.paused,state.x,state.y,state.heading,state.deck,state.career.boat,state.lights,...[w.waves,w.fog,w.rain,w.daylight||0,w.windDirection||0,w.waveDirection||0].map(n=>n.toFixed(2))].join('/');if(!state.paused||renderKey!==lastRenderKey){lastRenderKey=renderKey;ctx.clearRect(0,0,width,height);if(scene3D){scene3D.draw(state,w,clock,width,height,dpr,wake);drawBuoyLabels();drawLightGlows();}else{if(gpu)renderer.draw(state,w,clock,view);else drawFallback(ctx,w,clock,view,width,height);drawWakeFallback();drawGrounds();drawHarbor();drawPots(clock);drawBoat(w,clock);}atmosphere(w,clock);}
- if(audio)audio.update(state,w,soundOn);
+ if(audio)audio.update(state,w,soundOn&&!$('intro').open);
  uiTimer+=dt;toastAge+=dt;saveTimer+=dt;if(uiTimer>.2){updateUI();uiTimer=0;$('renderer').title=`${sceneError||renderer.label} · ${Math.round(fps)} FPS`;}if(saveTimer>10&&started&&!document.hidden){save();saveTimer=0;}requestAnimationFrame(frame);
 }
 updateUI();requestAnimationFrame(frame);

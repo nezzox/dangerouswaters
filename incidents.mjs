@@ -1,4 +1,4 @@
-import {INCIDENT_INTERVAL_SCALE} from './balance.mjs?v=0.17.5';
+import {INCIDENT_INTERVAL_SCALE} from './balance.mjs?v=0.17.6';
 const types=[
  ['engine','Engine room',['Fuel filter blockage','Cooling pump failure','Injector fault','Oil pressure loss','Turbo bearing seizure']],
  ['crane','Deck hydraulics',['Hydraulic hose burst','Hauler clutch jam','Crane overload trip','Winch motor failure','Boom pivot seizure']],

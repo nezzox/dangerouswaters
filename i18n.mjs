@@ -6,7 +6,7 @@ export function setLanguage(value){language=value==='sv'?'sv':'en';return langua
 export const toInternalMoney=(amount,locale=language)=>amount*(locale==='sv'?1:10);
 export function formatMoney(amount,locale=language){const sv=locale==='sv',n=amount/(sv?1:10),fraction=Math.abs(n-Math.round(n))>.000001;return new Intl.NumberFormat(sv?'sv-SE':'en-US',{style:'currency',currency:sv?'SEK':'USD',minimumFractionDigits:fraction?2:0,maximumFractionDigits:2}).format(n);}
 const sv={
- 'FILLING 100%':'FYLLS 100 %','FILLING 75%':'FYLLS 75 %','FILLING 50%':'FYLLS 50 %','SOAK COMPLETE':'FÄRDIGSOAKAD',
+ 'SKIP INTRO →':'HOPPA ÖVER INTRO →','FILLING 100%':'FYLLS 100 %','FILLING 75%':'FYLLS 75 %','FILLING 50%':'FYLLS 50 %','SOAK COMPLETE':'FÄRDIGSOAKAD',
  'DYNAMIC':'DYNAMISKT','REAL WEATHER':'VERKLIGT VÄDER','DYNAMIC WEATHER':'DYNAMISKT VÄDER','Weather mode':'Väderläge',
  'CONNECTING TO LIVE WEATHER':'ANSLUTER TILL AKTUELLT VÄDER','DYNAMIC BACKUP WEATHER':'DYNAMISKT RESERVVÄDER','LIVE MODEL':'AKTUELL VÄDERMODELL','CACHED MODEL':'SPARAD VÄDERMODELL','WAVES ESTIMATED':'VÅGOR UPPSKATTADE','WIND FROM':'VIND FRÅN','WAVES FROM':'VÅGOR FRÅN','FORECAST +6 H · REAL TIME WHEN CONNECTED':'PROGNOS +6 H · VERKLIG TID VID ANSLUTNING','Weather data: Open-Meteo · CC BY 4.0':'Väderdata: Open-Meteo · CC BY 4.0',
  'UNDOCK':'KASTA LOSS','UNDOCKING':'LOSSKASTNING','Letting go mooring lines':'Släpper förtöjningarna','Moving clear of the quay':'Glider ut från kajen','Turning toward open water':'Svänger mot öppet vatten','Casting off. Crew letting go the mooring lines.':'Kastar loss. Besättningen släpper förtöjningarna.','Clear of the quay. Manual helm or autopilot ready.':'Fri från kajen. Manuell styrning eller autopilot är redo.',
