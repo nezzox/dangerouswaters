@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {createGame,step,handleNet,potAction} from '../simulation.mjs';
+import {createGame,step,handleNet,handlePot,potAction} from '../simulation.mjs';
 import {ensureCareer} from '../career.mjs';
 import {BOATS} from '../catalog.mjs';
 import {INCIDENTS,triggerIncident} from '../incidents.mjs';
@@ -14,3 +14,5 @@ test('crane failure freezes an in-progress operation until crew repair it',()=>{
 test('auto set starts immediately outside the displayed pot ring',()=>{const s=sea();s.career.skills.autoDeploy=1;s.career.autoDeploy=true;s.speed=1;s.pots=[{id:1,x:s.x-81,y:s.y,setAt:s.hour}];step(s,0);assert.equal(s.deckJob?.kind,'deploy');});
 test('auto haul selects a soaked pot even when a fresh pot is nearer',()=>{const s=sea();s.career.skills.autoHaul=1;s.career.autoHaul=true;s.pots=[{id:1,x:s.x,y:s.y+10,setAt:s.hour},{id:2,x:s.x,y:s.y+30,legacyAbundance:1,setAt:s.hour-3}];step(s,0);assert.equal(s.deckJob?.kind,'haul');assert.equal(s.deckJob.potId,2);for(let i=0;i<60;i++)step(s,1);assert(!s.pots.some(p=>p.id===2));assert(s.pots.some(p=>p.id===1));assert(s.cargo>0);});
 test('auto set never retrieves an unsoaked pot inside the ring',()=>{const s=sea();s.career.skills.autoDeploy=1;s.career.autoDeploy=true;s.speed=1;s.pots=[{id:1,x:s.x,y:s.y+79,setAt:s.hour}];step(s,0);assert.equal(s.deckJob,null);});
+
+test('Swift catches salmon through the player Space-action flow in salmon mode',()=>{const s=sea();s.career.boat=BOATS.find(b=>b.name==='Swift 01').id;s.career.fishing='salmon';handlePot(s);assert.equal(s.deckJob.kind,'netSet');for(let i=0;i<40;i++)step(s,1);assert.equal(s.nets.length,1);s.hour+=2;Object.assign(s,{x:s.nets[0].x,y:s.nets[0].y,speed:0,desiredKnots:0});handlePot(s);assert.equal(s.deckJob.kind,'netHaul');assert(s.deckJob.catchKg>0);for(let i=0;i<60;i++)step(s,1);assert(s.salmon>0);assert.equal(s.lastHaul.species,'salmon');assert.equal(s.nets.length,0);assert.equal(s.cargo,0);});

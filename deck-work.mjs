@@ -1,11 +1,13 @@
-import {deckSign} from './vessel-profile.mjs?v=0.18.0';
-import {boatById} from './catalog.mjs?v=0.18.0';
+import {rackPositions} from './vessel-style.mjs?v=0.18.1';
+import {crewStations} from './crew-stations.mjs?v=0.18.1';
+import {deckSign} from './vessel-profile.mjs?v=0.18.1';
+import {boatById} from './catalog.mjs?v=0.18.1';
 const lerp=(a,b,t)=>a+(b-a)*Math.max(0,Math.min(1,t));
 const between=(a,b,t)=>a.map((v,i)=>lerp(v,b[i],t));
-export function deckWorkPose(job,boat=null){if(!job||job.kind==='unload'||job.kind==='undock'||job.kind.startsWith('net'))return null;const p=Math.max(0,Math.min(1,job.elapsed/job.duration)),side=job.layout==='both'&&job.side<0?-1:1,stern=job.layout==='stern',edge=y=>stern?[-13.5,y,0]:[-3.1,y,side*5.6],hand=stern?[-9,3.1,0]:[-3.8,3.1,side*2.65];let position,tip=0;const grapple=job.kind==='haul'&&job.grapple,q=grapple?Math.max(0,(p-.3)/.7):p;let hook=null,dragBuoy=null;
+export function deckWorkPose(job,boat=null){if(!job||job.kind==='unload'||job.kind==='undock'||job.kind.startsWith('net'))return null;const p=Math.max(0,Math.min(1,job.elapsed/job.duration)),side=job.layout==='both'&&job.side<0?-1:1,stern=job.layout==='stern',edge=y=>stern?[-13.5,y,0]:[-3.1,y,side*5.6],station=crewStations({hauler:job.layout},{...job,side})[1].target,hand=[station[0],3.1,station[1]];const stored=boat?rackPositions(Math.min(200,(boat.deck||0)+1),boatById(boat.career?.boat)):null,last=stored?.at(-1),slot=last?[last.x,last.y,last.z]:[-4,2.5,0],travelHeight=Math.max(4.7,(stored?.top||0)+1.8,slot[0]>0?7.5:0),lift=[slot[0],travelHeight,slot[2]];let position,tip=0;const grapple=job.kind==='haul'&&job.grapple,q=grapple?Math.max(0,(p-.3)/.7):p;let hook=null,dragBuoy=null;
  if(grapple&&p<.3){const d=boat?{x:job.x-boat.x,y:job.y-boat.y}:null,b=boatById(boat?.career?.boat),buoy=d?[(d.x*Math.cos(boat.heading)+d.y*Math.sin(boat.heading))*deckSign(b)/(b.length/24),.35,(-d.x*Math.sin(boat.heading)+d.y*Math.cos(boat.heading))/(b.beam/7.6)]:[8,.35,18];if(p<.12){hook=between(hand,buoy,p/.12);hook[1]+=Math.sin(p/.12*Math.PI)*3.;}else{hook=between(buoy,edge(.35),(p-.12)/.18);dragBuoy=[...hook];}return {progress:p,sequence:q,position:[hook[0],-3.2,hook[2]],tip:0,visible:false,craneActive:false,hand,hook,dragBuoy,hatch:0,crabs:false,stage:p<.12?'Throwing hook toward buoy':'Retrieving buoy to hauler'};}
- if(job.kind==='deploy'){position=p<.2?between([-4,2.5,1.5],[-3.5,4.7,side*2.5],p/.2):p<.45?between([-3.5,4.7,side*2.5],edge(4.3),(p-.2)/.25):between(edge(4.3),edge(-3.2),(p-.45)/.5);}
- else{position=q<.25?between(edge(-3.2),edge(4.5),q/.25):q<.45?between(edge(4.5),[-1.9,3.9,-.45],(q-.25)/.2):q<.8?[-1.9,3.9,-.45]:between([-1.9,3.9,-.45],[-4,2.5,0],(q-.8)/.2);tip=q>.45&&q<.8?Math.sin((q-.45)/.35*Math.PI)*1.35:0;}
+ if(job.kind==='deploy'){position=p<.2?between(slot,lift,p/.2):p<.45?between(lift,edge(travelHeight),(p-.2)/.25):between(edge(travelHeight),edge(-3.2),(p-.45)/.5);}
+ else{position=q<.25?between(edge(-3.2),edge(4.5),q/.25):q<.45?between(edge(4.5),[-1.9,3.9,-.45],(q-.25)/.2):q<.8?[-1.9,3.9,-.45]:q<.88?between([-1.9,3.9,-.45],[-1.9,travelHeight,-.45],(q-.8)/.08):q<.95?between([-1.9,travelHeight,-.45],lift,(q-.88)/.07):between(lift,slot,(q-.95)/.05);tip=q>.45&&q<.8?Math.sin((q-.45)/.35*Math.PI)*1.35:0;}
  return {progress:p,sequence:q,position,tip,hook,dragBuoy,craneActive:true,visible:job.kind==='haul'||p<.94,hatch:job.kind==='haul'?Math.sin(Math.max(0,Math.min(1,(q-.42)/.53))*Math.PI)*1.35:0,crabs:job.kind==='haul'&&q>.48&&q<.82,stage:job.kind==='deploy'?(p<.2?'Rigging pot':p<.45?'Swinging crane outboard':'Lowering pot'):(q<.25?'Hoisting pot':q<.45?'Swinging over the deck':q<.8?'Emptying and sorting':'Stowing pot')};
 }
 

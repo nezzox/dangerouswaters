@@ -1,20 +1,20 @@
-import {rackPositions,deckHardware} from './vessel-style.mjs?v=0.18.0';
+import {rackPositions,rackFootprints,rackFootprintKey,potBounds,deckHardware} from './vessel-style.mjs?v=0.18.1';
 export const CREW_RADIUS=.31,CREW_SPACING=.84;
 export const CABIN_DOOR={x:.18,z:1.65};
 export function potPositions(count,design={}){return rackPositions(count,design);}
 const rectangle=(x,z,a,b,c,d,r)=>Math.max(a-x,0,x-b)**2+Math.max(c-z,0,z-d)**2<r*r;
 export function canStand(x,z,count=8,door=false,design={}){
- if(x< -11.25||x>-.3||Math.abs(z)>3){if(!(door&&x>=-.3&&x<=.85&&z>=1.3&&z<=2.0))return false;}
+ if(x< -11.25||x>-.1||Math.abs(z)>3){if(!(door&&x>=-.3&&x<=.85&&z>=1.3&&z<=2.0))return false;}
  if(rectangle(x,z,-2.95,-.85,-1.55,.65,CREW_RADIUS)||rectangle(x,z,-3.,-.8,.55,1.25,CREW_RADIUS))return false;
  if(Math.hypot(x+1.5,z-2.1)<.38+CREW_RADIUS||Math.hypot(x+3,z-3.1)<.42+CREW_RADIUS)return false;
  if(rectangle(x,z,-1.95,-1.05,-2.7,-1.9,CREW_RADIUS))return false;
- for(const p of potPositions(count,design))if(rectangle(x,z,p.x-.85,p.x+.85,p.z-.83,p.z+.83,CREW_RADIUS))return false;
+ for(const p of rackFootprints(count,design)){const b=potBounds(p);if(rectangle(x,z,b.min[0],b.max[0],b.min[2],b.max[2],CREW_RADIUS))return false;}
  for(const box of deckHardware(design).solid)if(box.min[1]<3.65&&rectangle(x,z,box.min[0],box.max[0],box.min[2],box.max[2],CREW_RADIUS))return false;
  return true;
 }
 export function clearSegment(a,b,count=8,door=false,design={}){const steps=Math.ceil(Math.hypot(b[0]-a[0],b[1]-a[1])/.025);for(let i=0;i<=steps;i++){const t=steps?i/steps:0;if(!canStand(a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,count,door,design))return false;}return true;}
 const gridCache=new Map();
-function deckGrid(count,door,design){const key=[design.id||'',design.hauler||'',!!design.salmon,Math.min(count,20),door].join('/');if(gridCache.has(key))return gridCache.get(key);const nodes=[];for(let ix=0;ix<=48;ix++)for(let iz=0;iz<=24;iz++){const x=-11.25+ix*.25,z=-3+iz*.25;if(canStand(x,z,count,door,design))nodes.push({x,z,key:ix*25+iz});}const grid={nodes,edges:new Map()};if(gridCache.size>=64)gridCache.delete(gridCache.keys().next().value);gridCache.set(key,grid);return grid;}
+function deckGrid(count,door,design){const key=[design.id||'',design.hauler||'',!!design.salmon,rackFootprintKey(count,design),door].join('/');if(gridCache.has(key))return gridCache.get(key);const nodes=[];for(let ix=0;ix<=48;ix++)for(let iz=0;iz<=24;iz++){const x=-11.25+ix*.25,z=-3+iz*.25;if(canStand(x,z,count,door,design))nodes.push({x,z,key:ix*25+iz});}const grid={nodes,edges:new Map()};if(gridCache.size>=64)gridCache.delete(gridCache.keys().next().value);gridCache.set(key,grid);return grid;}
 export function walkableDeck(count,design={}){return deckGrid(count,false,design).nodes;}
 // A small fixed deck grid routes around cage stacks, hatch, hauler, crane and people.
 export function routeOnDeck(start,target,count=8,people=[],door=false,design={}){

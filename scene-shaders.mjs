@@ -1,5 +1,5 @@
-import {hullWaterGLSL} from './deck-water.mjs?v=0.18.0';
-import {seaHeightGLSL} from './sea-spectrum.mjs?v=0.18.0';
+import {hullWaterGLSL} from './deck-water.mjs?v=0.18.1';
+import {seaHeightGLSL} from './sea-spectrum.mjs?v=0.18.1';
 // Shared atmosphere and ocean functions keep lighting and reflections consistent.
 export const common=`
 precision highp float;precision highp int;
@@ -52,8 +52,8 @@ void main(){if(insideHullWater(vWorld))discard;vec2 p=vWorld.xz;vec4 field=seaFi
 export const meshVertex=`#version 300 es
 ${common}
 layout(location=0) in vec3 aPosition;layout(location=1) in vec3 aNormal;layout(location=2) in vec3 aColor;layout(location=3) in vec2 aSurface;
-layout(location=4) in vec3 aInstance;uniform float uInstanced;uniform mat4 uModel;out vec3 vWorld;out vec3 vNormal;out vec3 vColor;out vec2 vSurface;out vec3 vLocal;out vec4 vShadow;
-void main(){vec4 p=uModel*vec4(aPosition+aInstance*uInstanced,1.);vWorld=p.xyz;vNormal=transpose(inverse(mat3(uModel)))*aNormal;vColor=aColor;vSurface=aSurface;vLocal=aPosition;vShadow=uLightVP*p;gl_Position=uVP*p;}`;
+layout(location=4) in vec3 aInstance;uniform float uInstanced;uniform vec3 uRackScale;uniform mat4 uModel;out vec3 vWorld;out vec3 vNormal;out vec3 vColor;out vec2 vSurface;out vec3 vLocal;out vec4 vShadow;
+void main(){vec4 p=uModel*vec4(aPosition*mix(vec3(1.),uRackScale,uInstanced)+aInstance*uInstanced,1.);vWorld=p.xyz;vNormal=transpose(inverse(mat3(uModel)))*(aNormal/mix(vec3(1.),uRackScale,uInstanced));vColor=aColor;vSurface=aSurface;vLocal=aPosition;vShadow=uLightVP*p;gl_Position=uVP*p;}`;
 export const meshFragment=`#version 300 es
 ${common}
 in vec3 vWorld;in vec3 vNormal;in vec3 vColor;in vec2 vSurface;in vec3 vLocal;in vec4 vShadow;uniform sampler2D uShadow;out vec4 outColor;
@@ -101,7 +101,7 @@ void main(){if(uReflectionPass>.5&&vWorld.y<.04)discard;
  c+=base*directLamps(vWorld,n,v);c+=vColor*max(0.,vSurface.y)*2.*(uKind>1.5&&uKind<2.5?max(.12,1.-uDaylight):uLights);
  outColor=vec4(finishColor(c,vWorld),1.);}`;
 export const depthVertex=`#version 300 es
-precision highp float;layout(location=0) in vec3 aPosition;layout(location=4) in vec3 aInstance;uniform float uInstanced;uniform mat4 uModel;uniform mat4 uLightVP;void main(){gl_Position=uLightVP*uModel*vec4(aPosition+aInstance*uInstanced,1.);}`;
+precision highp float;layout(location=0) in vec3 aPosition;layout(location=4) in vec3 aInstance;uniform float uInstanced;uniform vec3 uRackScale;uniform mat4 uModel;uniform mat4 uLightVP;void main(){gl_Position=uLightVP*uModel*vec4(aPosition*mix(vec3(1.),uRackScale,uInstanced)+aInstance*uInstanced,1.);}`;
 export const depthFragment=`#version 300 es
 precision highp float;void main(){}`;
 export const sprayVertex=`#version 300 es
@@ -120,4 +120,4 @@ ${common}
 in vec3 vWorld;in vec3 vNormal;in vec3 vColor;in vec2 vSurface;in vec3 vLocal;in vec4 vShadow;out vec4 outColor;
 void main(){float amount=mix(uDeckWater.x,uDeckWater.y,smoothstep(-.3,.3,vLocal.z));if(amount<.001)discard;float front=sin(vLocal.x*4.+uTime*3.2+abs(vLocal.z)*5.),ripple=sin(vLocal.x*12.-uTime*6.)*.03;vec3 n=normalize(vNormal+vec3(front*.06,0.,ripple));float sparkle=pow(max(0.,dot(n,normalize(normalize(uEye-vWorld)+sunDir()))),80.);vec3 c=vec3(.07,.13,.14)+vec3(.5,.58,.57)*smoothstep(.65,1.,front)*amount*2.+sparkle*.18*uDaylight;outColor=vec4(finishColor(c,vWorld),clamp(amount*5.,0.,.38));}`;
 
-export const deckWashVertex=meshVertex.replace('vec4 p=uModel*vec4(aPosition+aInstance*uInstanced,1.);','vec3 position=aPosition;position.y=1.745+mix(uDeckWater.x,uDeckWater.y,smoothstep(-.3,.3,aPosition.z))*(.7+.3*sin(aPosition.x*3.+uTime*3.));vec4 p=uModel*vec4(position,1.);');
+export const deckWashVertex=meshVertex.replace('vec4 p=uModel*vec4(aPosition*mix(vec3(1.),uRackScale,uInstanced)+aInstance*uInstanced,1.);','vec3 position=aPosition;position.y=1.745+mix(uDeckWater.x,uDeckWater.y,smoothstep(-.3,.3,aPosition.z))*(.7+.3*sin(aPosition.x*3.+uTime*3.));vec4 p=uModel*vec4(position,1.);');

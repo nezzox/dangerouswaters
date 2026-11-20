@@ -1,8 +1,8 @@
-import {deckSign,hullPaint} from './vessel-profile.mjs?v=0.18.0';
-import {craneColor} from './crane-style.mjs?v=0.18.0';
-import {lineHaulerMounts} from './line-hauler.mjs?v=0.18.0';
-import {vesselStyle,rackPositions,gantryPlacement} from './vessel-style.mjs?v=0.18.0';
-import {HULL_STATIONS,hullWidthAt} from './fenders.mjs?v=0.18.0';
+import {deckSign,hullPaint} from './vessel-profile.mjs?v=0.18.1';
+import {craneColor} from './crane-style.mjs?v=0.18.1';
+import {lineHaulerMounts} from './line-hauler.mjs?v=0.18.1';
+import {vesselStyle,rackPositions,gantryPlacement} from './vessel-style.mjs?v=0.18.1';
+import {HULL_STATIONS,hullWidthAt} from './fenders.mjs?v=0.18.1';
 const steel=[.19,.24,.25],paint=[.68,.7,.64],dark=[.045,.08,.1],glass=[.055,.13,.17],brass=[.43,.31,.13],orange=[.72,.29,.065];
 export function geometry(){const data=[];
  function tri(a,b,c,color,rough=.6,emit=0){const u=b.map((x,i)=>x-a[i]),v=c.map((x,i)=>x-a[i]),n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]],len=Math.hypot(...n);if(len<1e-8)return;for(const p of [a,b,c])data.push(...p,...n.map(x=>x/len),...color,rough,emit);}
@@ -53,7 +53,7 @@ export function buildVessel(potCount=8,design={}){const orange=craneColor(design
  }
  if(design.salmon){for(const x of [-8.8,-6.7]){tube([x,1.8,-1.8],[x,3,-1.8],.09,steel);tube([x,1.8,0],[x,3,0],.09,steel);}tube([-7.75,2.8,-1.9],[-7.75,2.8,.1],.7,[.15,.28,.25],16);for(let z=-1.8;z<.1;z+=.12)tube([-7.75,2.8,z],[-7.75,2.8,z+.035],.72,[.3,.39,.31],12);}
  // Wire cages remain open so the deck and cage shadows can be seen through them.
- for(const [i,{x,z,y}] of rackPositions(potCount,design).entries())addRackPot(g,x,y,z,i);
+ for(const [i,{x,z,y,scale}] of rackPositions(potCount,design).entries())addRackPot(g,x,y,z,i,scale);
  for(const side of [-1,1]){box(5.4,5.5,side*2.75,.3,.16,.2,side<0?[.6,.015,.005]:[.015,.5,.13],.2,1);box(-.3,5.3,side*2.72,.4,.25,.24,[1.,.69,.28],.2,1.4);}
  // Directional searchlight and side floodlight housings.
  tube([6.8,5.3,0],[7.2,5.3,0],.23,steel,10);tube([7.2,5.3,0],[7.23,5.3,0],.19,[.78,.9,1.],10,.05);box(7.24,5.3,0,.03,.3,.3,[.78,.9,1.],.1,2);
@@ -80,7 +80,7 @@ export function buildVessel(potCount=8,design={}){const orange=craneColor(design
  box(-1.9,.55,-.5,1.8,.08,1.8,[.008,.014,.014],1);for(const x of [-2.85,-.95])box(x,1.35,-.5,.13,1.1,2.05,steel);for(const z of [-1.45,.45])box(-1.9,1.35,z,2.,1.1,.13,steel);for(const x of [-2.87,-.93])box(x,1.87,-.5,.16,.25,2.15,[.43,.45,.37]);for(const z of [-1.48,.48])box(-1.9,1.87,z,2.1,.25,.16,[.43,.45,.37]);box(-1.9,2.45,.9,2.2,.12,.7,[.48,.51,.45],.25);for(const x of [-2.9,-.9])tube([x,1.75,1.1],[x,2.4,1.1],.06,steel);
  box(-1.5,2.2,-2.3,.9,.9,.8,[.29,.3,.27]);tube([-1.5,2.65,-2.8],[-1.5,2.65,-1.8],.26,steel,12);
  box(10,2.1,0,.9,.5,1.1,steel);tube([9.4,2.3,-.5],[11.7,1.3,-.5],.05,steel);
- for(let i=0;i<24;i++){const a=i*Math.PI/12,b=(i+1)*Math.PI/12;tube([8.25+Math.cos(a)*.5,1.84,1.1+Math.sin(a)*.5],[8.25+Math.cos(b)*.5,1.84,1.1+Math.sin(b)*.5],.07,[.48,.45,.29],5);}
+ const compactCoil=!!design.id&&design.id!=='nordvind',coilX=compactCoil?8.5:8.25,coilZ=compactCoil?0:1.1,coilRadius=compactCoil?.25:.5;for(let i=0;i<24;i++){const a=i*Math.PI/12,b=(i+1)*Math.PI/12;tube([coilX+Math.cos(a)*coilRadius,1.84,coilZ+Math.sin(a)*coilRadius],[coilX+Math.cos(b)*coilRadius,1.84,coilZ+Math.sin(b)*coilRadius],.07,[.48,.45,.29],5);}
  const style=vesselStyle(design);if(style.family){
  if(style.gantry){const {x,z,height:h}=gantryPlacement(design);for(const side of [-1,1]){tube([x,1.85,side*z],[x,h,side*z],.16,paint,10);tube([x+1.4,1.85,side*z],[x,h,side*z],.09,steel,8);}tube([x,h,-z],[x,h,z],.2,paint,10);box(x,h,0,.7,.6,1.1,orange);}
  if(style.exhausts===2&&design.powertrain!=='electric')for(const z of [-1.65,1.65]){tube([1.2,5.9,z],[1.2,8.2,z],.22,dark,10);tube([1.2,8.2,z],[.7,8.5,z],.24,steel,10);}
@@ -91,9 +91,11 @@ export function buildVessel(potCount=8,design={}){const orange=craneColor(design
  if(orientation<0){for(let i=upperStart;i<g.data.length;i+=11){g.data[i]*=-1;g.data[i+3]*=-1;}}
  if(design.rampBow){quad([12.2,.35,-2.7],[12.2,.35,2.7],[12.2,2.7,2.7],[12.2,2.7,-2.7],paint,.75);for(const z of [-2.4,-1.2,0,1.2,2.4])tube([12.24,.6,z],[12.24,2.45,z],.055,steel,8);}
  return g.array();}
-function addRackPot(g,x,y,z,i){const {tube}=g;const c=[.39+(i%3)*.025,.31,.16];
+function addRackPot(g,x,y,z,i,scale=[1,1,1]){const start=g.data.length,{tube}=g;const c=[.39+(i%3)*.025,.31,.16];
   const xx=[x-.85,x+.85],yy=[y-.58,y+.58],zz=[z-.83,z+.83];for(const a of xx)for(const b of yy)tube([a,b,zz[0]],[a,b,zz[1]],.035,c,5);for(const a of xx)for(const b of zz)tube([a,yy[0],b],[a,yy[1],b],.035,c,5);for(const a of yy)for(const b of zz)tube([xx[0],a,b],[xx[1],a,b],.035,c,5);
-  for(let j=-.6;j<.8;j+=.32){for(const side of [-1,1]){tube([x+j,yy[0],z+side*.83],[x+j,yy[1],z+side*.83],.012,c,4);tube([x-.85,yy[1],z+j],[x+.85,yy[1],z+j],.012,c,4);}}}
+  for(let j=-.6;j<.8;j+=.32){for(const side of [-1,1]){tube([x+j,yy[0],z+side*.83],[x+j,yy[1],z+side*.83],.012,c,4);tube([x-.85,yy[1],z+j],[x+.85,yy[1],z+j],.012,c,4);}}
+ if(scale.some(v=>v!==1))for(let i=start;i<g.data.length;i+=11){for(let k=0;k<3;k++){const offset=[x,y,z][k];g.data[i+k]=offset+(g.data[i+k]-offset)*scale[k];g.data[i+3+k]/=scale[k];}const length=Math.hypot(...g.data.slice(i+3,i+6));for(let k=0;k<3;k++)g.data[i+3+k]/=length;}
+}
 export function buildRackPot(variant=0){const g=geometry();addRackPot(g,0,0,0,variant);return g.array();}
 export function buildBuoy(color=orange){const g=geometry();g.tube([0,-.4,0],[0,.9,0],.48,color,12);g.tube([0,.35,0],[0,.6,0],.5,paint,12);g.tube([0,.9,0],[0,2.1,0],.035,steel);g.box(.35,1.9,0,.7,.35,.025,color);return g.array();}
 export function buildOceanGrid(size=4000,segments=220){const data=new Float32Array(segments*segments*18),half=size/2;let k=0;for(let z=0;z<segments;z++)for(let x=0;x<segments;x++){const coord=v=>Math.sinh((v/segments*2-1)*5.5)/Math.sinh(5.5)*half,a=coord(x),b=coord(z),c=coord(x+1),d=coord(z+1);for(const p of [[a,0,b],[a,0,d],[c,0,b],[c,0,b],[a,0,d],[c,0,d]])for(const v of p)data[k++]=v;}return data;}
@@ -109,7 +111,7 @@ export function buildCrewParts(role=0){
  return {torso:torso.array(),head:head.array(),arm:arm.array(),forearm:forearm.array(),thigh:thigh.array(),shin:shin.array()};
 }
 
-export function buildDeckEquipment(){const pot=geometry(),boom=geometry(),rope=geometry(),lid=geometry(),crab=geometry(),hook=geometry(),throwLine=geometry(),door=geometry(),fender=geometry(),retch=geometry(),softRope=geometry(),tote=geometry(),trolley=geometry(),haulerRotor=geometry();
+export function buildDeckEquipment(){const pot=geometry(),boom=geometry(),rope=geometry(),lid=geometry(),crab=geometry(),hook=geometry(),throwLine=geometry(),door=geometry(),fender=geometry(),retch=geometry(),softRope=geometry(),tote=geometry(),trolley=geometry(),haulerRotor=geometry(),craneControls=geometry(),controlLever=geometry();
  for(const x of [-.85,.85])for(const y of [-.6,.6])pot.tube([x,y,-.85],[x,y,.85],.04,brass,6);for(const x of [-.85,.85])for(const z of [-.85,.85])pot.tube([x,-.6,z],[x,.6,z],.04,brass,6);for(const y of [-.6,.6])for(const z of [-.85,.85])pot.tube([-.85,y,z],[.85,y,z],.04,brass,6);
  for(let i=-.65;i<.8;i+=.25)for(const side of [-1,1]){pot.tube([i,-.6,side*.85],[i,.6,side*.85],.015,brass,4);pot.tube([side*.85,-.6,i],[side*.85,.6,i],.015,brass,4);}pot.tube([0,.6,0],[0,1.1,0],.035,steel,6);
  for(const side of [-1,1]){boom.tube([0,0,side*.12],[1.85,.68,side*.12],.11,orange,10);boom.tube([1.65,.61,side*.1],[3,1.1,side*.1],.075,orange,10);boom.tube([0,-.38,side*.16],[1.4,.18,side*.16],.09,steel,10);boom.tube([1.05,.04,side*.16],[2.35,.81,side*.16],.043,[.62,.65,.65],10);for(const at of [[0,0],[1.75,.65],[2.95,1.08]])boom.ellipsoid(at[0],at[1],side*.19,.1,.1,.04,steel,.3);}boom.tube([2.85,1.05,-.17],[2.85,1.05,.17],.16,dark,12);boom.tube([.2,.25,-.22],[1.5,.75,-.22],.022,dark,6);rope.tube([0,0,0],[0,1,0],.022,steel,6);
@@ -123,7 +125,8 @@ export function buildDeckEquipment(){const pot=geometry(),boom=geometry(),rope=g
  tote.roundedBox(0,0,0,.64,.42,.48,.045,[.15,.28,.27],.85);for(const z of [-.25,.25]){tote.tube([-.26,.23,z],[.26,.23,z],.025,[.3,.42,.37],8);tote.box(0,.08,z,.2,.055,.02,[.025,.04,.035],.9);}
  trolley.box(0,.24,0,1.4,.12,.85,steel,.7);for(const x of [-.5,.5])for(const z of [-.4,.4])trolley.tube([x,.14,z-.05],[x,.14,z+.05],.14,dark,12);for(const z of [-.35,.35]){trolley.tube([-.65,.3,z],[-.65,1.05,z],.035,steel);trolley.tube([-.65,1.05,z],[0,1.05,z],.035,steel);}
  for(const z of [-.215,.215]){for(let i=0;i<4;i++){const a=i*Math.PI/2;haulerRotor.tube([Math.cos(a)*.13,Math.sin(a)*.13,z],[Math.cos(a)*.35,Math.sin(a)*.35,z],.018,[.46,.49,.45],6);}haulerRotor.tube([.34,0,z],[.4,0,z],.028,[.9,.68,.2],6);}
- return {haulerRotor:haulerRotor.array(),tote:tote.array(),trolley:trolley.array(),softRope:softRope.array(),door:door.array(),fender:fender.array(),retch:retch.array(),throwLine:throwLine.array(),hook:hook.array(),pot:pot.array(),boom:boom.array(),rope:rope.array(),lid:lid.array(),crab:crab.array()};
+ craneControls.roundedBox(0,0,0,.42,.22,.48,.035,[.16,.2,.19],.65);for(const z of [-.13,.13])craneControls.tube([0,.115,z],[0,.13,z],.065,steel,8);craneControls.ellipsoid(-.14,.14,0,.045,.03,.045,[.45,.12,.08],.65);controlLever.tube([0,0,0],[0,.2,0],.018,steel,8);controlLever.ellipsoid(0,.22,0,.04,.035,.04,dark,.8);
+ return {craneControls:craneControls.array(),controlLever:controlLever.array(),haulerRotor:haulerRotor.array(),tote:tote.array(),trolley:trolley.array(),softRope:softRope.array(),door:door.array(),fender:fender.array(),retch:retch.array(),throwLine:throwLine.array(),hook:hook.array(),pot:pot.array(),boom:boom.array(),rope:rope.array(),lid:lid.array(),crab:crab.array()};
 }
 
 export function buildDeckWash(design={}){const g=geometry();for(let x=-11.8;x<11.8;x+=.3)for(let z=-3.4;z<3.4;z+=.3){const r=x+.3,b=z+.3;if(x*deckSign(design)>-.5)continue;if(Math.max(Math.abs(z),Math.abs(b))>Math.min(hullWidthAt(x,design),hullWidthAt(r,design))-.12)continue;const a=deckSign(design)>0?-2.9:.9,c=deckSign(design)>0?-.9:2.9;if(x<c&&r>a&&z<.55&&b>-1.55)continue;g.quad([x,1.795,z],[x,1.795,b],[r,1.795,b],[r,1.795,z],[.17,.26,.27],.12);}return g.array();}
