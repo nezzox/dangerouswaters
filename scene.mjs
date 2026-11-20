@@ -1,28 +1,28 @@
-import {deckFrame,deckSign} from './vessel-profile.mjs?v=0.18.1';
-import {createTerrainLoader} from './terrain-loader.mjs?v=0.18.1';
-import {craneColor} from './crane-style.mjs?v=0.18.1';
-import {rackScale} from './vessel-style.mjs?v=0.18.1';
-import {createRackInstances} from './rack-instances.mjs?v=0.18.1';
-import {lineHaulerMounts,haulerRunning} from './line-hauler.mjs?v=0.18.1';
-import {netWorkPose} from './deck-work.mjs?v=0.18.1';
-import {visibleFleet,fleetColor} from './fleet-visuals.mjs?v=0.18.1';
-import {fleetStats} from './fleet.mjs?v=0.18.1';
-import {buildPortScenery} from './port-scenery.mjs?v=0.18.1';
-import {buildGeography} from './geography-mesh.mjs?v=0.18.1';
-import {createDeckWater,stepDeckWater} from './deck-water.mjs?v=0.18.1';
-import {dockingStage,QUAY,BERTH,quayPoint} from './harbor.mjs?v=0.18.1';
-import {vesselStats} from './career.mjs?v=0.18.1';
-import {boatById} from './catalog.mjs?v=0.18.1';
-import {createBuoyancy,stepBuoyancy} from './buoyancy.mjs?v=0.18.1';
-import {buildFoam} from './foam.mjs?v=0.18.1';
-import {fenderPose,createFenderMotion,stepFenderMotion,ropePoints} from './fenders.mjs?v=0.18.1';
-import {inverseTransform,multiply,transform,perspective,lookAt,identity,project} from './math3d.mjs?v=0.18.1';
-import {buildRackPot,buildDeckWash,buildVessel,buildBuoy,buildOceanGrid,buildCrewParts,buildDeckEquipment} from './geometry.mjs?v=0.18.1';
-import {deckWorkPose} from './deck-work.mjs?v=0.18.1';
-import {createCrew,commandCrew,stepCrew,crewPose} from './crew.mjs?v=0.18.1';
-import * as shaders from './scene-shaders.mjs?v=0.18.1';
-export {seaHeight as surfaceHeight} from './sea-spectrum.mjs?v=0.18.1';
-import {seaHeight,seaSettings} from './sea-spectrum.mjs?v=0.18.1';
+import {deckFrame,deckSign} from './vessel-profile.mjs?v=0.18.2';
+import {createTerrainLoader} from './terrain-loader.mjs?v=0.18.2';
+import {craneColor} from './crane-style.mjs?v=0.18.2';
+import {rackScale} from './vessel-style.mjs?v=0.18.2';
+import {createRackInstances} from './rack-instances.mjs?v=0.18.2';
+import {lineHaulerMounts,haulerRunning} from './line-hauler.mjs?v=0.18.2';
+import {netWorkPose} from './deck-work.mjs?v=0.18.2';
+import {visibleFleet,fleetColor} from './fleet-visuals.mjs?v=0.18.2';
+import {fleetStats} from './fleet.mjs?v=0.18.2';
+import {buildPortScenery} from './port-scenery.mjs?v=0.18.2';
+import {buildGeography} from './geography-mesh.mjs?v=0.18.2';
+import {createDeckWater,stepDeckWater} from './deck-water.mjs?v=0.18.2';
+import {dockingStage,QUAY,BERTH,quayPoint} from './harbor.mjs?v=0.18.2';
+import {vesselStats} from './career.mjs?v=0.18.2';
+import {boatById} from './catalog.mjs?v=0.18.2';
+import {createBuoyancy,stepBuoyancy} from './buoyancy.mjs?v=0.18.2';
+import {buildFoam} from './foam.mjs?v=0.18.2';
+import {fenderPose,createFenderMotion,stepFenderMotion,ropePoints} from './fenders.mjs?v=0.18.2';
+import {inverseTransform,multiply,transform,perspective,lookAt,identity,project} from './math3d.mjs?v=0.18.2';
+import {buildRackPot,buildDeckWash,buildVessel,buildBuoy,buildOceanGrid,buildCrewParts,buildDeckEquipment} from './geometry.mjs?v=0.18.2';
+import {deckWorkPose} from './deck-work.mjs?v=0.18.2';
+import {createCrew,commandCrew,stepCrew,crewPose} from './crew.mjs?v=0.18.2';
+import * as shaders from './scene-shaders.mjs?v=0.18.2';
+export {seaHeight as surfaceHeight} from './sea-spectrum.mjs?v=0.18.2';
+import {seaHeight,seaSettings} from './sea-spectrum.mjs?v=0.18.2';
 function ortho(l,r,b,t,n,f){return new Float32Array([2/(r-l),0,0,0,0,2/(t-b),0,0,0,0,-2/(f-n),0,-(r+l)/(r-l),-(t+b)/(t-b),-(f+n)/(f-n),1]);}
 export function createScene(canvas,{preview=false}={}){
  let currentSea={},haulerAngle=0;const surfaceHeight=(x,z,t,waves)=>seaHeight(x,z,t,waves,currentSea);
@@ -59,9 +59,10 @@ export function createScene(canvas,{preview=false}={}){
   while(spawnDebt>=1&&particles.length<1200){spawnDebt--;const workSplash=splash&&random()<.4,stern=!workSplash&&motion>1.2&&random()<.22,side=workSplash?1:random()<.5?-1:1,along=(stern?-11+random():8+random()*3)*lengthScale,offset=(stern?(random()-.5)*1.5:side*(1.5+random()*1.5))*beamScale,up=stern?.5+random()*.6:workSplash?1+random()*2:.8+random()*(1.+w.waves*.6)+impact*w.waves*.45;const origin=workSplash?multiply(currentBoat,transform(...deckVisual.position)):null;particles.push({x:origin?origin[12]:s.x+f[0]*along+right[0]*offset,y:origin?Math.max(lastHullY+.1,origin[13]):lastHullY+.25,z:origin?origin[14]:s.y+f[1]*along+right[1]*offset,vx:f[0]*s.speed*.65+right[0]*side*(1+random()*3),vy:up,vz:f[1]*s.speed*.65+right[1]*side*(1+random()*3),age:0,life:.5+random()*.8,size:.25+random()*.65});}
   spawnDebt=Math.min(spawnDebt,1);let n=0;for(let i=particles.length-1;i>=0;i--){const p=particles[i];p.age+=dt;p.vx*=Math.exp(-dt*.5);p.vz*=Math.exp(-dt*.5);const windAngle=(w.windDirection??240)*Math.PI/180;p.vx+=(-Math.sin(windAngle)*w.wind*.5144*.22-p.vx)*dt*.18;p.vz+=(Math.cos(windAngle)*w.wind*.5144*.22-p.vz)*dt*.18;p.vy-=9.81*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.z+=p.vz*dt;if(p.age>p.life||p.y<surfaceHeight(p.x,p.z,t,w.waves)-.1){particles.splice(i,1);continue;}const fade=(1-p.age/p.life)*.38;particleData.set([p.x,p.y,p.z,fade,p.size],n*5);n++;}return n;
  }
- function drawCrew(p,boat,w){for(const m of crew.members){if(m.hidden)continue;const parts=crewMeshes[m.role],pose=crewPose(m,crew.elapsed,w.waves,lastCrewState?.deckJob),root=multiply(boat,transform(m.x,1.77+pose.bob,m.z,m.heading,pose.lean-crewPitch*.55,crewRoll*.35));
+ function drawCrew(p,boat,w){for(const m of crew.members){if(m.hidden)continue;const parts=crewMeshes[m.role],pose=crewPose(m,crew.elapsed,w.waves,lastCrewState?.deckJob||(crew.job?{kind:crew.job.kind,elapsed:crew.workTime,duration:crew.job.duration}:null)),root=multiply(boat,transform(m.x,1.77+pose.bob,m.z,m.heading,pose.lean-crewPitch*.55,crewRoll*.35));
   for(const offset of [0,4,8]){const len=Math.hypot(root[offset],root[offset+1],root[offset+2]);for(let k=0;k<3;k++)root[offset+k]/=len;}
   if(m.sick==='retching'&&m.sickTime%2.2<.65)for(let i=0;i<7;i++){const age=(m.sickTime%2.2+i*.055)% .65,drop=transform(.35+age*.9,1.55-age*age*4.5,Math.sin(i*2)*.05);drawMesh(p,equipment.retch,multiply(root,drop));}
+  if(m.task==='lash'&&m.working&&m.face)cable(p,boat,[m.x,2.8,m.z],[m.face[0],2.65,m.face[1]],equipment.softRope);
   drawMesh(p,parts.torso,root);drawMesh(p,parts.head,root);
   for(const side of [-1,1]){const legAngle=pose.leg*side,leg=multiply(root,transform(0,.78,side*(.15+w.waves*.012),0,legAngle,0));drawMesh(p,parts.thigh,leg);const lower=multiply(leg,transform(0,-.36,0,0,Math.max(0,-legAngle)*1.1,0));drawMesh(p,parts.shin,lower);
    const active=m.working&&pose.action!=='watch',angle=active?pose.arm+(side<0?.18:0):pose.arm*side+pose.brace;const upper=multiply(root,transform(0,1.34,side*.32,0,angle,side*pose.brace*.4));drawMesh(p,parts.arm,upper);drawMesh(p,parts.forearm,multiply(upper,transform(0,-.32,0,0,active?.65:.18,0)));}
@@ -81,6 +82,7 @@ export function createScene(canvas,{preview=false}={}){
  function drawNets(p,s,t,w){const job=s.deckJob,pose=netWorkPose(job),nets=[...(s.nets||[])];if(job?.kind==='netSet')nets.push({x:job.x,y:job.y});const outlet=multiply(currentBoat,transform(-11.2,2.6,-1.1)),end=[outlet[12],outlet[13],outlet[14]];for(const n of nets){const active=pose&&(job.kind==='netSet'||n.id===job.netId),fraction=active?pose.deployed:1,span=36*fraction,anchor=active&&job.kind==='netHaul'?{x:n.x+(end[0]-n.x)*pose.progress,y:n.y+(end[2]-n.y)*pose.progress}:n,point=(x,z)=>[x,surfaceHeight(x,z,t,w.waves)+.12+(active?pose.lift:0),z];if(fraction<.01)continue;for(const z of [-2.5,2.5]){let prior=point(anchor.x-span/2,anchor.y+z);for(let i=1;i<=12;i++){const next=point(anchor.x-span/2+span*i/12,anchor.y+z);cable(p,identity(),prior,next,equipment.softRope);prior=next;}}for(let i=0;i<=12;i++){const x=anchor.x-span/2+span*i/12;cable(p,identity(),point(x,anchor.y-2.5),point(x,anchor.y+2.5),equipment.softRope);if(i%3===0)drawMesh(p,buoy,transform(x,point(x,anchor.y)[1],anchor.y));}if(active){const near=point(anchor.x,anchor.y);for(const side of [-1,1])cable(p,identity(),[near[0],near[1],near[2]+side*2.5],[end[0],end[1],end[2]+side*.45],equipment.softRope);for(let i=0;i<8;i++){const u=i/8,a=[near[0]+(end[0]-near[0])*u,near[1]+(end[1]-near[1])*u,near[2]+(end[2]-near[2])*u];cable(p,identity(),[a[0],a[1],a[2]-(2.5-u*2)],[a[0],a[1],a[2]+(2.5-u*2)],equipment.softRope);}const marker=multiply(currentBoat,transform(-7.75+Math.cos(pose.drumAngle)*.74,2.8+Math.sin(pose.drumAngle)*.74,-1));cable(p,identity(),[marker[12],marker[13],marker[14]-.5],[marker[12],marker[13],marker[14]+.5]);}}}
 
  function harborPeople(p,s,t){const unloading=s.deckJob?.kind==='unload'&&s.deckJob.elapsed>s.deckJob.approach;for(let i=0;i<6;i++){const phase=t*(unloading?.075:.043)+i*2.1,walking=i<2||i>3,u=i<2?-20+12*Math.sin(phase):i===2?13:i===3?20:25+8*Math.sin(phase),v=i<4?4:11,at=quayPoint(u,v),heading=QUAY.heading+(walking?(Math.cos(phase)>0?0:Math.PI):Math.PI/2),m={role:i%3,moving:walking,working:!walking,phase:t*4.4+i},pose=crewPose(m,t,.3),root=transform(at.x,QUAY.deck+pose.bob,at.y,heading,pose.lean),parts=crewMeshes[i%3],carrying=i<2&&unloading&&Math.cos(phase)<0;
+  if(m.task==='lash'&&m.working&&m.face)cable(p,boat,[m.x,2.8,m.z],[m.face[0],2.65,m.face[1]],equipment.softRope);
   drawMesh(p,parts.torso,root);drawMesh(p,parts.head,root);for(const side of [-1,1]){const leg=multiply(root,transform(0,.78,side*.15,0,pose.leg*side));drawMesh(p,parts.thigh,leg);drawMesh(p,parts.shin,multiply(leg,transform(0,-.36,0,0,Math.max(0,-pose.leg*side)*1.1)));const arm=multiply(root,transform(0,1.34,side*.32,0,carrying||i===4?.9:walking?pose.arm*side:1.));drawMesh(p,parts.arm,arm);drawMesh(p,parts.forearm,multiply(arm,transform(0,-.32,0,0,.4)));}
   if(carrying)drawMesh(p,equipment.tote,multiply(root,transform(.4,.85,0)));if(i===4){drawMesh(p,equipment.trolley,multiply(root,transform(.8,0,0)));drawMesh(p,equipment.tote,multiply(root,transform(.9,.55,0)));}
  }}

@@ -14,7 +14,7 @@ export const SKILL_SYSTEMS=[
  ['bait','Bait preparation','Fishing',3000,'Bait cost reduced by 6% per rank'],
  ['hull','Heavy weather seamanship','Safety',5500,'Wave damage reduced by 4% per rank'],
  ['risk','Preventive maintenance','Safety',7500,'Incident frequency reduced by 5% per rank'],
- ['steer','Skipper navigation','Navigation',20000,'Rank I: full-speed return and dock; rank II: approach nearest own pot. Rudder response +7% per rank'],
+ ['steer','Skipper navigation','Navigation',20000,'Rank I: full-speed return and dock; rank II: approach oldest own pot. Rudder response +7% per rank'],
  ['net','Net handling','Fishing',5000,'Net deployment/retrieval 10% faster per rank'],
  ['unload','Landing coordination','Crew',3500,'Harbor unloading 10% faster per rank'],
  ['fleet','Fleet management','Business',10000,'Hired crew share reduced by 1 percentage point per rank'],

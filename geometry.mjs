@@ -1,8 +1,8 @@
-import {deckSign,hullPaint} from './vessel-profile.mjs?v=0.18.1';
-import {craneColor} from './crane-style.mjs?v=0.18.1';
-import {lineHaulerMounts} from './line-hauler.mjs?v=0.18.1';
-import {vesselStyle,rackPositions,gantryPlacement} from './vessel-style.mjs?v=0.18.1';
-import {HULL_STATIONS,hullWidthAt} from './fenders.mjs?v=0.18.1';
+import {deckSign,hullPaint} from './vessel-profile.mjs?v=0.18.2';
+import {craneColor} from './crane-style.mjs?v=0.18.2';
+import {lineHaulerMounts} from './line-hauler.mjs?v=0.18.2';
+import {vesselStyle,rackPositions,rackFrames,gantryPlacement} from './vessel-style.mjs?v=0.18.2';
+import {HULL_STATIONS,hullWidthAt} from './fenders.mjs?v=0.18.2';
 const steel=[.19,.24,.25],paint=[.68,.7,.64],dark=[.045,.08,.1],glass=[.055,.13,.17],brass=[.43,.31,.13],orange=[.72,.29,.065];
 export function geometry(){const data=[];
  function tri(a,b,c,color,rough=.6,emit=0){const u=b.map((x,i)=>x-a[i]),v=c.map((x,i)=>x-a[i]),n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]],len=Math.hypot(...n);if(len<1e-8)return;for(const p of [a,b,c])data.push(...p,...n.map(x=>x/len),...color,rough,emit);}
@@ -52,6 +52,8 @@ export function buildVessel(potCount=8,design={}){const orange=craneColor(design
  for(const dx of [-.3,.3])tube([x+dx,1.85,z-.27],[x+dx,y+.05,z-.27],.045,paint,8);tube([x-.34,y+.05,z-.27],[x+.34,y+.05,z-.27],.045,paint,8);tube([x,y,z-.4],[x,y,z-.23],.15,orange,12);tube([x+.33,y-.22,z-.12],[x+.33,y-.22,z+.12],.12,rubber,16);tube([x+.33,y-.22,z-.23],[x+.33,y-.22,z-.13],.045,steel,8);
  }
  if(design.salmon){for(const x of [-8.8,-6.7]){tube([x,1.8,-1.8],[x,3,-1.8],.09,steel);tube([x,1.8,0],[x,3,0],.09,steel);}tube([-7.75,2.8,-1.9],[-7.75,2.8,.1],.7,[.15,.28,.25],16);for(let z=-1.8;z<.1;z+=.12)tube([-7.75,2.8,z],[-7.75,2.8,z+.035],.72,[.3,.39,.31],12);}
+ // Raised transport racks provide real headroom below the central row.
+ for(const p of rackFrames(design)){const [sx,sy,sz]=p.scale,top=p.y-.64*sy;for(const x of [-.82,.82])for(const z of [-.8,.8])tube([p.x+x*sx,1.74,p.z+z*sz],[p.x+x*sx,top,p.z+z*sz],.045,steel,8);for(const z of [-.8,.8])tube([p.x-.86*sx,top,p.z+z*sz],[p.x+.86*sx,top,p.z+z*sz],.055,steel,8);for(const x of [-.82,.82])tube([p.x+x*sx,top,p.z-.86*sz],[p.x+x*sx,top,p.z+.86*sz],.055,steel,8);}
  // Wire cages remain open so the deck and cage shadows can be seen through them.
  for(const [i,{x,z,y,scale}] of rackPositions(potCount,design).entries())addRackPot(g,x,y,z,i,scale);
  for(const side of [-1,1]){box(5.4,5.5,side*2.75,.3,.16,.2,side<0?[.6,.015,.005]:[.015,.5,.13],.2,1);box(-.3,5.3,side*2.72,.4,.25,.24,[1.,.69,.28],.2,1.4);}
@@ -77,7 +79,7 @@ export function buildVessel(potCount=8,design={}){const orange=craneColor(design
  const segments=[[0,1,.6,1],[.6,1,.6,.5],[.6,.5,.6,0],[0,0,.6,0],[0,.5,0,0],[0,1,0,.5],[0,.5,.6,.5]];for(const [i,mask] of ['1111110','0110000','1101101','1111001','0110011','1011011','1011111','1110000','1111111','1111011'].entries())glyphs[i]=segments.filter((_,k)=>mask[k]==='1');
  for(const side of [-1,1])for(const [i,char] of [...(design.name?.toUpperCase()||'NORDVIND')].entries())for(const [a,b,c,d] of glyphs[char]||[])tube([(side>0?(orientation>0?1:5.25)+orientation*(i*(4.25/Math.max(8,design.name?.length||8))+a*.45):(orientation>0?5.25:1)-orientation*(i*(design.id&&design.id!=='nordvind'?4.25/Math.max(8,design.name?.length||8):.56)+a*.55)),3.15+b*.5,side*2.686],[(side>0?(orientation>0?1:5.25)+orientation*(i*(4.25/Math.max(8,design.name?.length||8))+c*.45):(orientation>0?5.25:1)-orientation*(i*(design.id&&design.id!=='nordvind'?4.25/Math.max(8,design.name?.length||8):.56)+c*.55)),3.15+d*.5,side*2.686],.022,design.powertrain==='electric'?[.65,.76,.72]:dark,4,.45,design.powertrain==='electric'?1.4:0);
  // Recessed hold hatch and sorting chute, with an actual opening in the deck mesh.
- box(-1.9,.55,-.5,1.8,.08,1.8,[.008,.014,.014],1);for(const x of [-2.85,-.95])box(x,1.35,-.5,.13,1.1,2.05,steel);for(const z of [-1.45,.45])box(-1.9,1.35,z,2.,1.1,.13,steel);for(const x of [-2.87,-.93])box(x,1.87,-.5,.16,.25,2.15,[.43,.45,.37]);for(const z of [-1.48,.48])box(-1.9,1.87,z,2.1,.25,.16,[.43,.45,.37]);box(-1.9,2.45,.9,2.2,.12,.7,[.48,.51,.45],.25);for(const x of [-2.9,-.9])tube([x,1.75,1.1],[x,2.4,1.1],.06,steel);
+ box(-1.9,.55,-.5,1.8,.08,1.8,[.008,.014,.014],1);for(const x of [-2.85,-.95])box(x,1.35,-.5,.13,1.1,2.05,steel);for(const z of [-1.45,.45])box(-1.9,1.35,z,2.,1.1,.13,steel);for(const x of [-2.87,-.93])box(x,1.87,-.5,.16,.25,2.15,[.43,.45,.37]);for(const z of [-1.48,.48])box(-1.9,1.87,z,2.1,.25,.16,[.43,.45,.37]);
  box(-1.5,2.2,-2.3,.9,.9,.8,[.29,.3,.27]);tube([-1.5,2.65,-2.8],[-1.5,2.65,-1.8],.26,steel,12);
  box(10,2.1,0,.9,.5,1.1,steel);tube([9.4,2.3,-.5],[11.7,1.3,-.5],.05,steel);
  const compactCoil=!!design.id&&design.id!=='nordvind',coilX=compactCoil?8.5:8.25,coilZ=compactCoil?0:1.1,coilRadius=compactCoil?.25:.5;for(let i=0;i<24;i++){const a=i*Math.PI/12,b=(i+1)*Math.PI/12;tube([coilX+Math.cos(a)*coilRadius,1.84,coilZ+Math.sin(a)*coilRadius],[coilX+Math.cos(b)*coilRadius,1.84,coilZ+Math.sin(b)*coilRadius],.07,[.48,.45,.29],5);}

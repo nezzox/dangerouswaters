@@ -1,14 +1,15 @@
-import {rackPositions,rackFootprints,rackFootprintKey,potBounds,deckHardware} from './vessel-style.mjs?v=0.18.1';
-export const CREW_RADIUS=.31,CREW_SPACING=.84;
+import {rackPositions,rackFootprints,rackFootprintKey,potBounds,rackFrames,rackScale,deckHardware} from './vessel-style.mjs?v=0.18.2';
+export const CREW_RADIUS=.26,CREW_SPACING=.62;
 export const CABIN_DOOR={x:.18,z:1.65};
 export function potPositions(count,design={}){return rackPositions(count,design);}
 const rectangle=(x,z,a,b,c,d,r)=>Math.max(a-x,0,x-b)**2+Math.max(c-z,0,z-d)**2<r*r;
 export function canStand(x,z,count=8,door=false,design={}){
  if(x< -11.25||x>-.1||Math.abs(z)>3){if(!(door&&x>=-.3&&x<=.85&&z>=1.3&&z<=2.0))return false;}
- if(rectangle(x,z,-2.95,-.85,-1.55,.65,CREW_RADIUS)||rectangle(x,z,-3.,-.8,.55,1.25,CREW_RADIUS))return false;
+ if(rectangle(x,z,-2.95,-.85,-1.55,.65,CREW_RADIUS))return false;
  if(Math.hypot(x+1.5,z-2.1)<.38+CREW_RADIUS||Math.hypot(x+3,z-3.1)<.42+CREW_RADIUS)return false;
  if(rectangle(x,z,-1.95,-1.05,-2.7,-1.9,CREW_RADIUS))return false;
- for(const p of rackFootprints(count,design)){const b=potBounds(p);if(rectangle(x,z,b.min[0],b.max[0],b.min[2],b.max[2],CREW_RADIUS))return false;}
+ for(const p of rackFootprints(count,design)){const b=potBounds(p);if(b.min[1]>1.7+2*rackScale(design)[1])continue;if(rectangle(x,z,b.min[0],b.max[0],b.min[2],b.max[2],CREW_RADIUS))return false;}
+ for(const p of rackFrames(design))for(const dx of [-.82,.82])for(const dz of [-.8,.8])if(Math.hypot(x-p.x-dx*p.scale[0],z-p.z-dz*p.scale[2])<CREW_RADIUS+.055)return false;
  for(const box of deckHardware(design).solid)if(box.min[1]<3.65&&rectangle(x,z,box.min[0],box.max[0],box.min[2],box.max[2],CREW_RADIUS))return false;
  return true;
 }
