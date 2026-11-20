@@ -1,4 +1,4 @@
-import {rackPositions,rackScale,rackCount} from './vessel-style.mjs?v=0.18.4';
+import {rackPositions,rackScale,rackCount} from './vessel-style.mjs?v=0.18.5';
 // Each hull/count layout uploads once. All render passes share its three buffers.
 export function createRackInstances(gl,meshes,limit=64){const cache=new Map();
  const release=entry=>{for(const group of entry.groups){gl.deleteVertexArray(group.vao);gl.deleteBuffer(group.buffer);}};

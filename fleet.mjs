@@ -1,14 +1,14 @@
-import {PARTS,boatById} from './catalog.mjs?v=0.18.4';
-import {solarCharge,electricBurn,energyPrice} from './energy.mjs?v=0.18.4';
-import {recoverFleetContact} from './fleet-recovery.mjs?v=0.18.4';
-import {nearbyGreeting} from './fleet-greetings.mjs?v=0.18.4';
-import {potCatchAt} from './pot-soak.mjs?v=0.18.4';
-import {prepareRareCatch,awardRareCatch,rareValue} from './rare-catch.mjs?v=0.18.4';
-import {FUEL_SCALE,SEA_WEAR_SCALE} from './balance.mjs?v=0.18.4';
-import {groundsAt} from './fishing-grounds.mjs?v=0.18.4';
-import {nearestWater,geoToWorld,clearWater} from './world.mjs?v=0.18.4';
-import {planSeaRoute,seaLane} from './navigation.mjs?v=0.18.4';
-import {vesselStats,settleLanding,tradeValue} from './career.mjs?v=0.18.4';
+import {PARTS,boatById} from './catalog.mjs?v=0.18.5';
+import {solarCharge,electricBurn,energyPrice} from './energy.mjs?v=0.18.5';
+import {recoverFleetContact} from './fleet-recovery.mjs?v=0.18.5';
+import {nearbyGreeting} from './fleet-greetings.mjs?v=0.18.5';
+import {potCatchAt} from './pot-soak.mjs?v=0.18.5';
+import {prepareRareCatch,awardRareCatch,rareValue} from './rare-catch.mjs?v=0.18.5';
+import {FUEL_SCALE,SEA_WEAR_SCALE} from './balance.mjs?v=0.18.5';
+import {groundsAt} from './fishing-grounds.mjs?v=0.18.5';
+import {nearestWater,geoToWorld,clearWater} from './world.mjs?v=0.18.5';
+import {planSeaRoute,seaLane} from './navigation.mjs?v=0.18.5';
+import {vesselStats,settleLanding,tradeValue} from './career.mjs?v=0.18.5';
 export function fleetStats(s,b){return vesselStats({...b,career:{boat:b.boat,parts:b.parts,skills:s.career.skills}});}
 export const fleetNoticeCount=s=>(s.career?.fleet||[]).filter(b=>b.unreadMessage||b.request?.status==='pending'||b.upgradeRequest?.status==='pending').length;
 export function readFleetMessages(s){for(const b of s.career?.fleet||[])b.unreadMessage=false;}
