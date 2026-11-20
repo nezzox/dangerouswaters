@@ -1,4 +1,4 @@
-// Five cumulative ranks per discipline/system: all 300 entries have gameplay effects.
+// Most disciplines/systems have five ranks; intelligent automation is a separate single purchase.
 export const SKILL_SYSTEMS=[
  ['autoDeploy','Automatic pot setting','Automation',4500,'Automatically set pots after clearing the buoy range ring'],
  ['autoHaul','Automatic pot retrieval','Automation',6500,'Unlock auto haul; higher ranks reduce minimum soak by 0.2 h'],
@@ -33,7 +33,8 @@ export const PART_SYSTEMS=[
  ['lights','Deck floodlights','Electronics',9000,'Pot deployment 5% faster per grade'],['landing','Landing conveyor','Deck',16000,'Harbor unloading 8% faster per grade'],
  ['workshop','Onboard workshop','Safety',20000,'Fuel/repair service prices reduced by 5% per grade'],['quarters','Crew accommodation','Hull',26000,'One additional berth per grade; crew increases work rate']
 ].map(([key,name,group,base,description])=>({key,name,group,base,description}));
-const ranks=(systems,prefix)=>systems.flatMap(d=>Array.from({length:5},(_,i)=>({id:`${prefix}-${d.key}-${i+1}`,key:d.key,rank:i+1,name:`${d.name} ${['I','II','III','IV','V'][i]}`,group:d.group,price:Math.round(d.base*(i+1)**2.15/100)*100,description:d.description,requires:i?`${prefix}-${d.key}-${i}`:null})));
+SKILL_SYSTEMS.push({key:'intelligentAutoSet',name:'Intelligent Auto Set',group:'Automation',base:1500000,maxRank:1,description:'Requires Auto Set I and installed sonar. Deploy only when the sonar lower crab estimate exceeds 50%. Existing speed and spacing limits still apply.'});
+const ranks=(systems,prefix)=>systems.flatMap(d=>Array.from({length:d.maxRank||5},(_,i)=>({id:`${prefix}-${d.key}-${i+1}`,key:d.key,rank:i+1,maxRank:d.maxRank||5,name:d.maxRank===1?d.name:`${d.name} ${['I','II','III','IV','V'][i]}`,group:d.group,price:Math.round(d.base*(i+1)**2.15/100)*100,description:d.description,requires:i?`${prefix}-${d.key}-${i}`:null})));
 export const SKILLS=ranks(SKILL_SYSTEMS,'skill'),PARTS=ranks(PART_SYSTEMS,'part');
 const DESIGNS=[
  ['Ridge','Coastal crabber','starboard',false,24,3,1,1],['Kodiak','Heavy crabber','starboard',false,27,4,.95,1.15],

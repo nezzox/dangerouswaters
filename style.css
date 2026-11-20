@@ -65,3 +65,5 @@
 .skipper-actions{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:7px}.skipper-actions button{font:8px monospace;padding:9px 3px}
 
 #kofi-support{position:fixed;z-index:4;display:flex;align-items:center;gap:5px;width:98px;height:26px;padding:4px 7px;background:#0d1b22;color:#c8d5cf;border:1px solid var(--line);font:8px monospace;text-decoration:none;opacity:.5}#kofi-support svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}#kofi-support:focus-visible{outline:2px solid var(--amber)}
+
+#intelligent-auto-set{grid-column:1/-1}.fleet-head{display:flex;align-items:flex-start;justify-content:space-between;gap:15px}.fleet-head button{margin:0;white-space:nowrap}.fleet-service-auto{display:flex;align-items:center;gap:9px;margin-top:12px;font:11px/1.5 monospace}.fleet-upgrade{border-top:1px solid var(--line);margin-top:15px;padding-top:12px}.fleet-sale-confirm{border:1px solid var(--amber);padding:12px;margin-top:12px}
