@@ -1,4 +1,5 @@
-import {HULL_STATIONS,hullWidthAt} from './fenders.mjs?v=0.17.15';
+import {vesselStyle,potRackPosition} from './vessel-style.mjs?v=0.17.16';
+import {HULL_STATIONS,hullWidthAt} from './fenders.mjs?v=0.17.16';
 const steel=[.19,.24,.25],paint=[.68,.7,.64],dark=[.045,.08,.1],glass=[.055,.13,.17],brass=[.43,.31,.13],orange=[.72,.29,.065];
 export function geometry(){const data=[];
  function tri(a,b,c,color,rough=.6,emit=0){const u=b.map((x,i)=>x-a[i]),v=c.map((x,i)=>x-a[i]),n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]],len=Math.hypot(...n);if(len<1e-8)return;for(const p of [a,b,c])data.push(...p,...n.map(x=>x/len),...color,rough,emit);}
@@ -42,7 +43,7 @@ export function buildVessel(potCount=8,design={}){const paint=design.color?[.42+
  const layouts=design.hauler==='both'?['starboard','port']:[design.hauler||'starboard'];for(const layout of layouts){const side=layout==='port'?-1:1,stern=layout==='stern',pivot=stern?[-8.1,2.1,1.6]:[-1.5,2.1,side*2.1];tube([pivot[0],1.8,pivot[2]],[pivot[0],5.1,pivot[2]],.18,orange,10);if(stern){tube([-10,2,0],[-12,2.8,0],.32,steel,12);box(-10,2,0,.9,.4,.9,orange);}else{tube([-3,2.,side*2.7],[-3,2.8,side*3.8],.32,steel,12);box(-3,2.,side*2.7,.9,.4,.9,orange);}}
  if(design.salmon){for(const x of [-8.8,-6.7]){tube([x,1.8,-1.8],[x,3,-1.8],.09,steel);tube([x,1.8,0],[x,3,0],.09,steel);}tube([-7.75,2.8,-1.9],[-7.75,2.8,.1],.7,[.15,.28,.25],16);for(let z=-1.8;z<.1;z+=.12)tube([-7.75,2.8,z],[-7.75,2.8,z+.035],.72,[.3,.39,.31],12);}
  // Wire cages remain open so the deck and cage shadows can be seen through them.
- for(let i=0;i<Math.min(potCount,20);i++){const x=-10+Math.floor(i/6)*2.0,z=-2.05+(i%2)*2.05,y=2.4+Math.floor((i%6)/2)*1.25;const c=[.39+(i%3)*.025,.31,.16];
+ for(let i=0;i<Math.min(potCount,design.salmon?16:20);i++){const {x,z,y}=potRackPosition(i,design);const c=[.39+(i%3)*.025,.31,.16];
   const xx=[x-.85,x+.85],yy=[y-.58,y+.58],zz=[z-.83,z+.83];for(const a of xx)for(const b of yy)tube([a,b,zz[0]],[a,b,zz[1]],.035,c,5);for(const a of xx)for(const b of zz)tube([a,yy[0],b],[a,yy[1],b],.035,c,5);for(const a of yy)for(const b of zz)tube([xx[0],a,b],[xx[1],a,b],.035,c,5);
   for(let j=-.6;j<.8;j+=.32){for(const side of [-1,1]){tube([x+j,yy[0],z+side*.83],[x+j,yy[1],z+side*.83],.012,c,4);tube([x-.85,yy[1],z+j],[x+.85,yy[1],z+j],.012,c,4);}}}
  for(const side of [-1,1]){box(5.4,5.5,side*2.75,.3,.16,.2,side<0?[.6,.015,.005]:[.015,.5,.13],.2,1);box(-.3,5.3,side*2.72,.4,.25,.24,[1.,.69,.28],.2,1.4);}
@@ -72,6 +73,13 @@ export function buildVessel(potCount=8,design={}){const paint=design.color?[.42+
  box(-1.5,2.2,-2.3,.9,.9,.8,[.29,.3,.27]);tube([-1.5,2.65,-2.8],[-1.5,2.65,-1.8],.26,steel,12);
  box(10,2.1,0,.9,.5,1.1,steel);tube([9.4,2.3,-.5],[11.7,1.3,-.5],.05,steel);
  for(let i=0;i<24;i++){const a=i*Math.PI/12,b=(i+1)*Math.PI/12;tube([8.25+Math.cos(a)*.5,1.84,1.1+Math.sin(a)*.5],[8.25+Math.cos(b)*.5,1.84,1.1+Math.sin(b)*.5],.07,[.48,.45,.29],5);}
+ const style=vesselStyle(design);if(style.family){
+ if(style.gantry){const x=style.family===2?-7:-9.8,h=style.gantryHeight;for(const side of [-1,1]){tube([x,1.85,side*2.9],[x,h,side*2.9],.16,paint,10);tube([x+1.4,1.85,side*2.9],[x,h,side*2.9],.09,steel,8);}tube([x,h,-2.9],[x,h,2.9],.2,paint,10);box(x,h,0,.7,.6,1.1,orange);}
+ if(style.exhausts===2)for(const z of [-1.65,1.65]){tube([1.2,5.9,z],[1.2,8.2,z],.22,dark,10);tube([1.2,8.2,z],[.7,8.5,z],.24,steel,10);}
+ if(style.upperBridge){roundedBox(3.2,6.7,0,3.1,1.4,3.7,.2,paint);box(4.76,6.85,0,.03,.65,2.9,glass,.1);roundedBox(3.2,7.5,0,3.6,.2,4.1,.12,paint);}
+ if(style.bowShield)for(const side of [-1,1]){quad([8,2.2,side*2.4],[11.5,2.2,side*.8],[11.5,3.2,side*.8],[8,3.5,side*2.4],paint,.7);}
+ if(style.radarArch){for(const side of [-1,1])tube([4.2,6,side*2.3],[4.2,7.3,side*2.3],.09,steel,8);tube([4.2,7.3,-2.3],[4.2,7.3,2.3],.1,paint,8);box(4.2,7.5,0,.8,.3,1.8,paint);}
+ }
  return g.array();}
 export function buildBuoy(color=orange){const g=geometry();g.tube([0,-.4,0],[0,.9,0],.48,color,12);g.tube([0,.35,0],[0,.6,0],.5,paint,12);g.tube([0,.9,0],[0,2.1,0],.035,steel);g.box(.35,1.9,0,.7,.35,.025,color);return g.array();}
 export function buildOceanGrid(size=4000,segments=220){const data=new Float32Array(segments*segments*18),half=size/2;let k=0;for(let z=0;z<segments;z++)for(let x=0;x<segments;x++){const coord=v=>Math.sinh((v/segments*2-1)*5.5)/Math.sinh(5.5)*half,a=coord(x),b=coord(z),c=coord(x+1),d=coord(z+1);for(const p of [[a,0,b],[a,0,d],[c,0,b],[c,0,b],[a,0,d],[c,0,d]])for(const v of p)data[k++]=v;}return data;}

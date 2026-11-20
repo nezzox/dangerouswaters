@@ -1,4 +1,4 @@
-import {boatById} from './catalog.mjs?v=0.17.15';
+import {boatById} from './catalog.mjs?v=0.17.16';
 const lerp=(a,b,t)=>a+(b-a)*Math.max(0,Math.min(1,t));
 const between=(a,b,t)=>a.map((v,i)=>lerp(v,b[i],t));
 export function deckWorkPose(job,boat=null){if(!job||job.kind==='unload'||job.kind==='undock'||job.kind.startsWith('net'))return null;const p=Math.max(0,Math.min(1,job.elapsed/job.duration)),side=job.layout==='both'&&job.side<0?-1:1,stern=job.layout==='stern',edge=y=>stern?[-10.6,y,0]:[-3.1,y,side*4.6],hand=stern?[-9,3.1,0]:[-3.8,3.1,side*2.65];let position,tip=0;const grapple=job.kind==='haul'&&job.grapple,q=grapple?Math.max(0,(p-.3)/.7):p;let hook=null,dragBuoy=null;
@@ -7,3 +7,5 @@ export function deckWorkPose(job,boat=null){if(!job||job.kind==='unload'||job.ki
  else{position=q<.25?between(edge(-3.2),edge(4.5),q/.25):q<.45?between(edge(4.5),[-1.9,3.9,-.45],(q-.25)/.2):q<.8?[-1.9,3.9,-.45]:between([-1.9,3.9,-.45],[-4,2.5,0],(q-.8)/.2);tip=q>.45&&q<.8?Math.sin((q-.45)/.35*Math.PI)*1.35:0;}
  return {progress:p,sequence:q,position,tip,hook,dragBuoy,craneActive:true,visible:job.kind==='haul'||p<.94,hatch:job.kind==='haul'?Math.sin(Math.max(0,Math.min(1,(q-.42)/.53))*Math.PI)*1.35:0,crabs:job.kind==='haul'&&q>.48&&q<.82,stage:job.kind==='deploy'?(p<.2?'Rigging pot':p<.45?'Swinging crane outboard':'Lowering pot'):(q<.25?'Hoisting pot':q<.45?'Swinging over the deck':q<.8?'Emptying and sorting':'Stowing pot')};
 }
+
+export function netWorkPose(job){if(!job||!['netSet','netHaul'].includes(job.kind))return null;const p=Math.max(0,Math.min(1,job.elapsed/job.duration)),hauling=job.kind==='netHaul';return {progress:p,deployed:hauling?1-p:p,lift:hauling?Math.sin(p*Math.PI)*2.8:.3,drumAngle:(hauling?-1:1)*p*Math.PI*16,stage:hauling?'Hauling net through power block':'Paying out salmon net'};}

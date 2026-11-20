@@ -1,17 +1,17 @@
-import {resolveFleetContact} from './vessel-collision.mjs?v=0.17.15';
-import {potCatchAt} from './pot-soak.mjs?v=0.17.15';
-import {fuelBurnRate} from './fuel-economy.mjs?v=0.17.15';
-import {prepareRareCatch,awardRareCatch,rareValue,rareById} from './rare-catch.mjs?v=0.17.15';
-import {SEA_WEAR_SCALE} from './balance.mjs?v=0.17.15';
-import {crabAbundance,salmonAbundance} from './fishing-grounds.mjs?v=0.17.15';
-export {groundsAt} from './fishing-grounds.mjs?v=0.17.15';
-import {WORLD_VERSION,WORLD_BOUNDS,FISHING_GROUNDS,isLand,inWorld} from './world.mjs?v=0.17.15';
-import {planSeaRoute} from './navigation.mjs?v=0.17.15';
-import {tickFleet} from './fleet.mjs?v=0.17.15';
-import {ensureCareer,vesselStats,settleLanding} from './career.mjs?v=0.17.15';
-import {tickIncidents,blocksDeck} from './incidents.mjs?v=0.17.15';
-import {BERTH,buildDockRoute,dockRouteDuration,dockingPose,vesselIntersectsHarbor,castOffPosition,buildCastOffRoute} from './harbor.mjs?v=0.17.15';
-export {BERTH} from './harbor.mjs?v=0.17.15';
+import {resolveFleetContact} from './vessel-collision.mjs?v=0.17.16';
+import {potCatchAt} from './pot-soak.mjs?v=0.17.16';
+import {fuelBurnRate} from './fuel-economy.mjs?v=0.17.16';
+import {prepareRareCatch,awardRareCatch,rareValue,rareById} from './rare-catch.mjs?v=0.17.16';
+import {SEA_WEAR_SCALE} from './balance.mjs?v=0.17.16';
+import {crabAbundance,salmonAbundance} from './fishing-grounds.mjs?v=0.17.16';
+export {groundsAt} from './fishing-grounds.mjs?v=0.17.16';
+import {WORLD_VERSION,WORLD_BOUNDS,FISHING_GROUNDS,isLand,inWorld} from './world.mjs?v=0.17.16';
+import {planSeaRoute} from './navigation.mjs?v=0.17.16';
+import {tickFleet} from './fleet.mjs?v=0.17.16';
+import {ensureCareer,vesselStats,settleLanding} from './career.mjs?v=0.17.16';
+import {tickIncidents,blocksDeck} from './incidents.mjs?v=0.17.16';
+import {BERTH,buildDockRoute,dockRouteDuration,dockingPose,vesselIntersectsHarbor,castOffPosition,buildCastOffRoute} from './harbor.mjs?v=0.17.16';
+export {BERTH} from './harbor.mjs?v=0.17.16';
 export const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 export const PORT={x:BERTH.x,y:BERTH.y};
 export const DECK_LIMIT_KNOTS=5;
@@ -38,7 +38,7 @@ export function depthAt(x,y){return Math.round(55+Math.min(180,Math.hypot(x,y)*.
 export function abundanceAt(x,y,hour=0){return crabAbundance(x,y,hour);}
 export const catchAt=potCatchAt;
 export function nearPort(s){return distance(s,PORT)<230;}
-export function step(s,dt){if(s.paused)return;const start={x:s.x,y:s.y,heading:s.heading},prior=new Map((s.career?.fleet||[]).map(b=>[b.id,{x:b.x,y:b.y,heading:b.heading}]));stepSimulation(s,dt);const hit=resolveFleetContact(s,start,prior);if(hit&&s.message!==`Hull contact with ${hit.name}. Engines stopped. Maneuver clear.`)notify(s,`Hull contact with ${hit.name}. Engines stopped. Maneuver clear.`);}
+export function step(s,dt){if(s.paused)return;const start={x:s.x,y:s.y,heading:s.heading},prior=new Map((s.career?.fleet||[]).map(b=>[b.id,{x:b.x,y:b.y,heading:b.heading}]));stepSimulation(s,dt);const hit=resolveFleetContact(s,start,prior,dt);if(hit&&s.message!==`Hull contact with ${hit.name}. Maneuver clear.`)notify(s,`Hull contact with ${hit.name}. Maneuver clear.`);}
 function stepSimulation(s,dt){
  if(s.paused)return;
  dt=clamp(dt,0,1);s.hour+=dt/45;const stats=vesselStats(s);tickIncidents(s,dt,stats,conditions(s));if(s.career)tickFleet(s,dt,conditions(s));
