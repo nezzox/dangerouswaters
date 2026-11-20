@@ -1,13 +1,11 @@
 {
-  "version": "0.18.5",
+  "version": "0.18.6",
   "notes": {
     "en": [
-      "Ko-fi donations now appear in the radio log without pausing play.",
-      "Update alerts include a short summary of what changed."
+      "Fixed Intelligent Auto Set slowing down with autopilot and inconsistent automation switches."
     ],
     "sv": [
-      "Ko-fi-donationer visas nu i radiologgen utan att pausa spelet.",
-      "Uppdateringsrutan visar en kort sammanfattning av ändringarna."
+      "Rättat inbromsningen för Intelligent Auto Set med autopilot och osynkroniserade automatikknappar."
     ]
   }
 }
