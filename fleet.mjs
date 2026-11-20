@@ -1,17 +1,18 @@
-import {recoverFleetContact} from './fleet-recovery.mjs?v=0.17.20';
-import {nearbyGreeting} from './fleet-greetings.mjs?v=0.17.20';
-import {potCatchAt} from './pot-soak.mjs?v=0.17.20';
-import {prepareRareCatch,awardRareCatch,rareValue} from './rare-catch.mjs?v=0.17.20';
-import {FUEL_SCALE,SEA_WEAR_SCALE} from './balance.mjs?v=0.17.20';
-import {groundsAt} from './fishing-grounds.mjs?v=0.17.20';
-import {nearestWater,geoToWorld,clearWater} from './world.mjs?v=0.17.20';
-import {planSeaRoute,seaLane} from './navigation.mjs?v=0.17.20';
-import {vesselStats,settleLanding} from './career.mjs?v=0.17.20';
+import {solarCharge,electricBurn,energyPrice} from './energy.mjs?v=0.18.0';
+import {recoverFleetContact} from './fleet-recovery.mjs?v=0.18.0';
+import {nearbyGreeting} from './fleet-greetings.mjs?v=0.18.0';
+import {potCatchAt} from './pot-soak.mjs?v=0.18.0';
+import {prepareRareCatch,awardRareCatch,rareValue} from './rare-catch.mjs?v=0.18.0';
+import {FUEL_SCALE,SEA_WEAR_SCALE} from './balance.mjs?v=0.18.0';
+import {groundsAt} from './fishing-grounds.mjs?v=0.18.0';
+import {nearestWater,geoToWorld,clearWater} from './world.mjs?v=0.18.0';
+import {planSeaRoute,seaLane} from './navigation.mjs?v=0.18.0';
+import {vesselStats,settleLanding} from './career.mjs?v=0.18.0';
 export function fleetStats(s,b){return vesselStats({...b,career:{boat:b.boat,parts:b.parts,skills:s.career.skills}});}
 export const fleetNoticeCount=s=>(s.career?.fleet||[]).filter(b=>b.unreadMessage||b.request?.status==='pending').length;
 export function readFleetMessages(s){for(const b of s.career?.fleet||[])b.unreadMessage=false;}
 function radio(s,b,text,attention=true){if(attention)b.unreadMessage=true;s.message=text;const entry={hour:s.hour,text,kind:'fleet'};s.log.unshift(entry);(s.popupEvents??=[]).push(entry);s.log=s.log.slice(0,8);}
-function requestService(s,b,stats){const fuel=Math.max(0,stats.tank-b.fuel),repair=Math.max(0,100-b.hull),bait=b.fishing==='salmon'?0:stats.potCapacity*stats.baitCost,cost=Math.ceil((fuel*9.5+repair*160)*stats.serviceCost+bait);b.phase='service';b.request={cost,fuel,repair,bait,status:'pending'};radio(s,b,`Captain of ${b.name}: permission for ${cost.toLocaleString('en-US')} kr of fuel, repairs and trip supplies? Open Fleet & finance.`);}
+function requestService(s,b,stats){const fuel=Math.max(0,stats.tank-b.fuel),repair=Math.max(0,100-b.hull),bait=b.fishing==='salmon'?0:stats.potCapacity*stats.baitCost,cost=Math.ceil((fuel*energyPrice(stats)+repair*160)*stats.serviceCost+bait);b.phase='service';b.request={cost,fuel,repair,bait,status:'pending'};radio(s,b,`Captain of ${b.name}: permission for ${cost.toLocaleString('en-US')} kr of ${stats.powertrain==='electric'?'shore charging':'fuel'}, repairs and trip supplies? Open Fleet & finance.`);}
 export function answerCaptain(s,id,approve){const b=s.career?.fleet.find(b=>b.id===id);if(!b?.request)return {ok:false,message:'No outstanding request.'};if(!approve){b.request.status='declined';return {ok:true,message:`${b.name} holding in harbor. You can approve later.`};}if(s.money<b.request.cost)return {ok:false,message:'Insufficient funds. Captain remains in harbor.'};const cost=b.request.cost;s.money-=cost;b.expenses=(b.expenses||0)+cost;const stats=fleetStats(s,b);b.fuel=stats.tank;b.hull=100;b.request=null;b.phase='outbound';b.groundTarget=null;b.waypoint=0;b.timer=0;return {ok:true,message:`${b.name}: supplies authorized. Departing for the grounds.`};}
 const move=(b,x,y,speed,dt)=>{const dx=x-b.x,dy=y-b.y,d=Math.hypot(dx,dy);if(d<.01)return true;b.heading=Math.atan2(dy,dx);const travel=Math.min(d,speed*dt);b.x+=dx/d*travel;b.y+=dy/d*travel;return travel>=d;};
 function navigate(s,b,x,y,speed,dt){const target=nearestWater(x,y),key=target.x.toFixed(1)+'/'+target.y.toFixed(1);if(b.navigation?.key!==key){const route=planSeaRoute(b,target);b.navigation=route?{key,route,index:0}:null;if(!route)return false;}const n=b.navigation,p=n.route[n.index];
@@ -20,11 +21,11 @@ function navigate(s,b,x,y,speed,dt){const target=nearestWater(x,y),key=target.x.
  const dx=p.x-b.x,dy=p.y-b.y,d=Math.hypot(dx,dy),ux=dx/Math.max(d,.01),uy=dy/Math.max(d,.01),own=fleetStats(s,b);if(d<.01){if(n.index<n.route.length-1){n.index++;return false;}return true;}for(const o of obstacles){const other=o===s?vesselStats(s):fleetStats(s,o),clearance=(own.length+other.length)*.55+10,ox=o.x-b.x,oy=o.y-b.y,along=ox*ux+oy*uy,across=Math.abs(ox*uy-oy*ux);if(along< -clearance||along>Math.min(d,clearance+speed*7)||across>clearance)continue;if(Math.hypot(target.x-o.x,target.y-o.y)<clearance*.65)return false;for(const side of [1,-1]){const a={x:o.x+ux*clearance-uy*clearance*side,y:o.y+uy*clearance+ux*clearance*side};if(clearWater(a.x,a.y,20)&&seaLane(b,a,18)){b.avoidPoint=a;break;}}return false;}
  if(move(b,p.x,p.y,b.fuel>0?speed:0,dt)){if(n.index<n.route.length-1)n.index++;else return true;}return false;}
 export function tickFleet(s,dt,w){for(const [i,b] of s.career.fleet.entries()){
- const stats=fleetStats(s,b);if(b.started){const greeting=nearbyGreeting(s,b);if(greeting)radio(s,b,greeting,false);}if(recoverFleetContact(s,b,stats,dt))continue;if(b.request)continue;
+ const stats=fleetStats(s,b);if(stats.powertrain==='electric')b.fuel=Math.min(stats.tank,b.fuel+solarCharge(stats,s.hour,w,dt));if(b.started){const greeting=nearbyGreeting(s,b);if(greeting)radio(s,b,greeting,false);}if(recoverFleetContact(s,b,stats,dt))continue;if(b.request)continue;
  if(!b.started||b.phase==='service'){b.started=true;requestService(s,b,stats);continue;}
- b.timer+=dt;const base=groundsAt(s.hour)[stats.tank>1800?1:0];if(!Number.isFinite(b.groundTarget?.x)||!Number.isFinite(b.groundTarget?.y))b.groundTarget=nearestWater(base.x+(i%4)*165,base.y+(Math.floor(i/4)%6)*180);const ground=b.groundTarget,speed=stats.top/(1+w.waves*.06),fuelRate=(b.phase==='soak'?.008:.06)*stats.fuelUse*FUEL_SCALE;b.fuel=Math.max(0,b.fuel-dt*fuelRate);if(w.waves>4)b.hull=Math.max(35,b.hull-dt*.0008/stats.protection*SEA_WEAR_SCALE);
+ b.timer+=dt;const base=groundsAt(s.hour)[stats.tank>1800?1:0];if(!Number.isFinite(b.groundTarget?.x)||!Number.isFinite(b.groundTarget?.y))b.groundTarget=nearestWater(base.x+(i%4)*165,base.y+(Math.floor(i/4)%6)*180);const ground=b.groundTarget,speed=stats.top/(1+w.waves*.06),fuelRate=(b.phase==='soak'?.008:.06)*stats.fuelUse*FUEL_SCALE;b.fuel=stats.powertrain==='electric'?Math.min(stats.tank,Math.max(0,b.fuel-electricBurn(b.phase==='soak'?0:.75,stats,dt))):Math.max(0,b.fuel-dt*fuelRate);if(w.waves>4)b.hull=Math.max(35,b.hull-dt*.0008/stats.protection*SEA_WEAR_SCALE);
  // Captains reserve enough fuel to return; no teleporting or unattended spending.
- if((b.fuel<Math.max(85,(Math.hypot(b.x-160,b.y-80)+4500)/Math.max(3,speed)*.07*stats.fuelUse*FUEL_SCALE)||b.hull<50)&&!['return','landing'].includes(b.phase)){b.phase=b.pots.length?'haul':'return';b.waypoint=0;b.timer=0;b.navigation=null;}
+ if((b.fuel<Math.max(85,(Math.hypot(b.x-160,b.y-80)+4500)/Math.max(3,speed)*(stats.powertrain==='electric'?electricBurn(.75,stats,1):.07*stats.fuelUse*FUEL_SCALE))||b.hull<50)&&!['return','landing'].includes(b.phase)){b.phase=b.pots.length?'haul':'return';b.waypoint=0;b.timer=0;b.navigation=null;}
  if(b.phase==='outbound'){const points=[[350,80],[ground.x,ground.y]],p=points[b.waypoint||0];if(navigate(s,b,...p,speed,dt)){b.waypoint=(b.waypoint||0)+1;if(b.waypoint>=points.length){b.phase=b.fishing==='salmon'&&stats.salmon?'net':'deploy';b.timer=0;}}}
  else if(b.phase==='deploy'){const n=b.pots.length,target={x:ground.x+(n%10)*165,y:ground.y+Math.floor(n/10)*165},arrived=navigate(s,b,target.x,target.y,Math.min(speed,2.3),dt);if(arrived&&b.timer>=14/stats.work){b.pots.push({id:n+1,x:b.x,y:b.y,setAt:s.hour});b.timer=0;if(b.pots.length>=stats.potCapacity){b.phase='soak';b.timer=0;}}}
  else if(b.phase==='soak'){if(b.timer>=112.5){b.phase='haul';b.timer=0;}}

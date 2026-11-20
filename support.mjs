@@ -1,10 +1,5 @@
-// Keep the external donation widget clear of the responsive game toolbar.
-const footer=document.querySelector('footer');
-const position=()=>document.documentElement.style.setProperty('--toolbar-height',`${Math.ceil(footer.getBoundingClientRect().height)}px`);
-new ResizeObserver(position).observe(footer);position();
-if(window.kofiWidgetOverlay)window.kofiWidgetOverlay.draw('nezzox',{
- type:'floating-chat',
- 'floating-chat.donateButton.text':'Support me',
- 'floating-chat.donateButton.background-color':'#0d1b22',
- 'floating-chat.donateButton.text-color':'#fff'
-});
+// Native, game-styled Ko-fi link: no third-party iframe on the rendering hot path.
+const footer=document.querySelector('footer'),weather=document.querySelector('.weather');
+const support=document.createElement('a');support.id='kofi-support';support.href='https://ko-fi.com/nezzox';support.target='_blank';support.rel='noopener';support.setAttribute('aria-label','Support Dangerous Waters on Ko-fi');support.innerHTML='<svg viewBox="0 0 32 28" aria-hidden="true"><path d="M4 8h18v9a7 7 0 0 1-7 7h-4a7 7 0 0 1-7-7zM22 10h3a4 4 0 0 1 0 8h-3M7 3v2m6-3v3m6-2v2M2 26h24"/></svg><span>Support me</span>';document.body.append(support);
+function position(){document.documentElement.style.setProperty('--toolbar-height',`${Math.ceil(footer.getBoundingClientRect().height)}px`);const r=weather.getBoundingClientRect();support.style.left=Math.min(innerWidth-support.offsetWidth-8,r.right+8)+'px';support.style.top=Math.max(8,r.bottom-support.offsetHeight)+'px';}
+const observer=new ResizeObserver(position);observer.observe(footer);observer.observe(weather);addEventListener('resize',position);position();

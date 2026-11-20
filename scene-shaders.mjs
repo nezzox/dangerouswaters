@@ -1,8 +1,9 @@
-import {hullWaterGLSL} from './deck-water.mjs?v=0.17.20';
-import {seaHeightGLSL} from './sea-spectrum.mjs?v=0.17.20';
+import {hullWaterGLSL} from './deck-water.mjs?v=0.18.0';
+import {seaHeightGLSL} from './sea-spectrum.mjs?v=0.18.0';
 // Shared atmosphere and ocean functions keep lighting and reflections consistent.
 export const common=`
 precision highp float;precision highp int;
+uniform float uDeckSign;uniform vec3 uCraneColor;
 uniform float uReflectionPass;uniform float uKind;uniform float uDaylight;uniform float uLights;uniform float uHullY;uniform vec4 uWake[48];uniform vec4 uWakeInfo[48];uniform int uWakeCount;uniform float uWakeTime;
 uniform vec3 uSea;uniform float uTime;uniform vec4 uWeather;uniform vec4 uBoat;uniform vec3 uEye;uniform mat4 uVP;uniform mat4 uLightVP;
 float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
@@ -12,7 +13,7 @@ float fbm(vec2 p){float f=0.,a=.5;for(int i=0;i<4;i++){f+=a*noise(p);p=mat2(.8,-
 vec4 wakeAt(vec2 p){vec4 result=vec4(0.);for(int i=0;i<48;i++){if(i>=uWakeCount)break;float age=uWakeTime-uWakeInfo[i].w;if(age<0.||age>35.)continue;vec2 d=p-uWake[i].xy,f=uWakeInfo[i].xy,r=vec2(-f.y,f.x);float along=dot(d,f),side=dot(d,r),energy=uWakeInfo[i].z;if(abs(along)>20.+age||abs(side)>5.+age*energy*.4)continue;float q=abs(side)-(2.+age*energy*.34),fade=exp(-age*.10)*energy/7.;float ring=exp(-q*q/(.2+age*.035))*exp(-along*along/pow(6.+age*.3,2.));float churn=exp(-dot(d,d)/(8.+age*1.5));result.x=max(result.x,(ring*.32+churn*.18)*fade);float phase=q*2.1-age*1.4;result.yz+=r*sign(side)*(-sin(phase))*ring*fade*.07;result.w+=cos(phase)*ring*fade*.028;}result.x*=smoothstep(.25,.7,fbm(p*1.7+vec2(uTime*.08,0.)));result.w=clamp(result.w,-.07,.07);return result;}
 vec3 shipLocal(vec3 p){vec2 f=vec2(cos(uBoat.z),sin(uBoat.z)),r=vec2(-f.y,f.x),d=p.xz-uBoat.xy;return vec3(dot(d,f),p.y-uHullY,dot(d,r));}
 bool blocked(vec3 o,vec3 p,vec3 lo,vec3 hi){vec3 inv=1./(p-o+vec3(.00001)),a=(lo-o)*inv,b=(hi-o)*inv,mn=min(a,b),mx=max(a,b);return max(max(mn.x,mn.y),max(mn.z,.025))<min(min(mx.x,mx.y),min(mx.z,.98));}
-vec3 lamps(vec3 p,vec3 n,vec3 view,bool volume,bool water){if(uLights<.5||length(p.xz)>160.)return vec3(0.);vec3 sum=vec3(0.);for(int i=0;i<5;i++){if(volume&&i>2)break;vec3 o,dir,col;float cone,power;if(i==0){o=vec3(7.,5.3,0.);dir=normalize(vec3(1.,-.2,0.));col=vec3(.7,.86,1.);cone=.91;power=8.;}else if(i<3){float side=i==1?-1.:1.;o=vec3(.0,5.4,side*2.8);dir=normalize(vec3(.3,-.37,side));col=vec3(.72,.87,1.);cone=.79;power=6.;}else{float side=i==3?-1.:1.;o=vec3(-.35,5.4,side*2.8);dir=normalize(vec3(-.6,-1.,-side*.25));col=vec3(1.,.77,.49);cone=.55;power=3.8;}vec3 delta=p-o;float dist=length(delta);vec3 toPoint=delta/max(.01,dist);float beam=smoothstep(cone,min(.999,cone+.09),dot(toPoint,dir));if(beam<.001)continue;float energy=power*beam/(1.+dist*dist*.035);if(!volume&&p.y<1.5&&(blocked(o,p,vec3(.25,1.75,-2.6),vec3(6.5,5.8,2.6))||blocked(o,p,vec3(-10.8,1.8,-2.9),vec3(-3.15,5.3,.8))))energy*=.55;if(volume)sum+=col*energy;else{float diffuse=max(.04,dot(n,-toPoint)),spec=pow(max(0.,dot(n,normalize(view-toPoint))),70.);sum+=col*energy*((water?spec*.65+diffuse*.001:diffuse*.42+spec*.25));}}return sum;}
+vec3 lamps(vec3 p,vec3 n,vec3 view,bool volume,bool water){if(uLights<.5||length(p.xz)>160.)return vec3(0.);vec3 sum=vec3(0.);for(int i=0;i<5;i++){if(volume&&i>2)break;vec3 o,dir,col;float cone,power;if(i==0){o=vec3(7.,5.3,0.);dir=normalize(vec3(1.,-.2,0.));col=vec3(.7,.86,1.);cone=.91;power=8.;}else if(i<3){float side=i==1?-1.:1.;o=vec3(.0,5.4,side*2.8);dir=normalize(vec3(.3,-.37,side));col=vec3(.72,.87,1.);cone=.79;power=6.;}else{float side=i==3?-1.:1.;o=vec3(-.35,5.4,side*2.8);dir=normalize(vec3(-.6,-1.,-side*.25));col=vec3(1.,.77,.49);cone=.55;power=3.8;}o.x*=uDeckSign;dir.x*=uDeckSign;vec3 delta=p-o;float dist=length(delta);vec3 toPoint=delta/max(.01,dist);float beam=smoothstep(cone,min(.999,cone+.09),dot(toPoint,dir));if(beam<.001)continue;float energy=power*beam/(1.+dist*dist*.035);if(!volume&&p.y<1.5&&(blocked(o,p,vec3(.25,1.75,-2.6),vec3(6.5,5.8,2.6))||blocked(o,p,vec3(-10.8,1.8,-2.9),vec3(-3.15,5.3,.8))))energy*=.55;if(volume)sum+=col*energy;else{float diffuse=max(.04,dot(n,-toPoint)),spec=pow(max(0.,dot(n,normalize(view-toPoint))),70.);sum+=col*energy*((water?spec*.65+diffuse*.001:diffuse*.42+spec*.25));}}return sum;}
 vec3 directLamps(vec3 p,vec3 n,vec3 view){vec2 f=vec2(cos(uBoat.z),sin(uBoat.z)),r=vec2(-f.y,f.x);vec3 localN=vec3(dot(n.xz,f),n.y,dot(n.xz,r)),localV=vec3(dot(view.xz,f),view.y,dot(view.xz,r));vec3 lighting=lamps(shipLocal(p),localN,localV,false,false)*(1.-uDaylight*.88);if(p.x<115.&&p.x> -235.)for(int i=0;i<4;i++){vec3 o=vec3(80.,9.,-200.+float(i)*145.),d=o-p;float dist=length(d);lighting+=vec3(1.,.77,.48)*max(0.,dot(n,d/max(.01,dist)))*3./(1.+dist*dist*.09)*(1.-uDaylight*.85);}return lighting;}
 vec3 waterLamps(vec3 p,vec3 n,vec3 view){vec2 f=vec2(cos(uBoat.z),sin(uBoat.z)),r=vec2(-f.y,f.x);return lamps(shipLocal(p),vec3(dot(n.xz,f),n.y,dot(n.xz,r)),vec3(dot(view.xz,f),view.y,dot(view.xz,r)),false,true)*(1.-uDaylight*.995);}
 vec3 beamFog(vec3 world){if(uLights<.5||uDaylight>.7)return vec3(0.);vec3 sum=vec3(0.);for(int i=0;i<12;i++){float t=(float(i)+.5)/12.;vec3 p=mix(uEye,world,t);sum+=lamps(shipLocal(p),vec3(0,1,0),vec3(0,1,0),true,false);}return sum*.5*(.0016+uWeather.y*.012+uWeather.z*.006)*smoothstep(.6,.07,uDaylight);}
@@ -62,7 +63,7 @@ void main(){if(uReflectionPass>.5&&vWorld.y<.04)discard;
  vec3 n=normalize(vNormal),v=normalize(uEye-vWorld),localN=abs(normalize(cross(dFdx(vLocal),dFdy(vLocal))));
  vec2 uv=localN.y>.65?vLocal.xz:localN.x>.65?vLocal.zy:vLocal.xy;
  float grain=noise(uv*48.),macro=fbm(uv*.7),vertical=1.-abs(n.y),painted=step(.34,vColor.r),glass=1.-step(.145,vSurface.x),detail=step(.5,uKind)*(1.-glass);
- float rust=0.,seam=0.,height=0.;vec3 base=pow(vColor,vec3(2.2));float rough=clamp(vSurface.x,.08,.98);
+ float rust=0.,seam=0.,height=0.;vec3 base=pow(vColor,vec3(2.2));float rough=clamp(vSurface.x,.08,.98);float lowerHull=(uKind>.5&&uKind<1.5&&vLocal.y<1.65)?1.:0.;if(lowerHull>.5)rough=max(rough,.84);if(uKind>4.5&&distance(vColor,vec3(.72,.29,.065))<.03)base=pow(uCraneColor,vec3(2.2));
  if(vSurface.y< -1.5){base=pow(vColor,vec3(2.2))*(.82+.28*noise(vWorld.xz*8.));rough=.98;height=(grain-.5)*.001;
  }else if(uKind>.5&&uKind<1.5){
   float drip=noise(vec2(uv.x*5.8,uv.y*.42))*noise(vec2(uv.x*18.,uv.y*.15)),salt=smoothstep(.53,.8,fbm(uv*vec2(1.8,5.)));
@@ -93,7 +94,7 @@ void main(){if(uReflectionPass>.5&&vWorld.y<.04)discard;
  if(uKind>.5&&uKind<1.5&&n.y>.5&&vLocal.y<2.){float cabin=length(max(abs(vLocal.xz-vec2(3.4,0.))-vec2(3.3,2.65),0.));contact=.5+.5*smoothstep(0.,1.6,cabin);}
  vec3 ambient=mix(vec3(.14,.21,.27),vec3(.43,.49,.5),n.y*.5+.5)*(.11+.89*uDaylight);
  vec3 c=base*ambient*contact*skyVisibility+brdf(base,f0,rough,n,v,l)*vec3(2.9,2.65,2.25)*shade*(1.-uWeather.w*.65)*uDaylight;
- vec3 reflected=sky(reflect(-v,n));vec3 F=f0+(1.-f0)*pow(1.-max(.01,dot(n,v)),5.);c+=reflected*F*(1.-rough*.65)*contact;
+ vec3 reflected=sky(reflect(-v,n));vec3 F=f0+(1.-f0)*pow(1.-max(.01,dot(n,v)),5.);c+=reflected*F*(1.-rough*.65)*contact*mix(1.,.08,lowerHull);
  if(glass>.5){float interior=.25+.25*noise(vLocal.xz*5.);c=base*ambient*interior*.2+reflected*(.07+.72*pow(1.-max(0.,dot(n,v)),4.));}
  // Negative surface emission marks matte earth/shore banks; buildings keep their own materials.
  if(vSurface.y< -1.5||(uKind>3.5&&vSurface.y<-.5))c=base*(ambient+vec3(1.1)*max(0.,dot(n,l))*uDaylight*(1.-uWeather.w*.65));
@@ -107,7 +108,7 @@ export const sprayVertex=`#version 300 es
 precision highp float;layout(location=0) in vec3 aPosition;layout(location=1) in vec2 aParticle;uniform mat4 uVP;uniform float uPixelRatio;out float vAlpha;
 void main(){vec4 p=uVP*vec4(aPosition,1.);gl_Position=p;gl_PointSize=clamp(aParticle.y*115./max(1.,p.w)*uPixelRatio,1.,10.);vAlpha=aParticle.x;}`;
 export const sprayFragment=`#version 300 es
-precision highp float;in float vAlpha;out vec4 outColor;void main(){vec2 p=gl_PointCoord*2.-1.;float r=dot(p,p);if(r>1.)discard;outColor=vec4(mix(vec3(.67,.78,.8),vec3(.94,.98,1.),smoothstep(.25,.75,r)),(1.-smoothstep(.35,1.,r))*vAlpha);}`;
+precision highp float;uniform float uDaylight;in float vAlpha;out vec4 outColor;void main(){vec2 p=gl_PointCoord*2.-1.;p.x*=1.2;float r=dot(p,p);if(r>1.)discard;float mist=exp(-r*3.8)*(1.-smoothstep(.65,1.,r));outColor=vec4(vec3(.7,.74,.73)*(.12+.88*uDaylight),mist*vAlpha);}`;
 
 export const foamFragment=`#version 300 es
 ${common}

@@ -1,4 +1,4 @@
-import {rackPositions,deckHardware} from './vessel-style.mjs?v=0.17.20';
+import {rackPositions,deckHardware} from './vessel-style.mjs?v=0.18.0';
 export const CREW_RADIUS=.31,CREW_SPACING=.84;
 export const CABIN_DOOR={x:.18,z:1.65};
 export function potPositions(count,design={}){return rackPositions(count,design);}
