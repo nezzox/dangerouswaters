@@ -1,28 +1,29 @@
-import {transitionWeather} from './weather-transition.mjs?v=0.17.10';
-import {ownedUpgrades,createRadioFeed} from './hud-status.mjs?v=0.17.10';
-import {createIntro} from './intro.mjs?v=0.17.10';
-import {fleetNoticeCount} from './fleet.mjs?v=0.17.10';
-import {redeemDeveloperCode} from './developer-code.mjs?v=0.17.10';
-import {potSoakStage} from './pot-soak.mjs?v=0.17.10';
-import {createLiveWeather} from './live-weather.mjs?v=0.17.10';
-import {dockingStage} from './harbor.mjs?v=0.17.10';
-import {fuelEconomy} from './fuel-economy.mjs?v=0.17.10';
-import {scanSonar,drawSonar} from './sonar.mjs?v=0.17.10';
-import {rareCount,rareValue} from './rare-catch.mjs?v=0.17.10';
-import {clipChartWater} from './chart-water.mjs?v=0.17.10';
-import {groundsAt,groundReport} from './fishing-grounds.mjs?v=0.17.10';
-import {createSoundscape} from './soundscape.mjs?v=0.17.10';
-import {WORLD_LAND,WORLD_CENTER,WORLD_BOUNDS,PLACES,worldToGeo} from './world.mjs?v=0.17.10';
-import {getLanguage,setLanguage,translateText,localizeTree} from './i18n.mjs?v=0.17.10';
-import {createShop} from './shop.mjs?v=0.17.10';
-import {restoreSeason,seasonJSON} from './saves.mjs?v=0.17.10';
-import {vesselStats,toggleAutomation} from './career.mjs?v=0.17.10';
-import {createGame,step,conditions,weatherAt,setWeatherMode,depthAt,PORT,distance,nearPort,handlePot,dock,undock,canUndock,service,rescue,clamp,potAction,POT_RANGE,jobProgress,setAutopilot,setRudder,potBearing,workingSide} from './simulation.mjs?v=0.17.10';
-import {createOcean,drawFallback} from './ocean.mjs?v=0.17.10';
-import {createScene} from './scene.mjs?v=0.17.10';
-import {createChartView,chartPoint,chartWorld,panChart,zoomChart,followVessel,updateChartFollow} from './chart.mjs?v=0.17.10';
-import {createWake} from './wake.mjs?v=0.17.10';
-import {advanceVoyage} from './voyage.mjs?v=0.17.10';
+import {visibleFleet} from './fleet-visuals.mjs?v=0.17.12';
+import {transitionWeather} from './weather-transition.mjs?v=0.17.12';
+import {ownedUpgrades,createRadioFeed} from './hud-status.mjs?v=0.17.12';
+import {createIntro} from './intro.mjs?v=0.17.12';
+import {fleetNoticeCount} from './fleet.mjs?v=0.17.12';
+import {redeemDeveloperCode} from './developer-code.mjs?v=0.17.12';
+import {potSoakStage} from './pot-soak.mjs?v=0.17.12';
+import {createLiveWeather} from './live-weather.mjs?v=0.17.12';
+import {dockingStage} from './harbor.mjs?v=0.17.12';
+import {fuelEconomy} from './fuel-economy.mjs?v=0.17.12';
+import {scanSonar,drawSonar} from './sonar.mjs?v=0.17.12';
+import {rareCount,rareValue} from './rare-catch.mjs?v=0.17.12';
+import {clipChartWater} from './chart-water.mjs?v=0.17.12';
+import {groundsAt,groundReport} from './fishing-grounds.mjs?v=0.17.12';
+import {createSoundscape} from './soundscape.mjs?v=0.17.12';
+import {WORLD_LAND,WORLD_CENTER,WORLD_BOUNDS,PLACES,worldToGeo} from './world.mjs?v=0.17.12';
+import {getLanguage,setLanguage,translateText,localizeTree} from './i18n.mjs?v=0.17.12';
+import {createShop} from './shop.mjs?v=0.17.12';
+import {restoreSeason,seasonJSON} from './saves.mjs?v=0.17.12';
+import {vesselStats,toggleAutomation} from './career.mjs?v=0.17.12';
+import {createGame,step,conditions,weatherAt,setWeatherMode,depthAt,PORT,distance,nearPort,handlePot,dock,undock,canUndock,service,rescue,clamp,potAction,POT_RANGE,jobProgress,setAutopilot,setRudder,potBearing,workingSide} from './simulation.mjs?v=0.17.12';
+import {createOcean,drawFallback} from './ocean.mjs?v=0.17.12';
+import {createScene} from './scene.mjs?v=0.17.12';
+import {createChartView,chartPoint,chartWorld,panChart,zoomChart,followVessel,updateChartFollow} from './chart.mjs?v=0.17.12';
+import {createWake} from './wake.mjs?v=0.17.12';
+import {advanceVoyage} from './voyage.mjs?v=0.17.12';
 let sonarFrame='';const radioFeed=createRadioFeed();let ownedSignature='';
 const wake=createWake();
 const $=id=>document.getElementById(id),canvas=$('world'),ctx=canvas.getContext('2d'),sea=$('ocean'),chart=$('chart'),map=chart.getContext('2d');
@@ -157,6 +158,7 @@ function drawGrounds(){ctx.save();clipChartWater(ctx,pos,width,height);for(const
 function drawPots(t){for(const pot of state.pots){const p=pos(pot.x,pot.y);ctx.save();ctx.translate(p.x,p.y+Math.sin(t*2+pot.id)*2);ctx.save();ctx.strokeStyle=distance(state,pot)<POT_RANGE?'#a8dcb7aa':'#e4ac6455';ctx.setLineDash([5,6]);ctx.beginPath();ctx.arc(0,0,POT_RANGE*view.scale,0,Math.PI*2);ctx.stroke();ctx.restore();ctx.strokeStyle='#cdbd9b66';ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(-12,20);ctx.stroke();ctx.shadowBlur=8;ctx.shadowColor='#edb56d66';ctx.fillStyle='#e5a352';ctx.beginPath();ctx.ellipse(0,0,5,8,Math.sin(t)*.1,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.fillStyle='#f2e4bf';ctx.fillRect(-3,-2,6,3);ctx.fillStyle='#d3d9c8';ctx.font='8px monospace';ctx.fillText(`${String(pot.id).padStart(2,'0')} · ${(state.hour-pot.setAt).toFixed(1)} h`,10,-5);ctx.restore();}}
 function drawWakeFallback(){for(const p of wake.points){const screen=pos(p.x,p.z),age=wake.time-p.born;ctx.save();ctx.translate(screen.x,screen.y);ctx.rotate(p.heading);ctx.strokeStyle=`rgba(190,215,217,${Math.max(0,1-age/42)*.2})`;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(0,0,10+age*.4,4+age*.6,0,0,Math.PI*2);ctx.stroke();ctx.restore();}}
 function boatPath(){ctx.beginPath();ctx.moveTo(54,0);ctx.bezierCurveTo(43,-10,31,-15,13,-16);ctx.lineTo(-49,-16);ctx.lineTo(-55,-11);ctx.lineTo(-55,11);ctx.lineTo(-49,16);ctx.lineTo(13,16);ctx.bezierCurveTo(31,15,43,10,54,0);ctx.closePath();}
+function drawFleetFallback(){for(const v of visibleFleet(state)){const b=v.boat;if(v.visible){const p=pos(b.x,b.y);ctx.save();ctx.translate(p.x,p.y);ctx.rotate(b.heading);ctx.fillStyle=b.color||'#70c9df';ctx.strokeStyle='#d8e3dc';ctx.beginPath();ctx.moveTo(17*view.scale,0);ctx.lineTo(8*view.scale,4*view.scale);ctx.lineTo(-12*view.scale,4*view.scale);ctx.lineTo(-12*view.scale,-4*view.scale);ctx.lineTo(8*view.scale,-4*view.scale);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();}for(const pot of v.pots){const p=pos(pot.x,pot.y);ctx.fillStyle=b.color||'#70c9df';ctx.beginPath();ctx.arc(p.x,p.y,3,0,Math.PI*2);ctx.fill();}}}
 function drawBoat(w,t){
  const p=pos(state.x,state.y),scale=width<760?1:1.2;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(state.heading);const bob=Math.sin(t*1.4)*w.waves*.014;ctx.scale(scale,scale*(1+bob));
 
@@ -185,7 +187,7 @@ for(const p of state.pots){if(state.deckJob?.kind==='haul'&&state.deckJob.potId=
 function frame(now){weatherPoll+=1;if(state.weatherMode!=='dynamic'&&(weatherPoll===1||weatherPoll%60===0))void liveWeather.update(state);const wallDt=Math.max(0,(now-last)/1000),dt=Math.min(wallDt,.1);last=now;let elapsed=0;fps+=(1/Math.max(wallDt,.001)-fps)*.03;
  if(started&&!state.paused){if(keys.has('KeyW')||keys.has('ArrowUp'))state.desiredKnots=clamp((state.desiredKnots||0)+dt*2,-3,Math.ceil(vesselStats(state).top*1.94384));if(keys.has('KeyS')||keys.has('ArrowDown'))state.desiredKnots=clamp((state.desiredKnots||0)-dt*2.5,-3,Math.ceil(vesselStats(state).top*1.94384));const helm=(keys.has('KeyD')||keys.has('ArrowRight')?1:0)-(keys.has('KeyA')||keys.has('ArrowLeft')?1:0);if(helm)setRudder(state,state.rudder*35+helm*dt*12);elapsed=advanceVoyage(state,wake,dt,timeSpeed);}
  clock+=started?elapsed:dt;
- view.x+=(state.x-view.x)*(1-Math.exp(-dt*2));view.y+=(state.y-view.y)*(1-Math.exp(-dt*2));visualWeather=transitionWeather(visualWeather,conditions(state),dt,clock,state.x,state.y);const w=visualWeather;const renderKey=[clock,width,height,cameraZoom,cameraOverhead,state.paused,state.x,state.y,state.heading,state.deck,state.career.boat,state.lights,...[w.waves,w.fog,w.rain,w.daylight||0,w.windDirection||0,w.waveDirection||0].map(n=>n.toFixed(2))].join('/');if(!state.paused||renderKey!==lastRenderKey){lastRenderKey=renderKey;ctx.clearRect(0,0,width,height);if(scene3D){scene3D.draw(state,w,clock,width,height,dpr,wake);drawBuoyLabels();drawLightGlows();}else{if(gpu)renderer.draw(state,w,clock,view);else drawFallback(ctx,w,clock,view,width,height);drawWakeFallback();drawGrounds();drawHarbor();drawPots(clock);drawBoat(w,clock);}atmosphere(w,clock);}
+ view.x+=(state.x-view.x)*(1-Math.exp(-dt*2));view.y+=(state.y-view.y)*(1-Math.exp(-dt*2));visualWeather=transitionWeather(visualWeather,conditions(state),dt,clock,state.x,state.y);const w=visualWeather;const renderKey=[clock,width,height,cameraZoom,cameraOverhead,state.paused,state.x,state.y,state.heading,state.deck,state.career.boat,state.lights,...[w.waves,w.fog,w.rain,w.daylight||0,w.windDirection||0,w.waveDirection||0].map(n=>n.toFixed(2))].join('/');if(!state.paused||renderKey!==lastRenderKey){lastRenderKey=renderKey;ctx.clearRect(0,0,width,height);if(scene3D){scene3D.draw(state,w,clock,width,height,dpr,wake);drawBuoyLabels();drawLightGlows();}else{if(gpu)renderer.draw(state,w,clock,view);else drawFallback(ctx,w,clock,view,width,height);drawWakeFallback();drawGrounds();drawHarbor();drawPots(clock);drawFleetFallback();drawBoat(w,clock);}atmosphere(w,clock);}
  if(audio)audio.update(state,w,soundOn&&!$('intro').open);
  uiTimer+=dt;toastAge+=dt;saveTimer+=dt;if(uiTimer>.2){updateUI();uiTimer=0;$('renderer').title=`${sceneError||renderer.label} · ${Math.round(fps)} FPS`;}if(saveTimer>10&&started&&!document.hidden){save();saveTimer=0;}requestAnimationFrame(frame);
 }

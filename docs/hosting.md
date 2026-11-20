@@ -96,3 +96,7 @@ Sources: https://open-meteo.com/en/docs and https://open-meteo.com/en/docs/marin
 0.17.9: Weather transitions now retain local ocean phase while swell direction/period change, avoiding animation-time-dependent jumps in water and reflections. Wind, precipitation, fog and front intensity ease over real time; missing snow/directional values ease to defaults instead of disappearing abruptly. CPU/GPU share the phase offsets.
 
 0.17.10: Auto Set supports Tight (80 m), Standard (160 m), and Wide (220 m). The selected clearance is checked against every deployed player pot before starting the deployment animation; manual handling and the 80 m hauling radius are unchanged. Existing saves default to Tight, and the choice persists with the career.
+
+0.17.11: Nearby hired vessels and their deployed pot buoys now render in the 3D scene, including shadows/reflections, vessel-specific hull dimensions and wave motion. Fleet buoy colors match the chart. Meshes are cached and culled beyond 900 m; nearby pots remain visible even when their owner is far away. The Canvas fallback also renders fleet markers.
+
+0.17.12: Hired captains greet the player within 250 m, using 1,000 combinations of greetings, crew banter and farewells. Another greeting requires leaving beyond 450 m and at least 12 game hours. These messages use the existing radio feed and unread fleet badge. Pot ownership remains isolated in the player pot list and each hired vessel’s private pot list; regression tests cover identical pot IDs across owners.
