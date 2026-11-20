@@ -94,3 +94,5 @@ Sources: https://open-meteo.com/en/docs and https://open-meteo.com/en/docs/marin
 0.17.8: Download Save and Upload Save shortcuts sit immediately before Language in the footer. Downloads use the existing JSON export. Upload validates size, JSON and season compatibility before offering explicit replacement; invalid files never replace state. Loaded games remain paused.
 
 0.17.9: Weather transitions now retain local ocean phase while swell direction/period change, avoiding animation-time-dependent jumps in water and reflections. Wind, precipitation, fog and front intensity ease over real time; missing snow/directional values ease to defaults instead of disappearing abruptly. CPU/GPU share the phase offsets.
+
+0.17.10: Auto Set supports Tight (80 m), Standard (160 m), and Wide (220 m). The selected clearance is checked against every deployed player pot before starting the deployment animation; manual handling and the 80 m hauling radius are unchanged. Existing saves default to Tight, and the choice persists with the career.

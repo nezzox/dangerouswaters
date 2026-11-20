@@ -1,4 +1,4 @@
-import {boatById} from './catalog.mjs?v=0.17.9';
+import {boatById} from './catalog.mjs?v=0.17.10';
 const lerp=(a,b,t)=>a+(b-a)*Math.max(0,Math.min(1,t));
 const between=(a,b,t)=>a.map((v,i)=>lerp(v,b[i],t));
 export function deckWorkPose(job,boat=null){if(!job||job.kind==='unload'||job.kind==='undock'||job.kind.startsWith('net'))return null;const p=Math.max(0,Math.min(1,job.elapsed/job.duration)),side=job.layout==='both'&&job.side<0?-1:1,stern=job.layout==='stern',edge=y=>stern?[-10.6,y,0]:[-3.1,y,side*4.6],hand=stern?[-9,3.1,0]:[-3.8,3.1,side*2.65];let position,tip=0;const grapple=job.kind==='haul'&&job.grapple,q=grapple?Math.max(0,(p-.3)/.7):p;let hook=null,dragBuoy=null;
