@@ -1,15 +1,15 @@
-import {nearbyGreeting} from './fleet-greetings.mjs?v=0.17.12';
-import {potCatchAt} from './pot-soak.mjs?v=0.17.12';
-import {prepareRareCatch,awardRareCatch,rareValue} from './rare-catch.mjs?v=0.17.12';
-import {FUEL_SCALE,SEA_WEAR_SCALE} from './balance.mjs?v=0.17.12';
-import {groundsAt} from './fishing-grounds.mjs?v=0.17.12';
-import {nearestWater,geoToWorld} from './world.mjs?v=0.17.12';
-import {planSeaRoute} from './navigation.mjs?v=0.17.12';
-import {vesselStats,settleLanding} from './career.mjs?v=0.17.12';
+import {nearbyGreeting} from './fleet-greetings.mjs?v=0.17.14';
+import {potCatchAt} from './pot-soak.mjs?v=0.17.14';
+import {prepareRareCatch,awardRareCatch,rareValue} from './rare-catch.mjs?v=0.17.14';
+import {FUEL_SCALE,SEA_WEAR_SCALE} from './balance.mjs?v=0.17.14';
+import {groundsAt} from './fishing-grounds.mjs?v=0.17.14';
+import {nearestWater,geoToWorld} from './world.mjs?v=0.17.14';
+import {planSeaRoute} from './navigation.mjs?v=0.17.14';
+import {vesselStats,settleLanding} from './career.mjs?v=0.17.14';
 export function fleetStats(s,b){return vesselStats({...b,career:{boat:b.boat,parts:b.parts,skills:s.career.skills}});}
 export const fleetNoticeCount=s=>(s.career?.fleet||[]).filter(b=>b.unreadMessage||b.request?.status==='pending').length;
 export function readFleetMessages(s){for(const b of s.career?.fleet||[])b.unreadMessage=false;}
-function radio(s,b,text){b.unreadMessage=true;s.message=text;s.log.unshift({hour:s.hour,text});s.log=s.log.slice(0,8);}
+function radio(s,b,text){b.unreadMessage=true;s.message=text;const entry={hour:s.hour,text,kind:'fleet'};s.log.unshift(entry);(s.popupEvents??=[]).push(entry);s.log=s.log.slice(0,8);}
 function requestService(s,b,stats){const fuel=Math.max(0,stats.tank-b.fuel),repair=Math.max(0,100-b.hull),bait=b.fishing==='salmon'?0:stats.potCapacity*stats.baitCost,cost=Math.ceil((fuel*9.5+repair*160)*stats.serviceCost+bait);b.phase='service';b.request={cost,fuel,repair,bait,status:'pending'};radio(s,b,`Captain of ${b.name}: permission for ${cost.toLocaleString('en-US')} kr of fuel, repairs and trip supplies? Open Fleet & finance.`);}
 export function answerCaptain(s,id,approve){const b=s.career?.fleet.find(b=>b.id===id);if(!b?.request)return {ok:false,message:'No outstanding request.'};if(!approve){b.request.status='declined';return {ok:true,message:`${b.name} holding in harbor. You can approve later.`};}if(s.money<b.request.cost)return {ok:false,message:'Insufficient funds. Captain remains in harbor.'};const cost=b.request.cost;s.money-=cost;b.expenses=(b.expenses||0)+cost;const stats=fleetStats(s,b);b.fuel=stats.tank;b.hull=100;b.request=null;b.phase='outbound';b.groundTarget=null;b.waypoint=0;b.timer=0;return {ok:true,message:`${b.name}: supplies authorized. Departing for the grounds.`};}
 const move=(b,x,y,speed,dt)=>{const dx=x-b.x,dy=y-b.y,d=Math.hypot(dx,dy);if(d<.01)return true;b.heading=Math.atan2(dy,dx);const travel=Math.min(d,speed*dt);b.x+=dx/d*travel;b.y+=dy/d*travel;return travel>=d;};

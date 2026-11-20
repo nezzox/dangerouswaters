@@ -1,16 +1,16 @@
-import {potCatchAt} from './pot-soak.mjs?v=0.17.12';
-import {fuelBurnRate} from './fuel-economy.mjs?v=0.17.12';
-import {prepareRareCatch,awardRareCatch,rareValue,rareById} from './rare-catch.mjs?v=0.17.12';
-import {SEA_WEAR_SCALE} from './balance.mjs?v=0.17.12';
-import {crabAbundance,salmonAbundance} from './fishing-grounds.mjs?v=0.17.12';
-export {groundsAt} from './fishing-grounds.mjs?v=0.17.12';
-import {WORLD_VERSION,WORLD_BOUNDS,FISHING_GROUNDS,isLand,inWorld} from './world.mjs?v=0.17.12';
-import {planSeaRoute} from './navigation.mjs?v=0.17.12';
-import {tickFleet} from './fleet.mjs?v=0.17.12';
-import {ensureCareer,vesselStats,settleLanding} from './career.mjs?v=0.17.12';
-import {tickIncidents,blocksDeck} from './incidents.mjs?v=0.17.12';
-import {BERTH,buildDockRoute,dockRouteDuration,dockingPose,vesselIntersectsHarbor,castOffPosition,buildCastOffRoute} from './harbor.mjs?v=0.17.12';
-export {BERTH} from './harbor.mjs?v=0.17.12';
+import {potCatchAt} from './pot-soak.mjs?v=0.17.14';
+import {fuelBurnRate} from './fuel-economy.mjs?v=0.17.14';
+import {prepareRareCatch,awardRareCatch,rareValue,rareById} from './rare-catch.mjs?v=0.17.14';
+import {SEA_WEAR_SCALE} from './balance.mjs?v=0.17.14';
+import {crabAbundance,salmonAbundance} from './fishing-grounds.mjs?v=0.17.14';
+export {groundsAt} from './fishing-grounds.mjs?v=0.17.14';
+import {WORLD_VERSION,WORLD_BOUNDS,FISHING_GROUNDS,isLand,inWorld} from './world.mjs?v=0.17.14';
+import {planSeaRoute} from './navigation.mjs?v=0.17.14';
+import {tickFleet} from './fleet.mjs?v=0.17.14';
+import {ensureCareer,vesselStats,settleLanding} from './career.mjs?v=0.17.14';
+import {tickIncidents,blocksDeck} from './incidents.mjs?v=0.17.14';
+import {BERTH,buildDockRoute,dockRouteDuration,dockingPose,vesselIntersectsHarbor,castOffPosition,buildCastOffRoute} from './harbor.mjs?v=0.17.14';
+export {BERTH} from './harbor.mjs?v=0.17.14';
 export const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 export const PORT={x:BERTH.x,y:BERTH.y};
 export const DECK_LIMIT_KNOTS=5;
@@ -52,8 +52,8 @@ export function step(s,dt){
  if(s.deckJob&&!blocksDeck(s)&&!(s.incident?.system==='net'&&s.deckJob.kind.startsWith('net'))){const j=s.deckJob;j.elapsed+=dt*(s.incident?.system==='crew'?.5:1);if(j.kind==='deploy'&&!j.released&&j.elapsed>=j.duration*.9)j.released={...releasePoint(s),at:s.hour};if(j.elapsed>=j.duration){
  if(j.kind==='deploy'){const drop=j.released||{...releasePoint(s),at:s.hour};s.pots.push({id:s.nextPot++,x:drop.x,y:drop.y,setAt:drop.at});notify(s,'Pot deployed. Clear the range ring before setting another.');}
  else if(j.kind==='netSet'){s.nets.push({id:s.nextPot++,x:j.x,y:j.y,setAt:s.hour});notify(s,'Salmon net set. Let it soak, then return within 120 meters.');}
- else if(j.kind==='netHaul'){const net=s.nets.find(n=>n.id===j.netId);if(net){const kg=Math.min(j.catchKg,Math.max(0,stats.capacity-s.cargo-s.salmon));s.salmon+=kg;s.nets=s.nets.filter(n=>n.id!==j.netId);notify(s,`${kg} kg salmon sorted into the hold.`);revealRare(s,j.rareId,'salmon');}}
- else {const p=s.pots.find(p=>p.id===j.potId);if(p){const kg=Math.min(j.catchKg,Math.max(0,stats.capacity-s.cargo-(s.salmon||0)));s.cargo+=kg;s.deck++;s.pots=s.pots.filter(p=>p.id!==j.potId);notify(s,`Pot ${j.potId} emptied. ${kg} kg of crab sorted into the hold.`);revealRare(s,j.rareId,'crab');}}s.deckJob=null;}}
+ else if(j.kind==='netHaul'){const net=s.nets.find(n=>n.id===j.netId);if(net){const kg=Math.min(j.catchKg,Math.max(0,stats.capacity-s.cargo-s.salmon));s.salmon+=kg;s.lastHaul={kg,species:'salmon'};s.nets=s.nets.filter(n=>n.id!==j.netId);notify(s,`${kg} kg salmon sorted into the hold.`);revealRare(s,j.rareId,'salmon');}}
+ else {const p=s.pots.find(p=>p.id===j.potId);if(p){const kg=Math.min(j.catchKg,Math.max(0,stats.capacity-s.cargo-(s.salmon||0)));s.cargo+=kg;s.lastHaul={kg,species:'crab'};s.deck++;s.pots=s.pots.filter(p=>p.id!==j.potId);notify(s,`Pot ${j.potId} emptied. ${kg} kg of crab sorted into the hold.`);revealRare(s,j.rareId,'crab');}}s.deckJob=null;}}
  const previous={x:s.x,y:s.y,heading:s.heading,career:s.career};
  s.heading+=s.rudder*stats.steer*dt*(.07+Math.abs(s.speed)*.024)*(s.speed<0?-1:1);
  s.x+=Math.cos(s.heading)*s.speed*dt;s.y+=Math.sin(s.heading)*s.speed*dt;

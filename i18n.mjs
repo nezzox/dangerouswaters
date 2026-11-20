@@ -6,6 +6,8 @@ export function setLanguage(value){language=value==='sv'?'sv':'en';return langua
 export const toInternalMoney=(amount,locale=language)=>amount*(locale==='sv'?1:10);
 export function formatMoney(amount,locale=language){const sv=locale==='sv',n=amount/(sv?1:10),fraction=Math.abs(n-Math.round(n))>.000001;return new Intl.NumberFormat(sv?'sv-SE':'en-US',{style:'currency',currency:sv?'SEK':'USD',minimumFractionDigits:fraction?2:0,maximumFractionDigits:2}).format(n);}
 const sv={
+ 'MAX LOAD':'MAXLAST','Latest haul':'Senaste upptag',
+ 'REPAIR & VESSEL ALERT':'REPARATION & FARTYGSLARM','FLEET RADIO':'FLOTTRADIO',
  'AUTO SET SPACING':'AVSTÅND VID AUTOSÄTTNING','Auto set spacing':'Avstånd vid autosättning','TIGHT · 80 M':'TÄTT · 80 M','STANDARD · 160 M':'STANDARD · 160 M','WIDE · 220 M':'GLEST · 220 M',
  '↓ DOWNLOAD SAVE':'↓ LADDA NER SAVE','↑ UPLOAD SAVE':'↑ LADDA UPP SAVE','Load saved season?':'Ladda sparad säsong?','LOAD SAVE':'LADDA SAVE','Reading save file…':'Läser sparfil…',
  'A dedicated graphics card provides a better gameplay experience.':'Ett dedikerat grafikkort ger en bättre spelupplevelse.','SKILLS & EQUIPMENT':'FÄRDIGHETER & UTRUSTNING','INSTALLED EQUIPMENT':'INSTALLERAD UTRUSTNING','None purchased yet':'Inga köp ännu',

@@ -100,3 +100,7 @@ Sources: https://open-meteo.com/en/docs and https://open-meteo.com/en/docs/marin
 0.17.11: Nearby hired vessels and their deployed pot buoys now render in the 3D scene, including shadows/reflections, vessel-specific hull dimensions and wave motion. Fleet buoy colors match the chart. Meshes are cached and culled beyond 900 m; nearby pots remain visible even when their owner is far away. The Canvas fallback also renders fleet markers.
 
 0.17.12: Hired captains greet the player within 250 m, using 1,000 combinations of greetings, crew banter and farewells. Another greeting requires leaving beyond 450 m and at least 12 game hours. These messages use the existing radio feed and unread fleet badge. Pot ownership remains isolated in the player pot list and each hired vessel’s private pot list; regression tests cover identical pot IDs across owners.
+
+0.17.13: Vessel incident/repair announcements and fleet radio messages display as centered, queued OK dialogs. Play pauses while a message is visible and resumes its prior pause state on acknowledgement. Messages wait behind existing dialogs and normal deck chatter stays in the transparent feed. Restored active incidents also receive an alert.
+
+0.17.14: Cargo shows effective maximum hold capacity, including installed upgrades. The most recently sorted player pot/net catch appears as a smaller +kg value next to total cargo, using the actual weight accepted into the hold. It fades over the final eight seconds of a 45-second real-time lifetime and restarts on each haul; fleet landings do not affect it.
