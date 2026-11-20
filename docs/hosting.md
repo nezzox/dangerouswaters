@@ -92,3 +92,5 @@ Sources: https://open-meteo.com/en/docs and https://open-meteo.com/en/docs/marin
 0.17.7: The new/continue screen recommends a dedicated GPU. Purchased company skills and the active vessel’s installed equipment/ranks are listed below the weather panel, including legacy upgrades. Radio messages appear on a transparent feed beside the helm, newest first; they fade over the last six seconds of a 30-second real-time lifetime, independent of simulation speed.
 
 0.17.8: Download Save and Upload Save shortcuts sit immediately before Language in the footer. Downloads use the existing JSON export. Upload validates size, JSON and season compatibility before offering explicit replacement; invalid files never replace state. Loaded games remain paused.
+
+0.17.9: Weather transitions now retain local ocean phase while swell direction/period change, avoiding animation-time-dependent jumps in water and reflections. Wind, precipitation, fog and front intensity ease over real time; missing snow/directional values ease to defaults instead of disappearing abruptly. CPU/GPU share the phase offsets.

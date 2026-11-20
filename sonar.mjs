@@ -1,6 +1,6 @@
-import {depthAt} from './simulation.mjs?v=0.17.8';
-import {crabAbundance,salmonAbundance} from './fishing-grounds.mjs?v=0.17.8';
-import {isLand} from './world.mjs?v=0.17.8';
+import {depthAt} from './simulation.mjs?v=0.17.9';
+import {crabAbundance,salmonAbundance} from './fishing-grounds.mjs?v=0.17.9';
+import {isLand} from './world.mjs?v=0.17.9';
 // Gameplay interpretation of a sounder, not a physical model of species identification.
 export const SONAR_GRADES=[
  {radius:60,samples:12,error:30,interval:2,name:'Basic'},
