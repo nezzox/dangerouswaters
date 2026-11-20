@@ -6,6 +6,7 @@ export function setLanguage(value){language=value==='sv'?'sv':'en';return langua
 export const toInternalMoney=(amount,locale=language)=>amount*(locale==='sv'?1:10);
 export function formatMoney(amount,locale=language){const sv=locale==='sv',n=amount/(sv?1:10),fraction=Math.abs(n-Math.round(n))>.000001;return new Intl.NumberFormat(sv?'sv-SE':'en-US',{style:'currency',currency:sv?'SEK':'USD',minimumFractionDigits:fraction?2:0,maximumFractionDigits:2}).format(n);}
 const sv={
+ 'A dedicated graphics card provides a better gameplay experience.':'Ett dedikerat grafikkort ger en bättre spelupplevelse.','SKILLS & EQUIPMENT':'FÄRDIGHETER & UTRUSTNING','INSTALLED EQUIPMENT':'INSTALLERAD UTRUSTNING','None purchased yet':'Inga köp ännu',
  'SKIP INTRO →':'HOPPA ÖVER INTRO →','FILLING 100%':'FYLLS 100 %','FILLING 75%':'FYLLS 75 %','FILLING 50%':'FYLLS 50 %','SOAK COMPLETE':'FÄRDIGSOAKAD',
  'DYNAMIC':'DYNAMISKT','REAL WEATHER':'VERKLIGT VÄDER','DYNAMIC WEATHER':'DYNAMISKT VÄDER','Weather mode':'Väderläge',
  'CONNECTING TO LIVE WEATHER':'ANSLUTER TILL AKTUELLT VÄDER','DYNAMIC BACKUP WEATHER':'DYNAMISKT RESERVVÄDER','LIVE MODEL':'AKTUELL VÄDERMODELL','CACHED MODEL':'SPARAD VÄDERMODELL','WAVES ESTIMATED':'VÅGOR UPPSKATTADE','WIND FROM':'VIND FRÅN','WAVES FROM':'VÅGOR FRÅN','FORECAST +6 H · REAL TIME WHEN CONNECTED':'PROGNOS +6 H · VERKLIG TID VID ANSLUTNING','Weather data: Open-Meteo · CC BY 4.0':'Väderdata: Open-Meteo · CC BY 4.0',

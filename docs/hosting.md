@@ -88,3 +88,5 @@ Sources: https://open-meteo.com/en/docs and https://open-meteo.com/en/docs/marin
 0.17.5: Fleet & Finance displays a high-contrast envelope badge for unread captain radio messages or pending approvals. Viewing Fleet clears unread messages; pending requests remain marked until answered. Unread flags persist with vessel saves.
 
 0.17.6: The supplied DangerousWaters.mp4 is bundled as intro.mp4 (40 seconds, H.264/AAC, 720p, fast-start). It loads only after starting a new season, including Start over; continuing a saved season bypasses it. Skip, Escape, natural completion or a media error enter the game without running the simulation behind the film. Native video controls support pause, volume and playback retry.
+
+0.17.7: The new/continue screen recommends a dedicated GPU. Purchased company skills and the active vessel’s installed equipment/ranks are listed below the weather panel, including legacy upgrades. Radio messages appear on a transparent feed beside the helm, newest first; they fade over the last six seconds of a 30-second real-time lifetime, independent of simulation speed.
