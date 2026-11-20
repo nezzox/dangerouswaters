@@ -7,7 +7,8 @@ import zipfile
 
 root = Path(__file__).resolve().parent
 version = json.loads((root / 'package.json').read_text())['version']
-files = [root / 'index.html', root / 'style.css', root / '.nojekyll', root / 'intro.mp4', *sorted(root.glob('*.mjs'))]
+(root / 'version.json').write_text(json.dumps({'version': version}) + '\n')
+files = [root / 'version.json', root / 'index.html', root / 'style.css', root / '.nojekyll', root / 'intro.mp4', *sorted(root.glob('*.mjs'))]
 for path in files:
     if path.suffix == '.mp4':
         continue

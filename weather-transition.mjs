@@ -1,4 +1,4 @@
-import {directionalSpectrum,SWELL} from './sea-spectrum.mjs?v=0.18.3';
+import {directionalSpectrum,SWELL} from './sea-spectrum.mjs?v=0.18.4';
 const BASE_DIRECTION=(Math.atan2(SWELL[0].kz,SWELL[0].kx)*180/Math.PI-90+360)%360;
 const BASE_PERIOD=2*Math.PI/SWELL[0].omega;
 const wrap=n=>Math.atan2(Math.sin(n),Math.cos(n));
