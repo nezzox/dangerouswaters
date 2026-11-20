@@ -1,6 +1,6 @@
-import {lineHaulerMounts} from './line-hauler.mjs?v=0.17.19';
-import {vesselStyle,rackPositions,gantryPlacement} from './vessel-style.mjs?v=0.17.19';
-import {HULL_STATIONS,hullWidthAt} from './fenders.mjs?v=0.17.19';
+import {lineHaulerMounts} from './line-hauler.mjs?v=0.17.20';
+import {vesselStyle,rackPositions,gantryPlacement} from './vessel-style.mjs?v=0.17.20';
+import {HULL_STATIONS,hullWidthAt} from './fenders.mjs?v=0.17.20';
 const steel=[.19,.24,.25],paint=[.68,.7,.64],dark=[.045,.08,.1],glass=[.055,.13,.17],brass=[.43,.31,.13],orange=[.72,.29,.065];
 export function geometry(){const data=[];
  function tri(a,b,c,color,rough=.6,emit=0){const u=b.map((x,i)=>x-a[i]),v=c.map((x,i)=>x-a[i]),n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]],len=Math.hypot(...n);if(len<1e-8)return;for(const p of [a,b,c])data.push(...p,...n.map(x=>x/len),...color,rough,emit);}
@@ -48,9 +48,7 @@ export function buildVessel(potCount=8,design={}){const paint=design.color?[.42+
  }
  if(design.salmon){for(const x of [-8.8,-6.7]){tube([x,1.8,-1.8],[x,3,-1.8],.09,steel);tube([x,1.8,0],[x,3,0],.09,steel);}tube([-7.75,2.8,-1.9],[-7.75,2.8,.1],.7,[.15,.28,.25],16);for(let z=-1.8;z<.1;z+=.12)tube([-7.75,2.8,z],[-7.75,2.8,z+.035],.72,[.3,.39,.31],12);}
  // Wire cages remain open so the deck and cage shadows can be seen through them.
- for(const [i,{x,z,y}] of rackPositions(potCount,design).entries()){const c=[.39+(i%3)*.025,.31,.16];
-  const xx=[x-.85,x+.85],yy=[y-.58,y+.58],zz=[z-.83,z+.83];for(const a of xx)for(const b of yy)tube([a,b,zz[0]],[a,b,zz[1]],.035,c,5);for(const a of xx)for(const b of zz)tube([a,yy[0],b],[a,yy[1],b],.035,c,5);for(const a of yy)for(const b of zz)tube([xx[0],a,b],[xx[1],a,b],.035,c,5);
-  for(let j=-.6;j<.8;j+=.32){for(const side of [-1,1]){tube([x+j,yy[0],z+side*.83],[x+j,yy[1],z+side*.83],.012,c,4);tube([x-.85,yy[1],z+j],[x+.85,yy[1],z+j],.012,c,4);}}}
+ for(const [i,{x,z,y}] of rackPositions(potCount,design).entries())addRackPot(g,x,y,z,i);
  for(const side of [-1,1]){box(5.4,5.5,side*2.75,.3,.16,.2,side<0?[.6,.015,.005]:[.015,.5,.13],.2,1);box(-.3,5.3,side*2.72,.4,.25,.24,[1.,.69,.28],.2,1.4);}
  // Directional searchlight and side floodlight housings.
  tube([6.8,5.3,0],[7.2,5.3,0],.23,steel,10);tube([7.2,5.3,0],[7.23,5.3,0],.19,[.78,.9,1.],10,.05);box(7.24,5.3,0,.03,.3,.3,[.78,.9,1.],.1,2);
@@ -86,6 +84,10 @@ export function buildVessel(potCount=8,design={}){const paint=design.color?[.42+
  if(style.radarArch){for(const side of [-1,1])tube([4.2,6,side*2.3],[4.2,7.3,side*2.3],.09,steel,8);tube([4.2,7.3,-2.3],[4.2,7.3,2.3],.1,paint,8);box(4.2,7.5,0,.8,.3,1.8,paint);}
  }
  return g.array();}
+function addRackPot(g,x,y,z,i){const {tube}=g;const c=[.39+(i%3)*.025,.31,.16];
+  const xx=[x-.85,x+.85],yy=[y-.58,y+.58],zz=[z-.83,z+.83];for(const a of xx)for(const b of yy)tube([a,b,zz[0]],[a,b,zz[1]],.035,c,5);for(const a of xx)for(const b of zz)tube([a,yy[0],b],[a,yy[1],b],.035,c,5);for(const a of yy)for(const b of zz)tube([xx[0],a,b],[xx[1],a,b],.035,c,5);
+  for(let j=-.6;j<.8;j+=.32){for(const side of [-1,1]){tube([x+j,yy[0],z+side*.83],[x+j,yy[1],z+side*.83],.012,c,4);tube([x-.85,yy[1],z+j],[x+.85,yy[1],z+j],.012,c,4);}}}
+export function buildRackPot(variant=0){const g=geometry();addRackPot(g,0,0,0,variant);return g.array();}
 export function buildBuoy(color=orange){const g=geometry();g.tube([0,-.4,0],[0,.9,0],.48,color,12);g.tube([0,.35,0],[0,.6,0],.5,paint,12);g.tube([0,.9,0],[0,2.1,0],.035,steel);g.box(.35,1.9,0,.7,.35,.025,color);return g.array();}
 export function buildOceanGrid(size=4000,segments=220){const data=new Float32Array(segments*segments*18),half=size/2;let k=0;for(let z=0;z<segments;z++)for(let x=0;x<segments;x++){const coord=v=>Math.sinh((v/segments*2-1)*5.5)/Math.sinh(5.5)*half,a=coord(x),b=coord(z),c=coord(x+1),d=coord(z+1);for(const p of [[a,0,b],[a,0,d],[c,0,b],[c,0,b],[a,0,d],[c,0,d]])for(const v of p)data[k++]=v;}return data;}
 

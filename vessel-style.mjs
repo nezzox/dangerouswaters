@@ -12,4 +12,6 @@ function buildDeckHardware(design={}){const style=vesselStyle(design),solid=[],w
  if(design.salmon)solid.push({min:[-8.95,1.7,-2.05],max:[-6.5,3.65,.18]});
  if(style.gantry){const {x,z,height:h}=gantryPlacement(design);for(const side of [-1,1])solid.push({min:[x-.2,1.7,side*z-.2],max:[x+1.6,h+.2,side*z+.2]});solid.push({min:[x-.24,h-.24,-z-.2],max:[x+.24,h+.24,z+.2]},{min:[x-.4,h-.35,-.6],max:[x+.4,h+.35,.6]});}
  return {solid,work};}
-export function rackPositions(count,design={}){const hardware=deckHardware(design),limit=design.salmon?16:20,candidates=Array.from({length:limit},(_,i)=>potRackPosition(i,design));return candidates.filter(p=>![...hardware.solid,...hardware.work].some(box=>boxesOverlap(potBounds(p),box))).slice(0,Math.min(count,limit));}
+const rackCache=new Map();
+export function rackPositions(count,design={}){const key=layoutKey(design)+'/'+Math.max(0,Math.min(count,20));if(rackCache.has(key))return rackCache.get(key);const result=buildRackPositions(count,design);if(rackCache.size>=256)rackCache.delete(rackCache.keys().next().value);rackCache.set(key,result);return result;}
+function buildRackPositions(count,design={}){const hardware=deckHardware(design),limit=design.salmon?16:20,candidates=Array.from({length:limit},(_,i)=>potRackPosition(i,design));return candidates.filter(p=>![...hardware.solid,...hardware.work].some(box=>boxesOverlap(potBounds(p),box))).slice(0,Math.min(count,limit));}
