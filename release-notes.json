@@ -1,11 +1,19 @@
 {
-  "version": "0.18.6",
+  "version": "0.18.7",
   "notes": {
     "en": [
-      "Fixed Intelligent Auto Set slowing down with autopilot and inconsistent automation switches."
+      "Auto Set and Intelligent Auto Set are separate modes; slow down only when a pot can be set.",
+      "Pickup All plots a continuous working-side route, enables Auto Haul and collects while moving.",
+      "Crab knowledge V reveals darker dense cores inside fishing grounds.",
+      "Automatic fleet service stays quiet; only upgrade requests need attention, not installation reports.",
+      "Reduced CPU work when deckhands plan their routes."
     ],
     "sv": [
-      "Rättat inbromsningen för Intelligent Auto Set med autopilot och osynkroniserade automatikknappar."
+      "Auto Set och Intelligent Auto Set är separata lägen; bromsar först när en tina kan sättas.",
+      "Pickup All planerar en sammanhängande rutt på rätt arbetssida och aktiverar Auto Haul.",
+      "Crab Knowledge V visar mörkare tätkärnor i fiskeområdena.",
+      "Autogodkänd flottservice är tyst; uppgraderingsförfrågningar aviseras, inte installationer.",
+      "Mindre CPU-arbete när manskapet planerar sina vägar på däck."
     ]
   }
 }

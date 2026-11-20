@@ -1,4 +1,4 @@
-import {FISHING_GROUNDS,clearWater,isLand,inWorld,nearestWater} from './world.mjs?v=0.18.6';
+import {FISHING_GROUNDS,clearWater,isLand,inWorld,nearestWater} from './world.mjs?v=0.18.7';
 // Gameplay approximation: deterministic slow migration, at most 37.5 m/game hour.
 // Tracks reverse along proven water-only segments instead of jumping across islands.
 const HOURS=36,STEP=900;
@@ -12,3 +12,6 @@ export function soakedAbundance(p,hour){if(p.legacyAbundance!==undefined)return 
 export function groundPotential(g,species,hour=0){if(g.id===0&&species==='crab')return 1;return Math.max(.3,Math.min(1,.64+.22*Math.sin(g.id*2.17+(species==='salmon'?2.8:0))+.13*Math.sin(hour/72+g.id)));}
 export function groundReport(g,species,rank,hour=0){if(!(rank>0))return null;rank=Math.min(5,Math.floor(rank));const value=groundPotential(g,species,hour)*100,margin=30-rank*5,error=Math.sin(g.id*3.4+hour/120+(species==='salmon'?1:0))*margin*.4,mid=Math.round((value+error)/5)*5;return {low:Math.max(0,mid-margin),high:Math.min(100,mid+margin)};}
 export function salmonAbundance(x,y,hour=0){if(!inWorld(x,y)||isLand(x,y))return 0;return Math.max(.15,...groundsAt(hour).map(g=>groundPotential(g,'salmon',hour)*Math.exp(-((x-g.x)**2+(y-g.y)**2)/(g.rx*g.ry*.3))));}
+
+// Rank V reveals the dense core of the same abundance field used by pots and sonar.
+export function crabHotspot(g,rank,hour=0){return rank>=5?{x:g.x,y:g.y,rx:g.rx*.3,ry:g.ry*.3,angle:g.angle,potential:groundPotential(g,'crab',hour)}:null;}

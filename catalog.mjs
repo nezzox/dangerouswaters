@@ -8,7 +8,7 @@ export const SKILL_SYSTEMS=[
  ['sort','Catch sorting','Crew',3200,'Haul/sort cycle 7% faster per rank'],
  ['repair','Damage control','Safety',6000,'Incident repairs 15% faster per rank'],
  ['fuel','Economical helm','Navigation',5000,'Fuel use reduced by 4% per rank'],
- ['crab','Crab grounds knowledge','Fishing',5500,'Unlock crab ground potential forecasts; higher ranks narrow uncertainty and add 6% yield per rank'],
+ ['crab','Crab grounds knowledge','Fishing',5500,'Unlock crab ground potential forecasts; higher ranks narrow uncertainty and add 6% yield per rank; rank V reveals dense crab cores on the chart'],
  ['salmon','Salmon reading','Fishing',6500,'Unlock salmon ground potential forecasts; higher ranks narrow uncertainty and add 8% yield per rank'],
  ['price','Market negotiation','Business',8000,'Catch prices +2.5% per rank'],
  ['bait','Bait preparation','Fishing',3000,'Bait cost reduced by 6% per rank'],
@@ -34,7 +34,7 @@ export const PART_SYSTEMS=[
  ['workshop','Onboard workshop','Safety',20000,'Fuel/repair service prices reduced by 5% per grade'],['quarters','Crew accommodation','Hull',26000,'One additional berth per grade; crew increases work rate']
 ].map(([key,name,group,base,description])=>({key,name,group,base,description}));
 SKILL_SYSTEMS.push({key:'intelligentAutoSet',name:'Intelligent Auto Set',group:'Automation',base:1500000,maxRank:1,description:'Requires Auto Set I and installed sonar. Deploy only when the sonar lower crab estimate exceeds 50%. Existing speed and spacing limits still apply.'});
-SKILL_SYSTEMS.push({key:'pickupAll',name:'Pickup All Pots',group:'Automation',base:1500000,maxRank:1,description:'Navigate to and retrieve all your own pots, oldest first. Includes working-side approaches; pauses for deck repairs and stops when the hold is full.'});
+SKILL_SYSTEMS.push({key:'pickupAll',name:'Pickup All Pots',group:'Automation',base:1500000,maxRank:1,description:'Requires Auto Haul. Plots a continuous working-side route through all your own pots, oldest first, and enables Auto Haul. Stops when the hold is full.'});
 const ranks=(systems,prefix)=>systems.flatMap(d=>Array.from({length:d.maxRank||5},(_,i)=>({id:`${prefix}-${d.key}-${i+1}`,key:d.key,rank:i+1,maxRank:d.maxRank||5,name:d.maxRank===1?d.name:`${d.name} ${['I','II','III','IV','V'][i]}`,group:d.group,price:Math.round(d.base*(i+1)**2.15/100)*100,description:d.description,requires:i?`${prefix}-${d.key}-${i}`:null})));
 export const SKILLS=ranks(SKILL_SYSTEMS,'skill'),PARTS=ranks(PART_SYSTEMS,'part');
 const DESIGNS=[

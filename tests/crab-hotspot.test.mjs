@@ -1,0 +1,2 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {groundsAt,crabHotspot,crabAbundance} from '../fishing-grounds.mjs';
+test('rank V crab knowledge exposes the actual dense core within each larger ground',()=>{for(const hour of [0,24,72])for(const g of groundsAt(hour)){assert.equal(crabHotspot(g,4,hour),null);const core=crabHotspot(g,5,hour);assert(core.rx<g.rx&&core.ry<g.ry);assert.equal(core.x,g.x);assert.equal(core.y,g.y);assert(crabAbundance(core.x,core.y,hour)>=crabAbundance(g.x+g.rx,g.y,hour));}});
