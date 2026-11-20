@@ -1,5 +1,6 @@
-import {vesselStyle,potRackPosition} from './vessel-style.mjs?v=0.17.17';
-import {HULL_STATIONS,hullWidthAt} from './fenders.mjs?v=0.17.17';
+import {lineHaulerMounts} from './line-hauler.mjs?v=0.17.19';
+import {vesselStyle,rackPositions,gantryPlacement} from './vessel-style.mjs?v=0.17.19';
+import {HULL_STATIONS,hullWidthAt} from './fenders.mjs?v=0.17.19';
 const steel=[.19,.24,.25],paint=[.68,.7,.64],dark=[.045,.08,.1],glass=[.055,.13,.17],brass=[.43,.31,.13],orange=[.72,.29,.065];
 export function geometry(){const data=[];
  function tri(a,b,c,color,rough=.6,emit=0){const u=b.map((x,i)=>x-a[i]),v=c.map((x,i)=>x-a[i]),n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]],len=Math.hypot(...n);if(len<1e-8)return;for(const p of [a,b,c])data.push(...p,...n.map(x=>x/len),...color,rough,emit);}
@@ -40,10 +41,14 @@ export function buildVessel(potCount=8,design={}){const paint=design.color?[.42+
  tube([2.8,6.,0],[2.8,11.,0],.11,paint,10);tube([2.8,9.,-2.1],[2.8,9.,2.1],.07,paint);tube([-1,2.,-3],[2.8,10.,0],.018,steel,5);tube([-1,2.,3],[2.8,10.,0],.018,steel,5);
  box(2.8,9.25,0,.55,.3,3.4,paint);tube([4.6,6.,1],[4.6,8.6,1],.018,steel,5);tube([1.5,6.,-1],[1.5,8.9,-1],.018,steel,5);box(.3,5.9,-1.5,.6,2.5,.7,[.24,.25,.22]);box(.3,7.2,-1.5,.8,.18,.9,dark);
  // Hull-specific hauler mounts; animated booms are rendered separately.
- const layouts=design.hauler==='both'?['starboard','port']:[design.hauler||'starboard'];for(const layout of layouts){const side=layout==='port'?-1:1,stern=layout==='stern',pivot=stern?[-8.1,2.1,1.6]:[-1.5,2.1,side*2.1];tube([pivot[0],1.8,pivot[2]],[pivot[0],5.1,pivot[2]],.18,orange,10);if(stern){tube([-10,2,0],[-12,2.8,0],.32,steel,12);box(-10,2,0,.9,.4,.9,orange);}else{tube([-3,2.,side*2.7],[-3,2.8,side*3.8],.32,steel,12);box(-3,2.,side*2.7,.9,.4,.9,orange);}}
+ const layouts=design.hauler==='both'?['starboard','port']:[design.hauler||'starboard'];for(const layout of layouts){const side=layout==='port'?-1:1,stern=layout==='stern',pivot=stern?[-8.1,2.1,1.6]:[-1.5,2.1,side*2.1];tube([pivot[0],1.8,pivot[2]],[pivot[0],5.1,pivot[2]],.18,orange,10);}
+ for(const [x,y,z] of lineHaulerMounts(design)){
+ const rubber=[.035,.045,.042];for(const side of [-1,1]){for(let i=0;i<32;i++){const a=i*Math.PI/16,b=(i+1)*Math.PI/16,point=(t,r,d)=>[x+Math.cos(t)*r,y+Math.sin(t)*r,z+d];quad(point(a,.42,side*.16),point(b,.42,side*.16),point(b,.24,side*.025),point(a,.24,side*.025),rubber,.88);quad(point(a,.42,side*.16),point(a,.36,side*.21),point(b,.36,side*.21),point(b,.42,side*.16),rubber,.88);}tube([x,y,z+side*.2],[x,y,z+side*.23],.12,steel,16);}
+ for(const dx of [-.3,.3])tube([x+dx,1.85,z-.27],[x+dx,y+.05,z-.27],.045,paint,8);tube([x-.34,y+.05,z-.27],[x+.34,y+.05,z-.27],.045,paint,8);tube([x,y,z-.4],[x,y,z-.23],.15,orange,12);tube([x+.33,y-.22,z-.12],[x+.33,y-.22,z+.12],.12,rubber,16);tube([x+.33,y-.22,z-.23],[x+.33,y-.22,z-.13],.045,steel,8);
+ }
  if(design.salmon){for(const x of [-8.8,-6.7]){tube([x,1.8,-1.8],[x,3,-1.8],.09,steel);tube([x,1.8,0],[x,3,0],.09,steel);}tube([-7.75,2.8,-1.9],[-7.75,2.8,.1],.7,[.15,.28,.25],16);for(let z=-1.8;z<.1;z+=.12)tube([-7.75,2.8,z],[-7.75,2.8,z+.035],.72,[.3,.39,.31],12);}
  // Wire cages remain open so the deck and cage shadows can be seen through them.
- for(let i=0;i<Math.min(potCount,design.salmon?16:20);i++){const {x,z,y}=potRackPosition(i,design);const c=[.39+(i%3)*.025,.31,.16];
+ for(const [i,{x,z,y}] of rackPositions(potCount,design).entries()){const c=[.39+(i%3)*.025,.31,.16];
   const xx=[x-.85,x+.85],yy=[y-.58,y+.58],zz=[z-.83,z+.83];for(const a of xx)for(const b of yy)tube([a,b,zz[0]],[a,b,zz[1]],.035,c,5);for(const a of xx)for(const b of zz)tube([a,yy[0],b],[a,yy[1],b],.035,c,5);for(const a of yy)for(const b of zz)tube([xx[0],a,b],[xx[1],a,b],.035,c,5);
   for(let j=-.6;j<.8;j+=.32){for(const side of [-1,1]){tube([x+j,yy[0],z+side*.83],[x+j,yy[1],z+side*.83],.012,c,4);tube([x-.85,yy[1],z+j],[x+.85,yy[1],z+j],.012,c,4);}}}
  for(const side of [-1,1]){box(5.4,5.5,side*2.75,.3,.16,.2,side<0?[.6,.015,.005]:[.015,.5,.13],.2,1);box(-.3,5.3,side*2.72,.4,.25,.24,[1.,.69,.28],.2,1.4);}
@@ -74,7 +79,7 @@ export function buildVessel(potCount=8,design={}){const paint=design.color?[.42+
  box(10,2.1,0,.9,.5,1.1,steel);tube([9.4,2.3,-.5],[11.7,1.3,-.5],.05,steel);
  for(let i=0;i<24;i++){const a=i*Math.PI/12,b=(i+1)*Math.PI/12;tube([8.25+Math.cos(a)*.5,1.84,1.1+Math.sin(a)*.5],[8.25+Math.cos(b)*.5,1.84,1.1+Math.sin(b)*.5],.07,[.48,.45,.29],5);}
  const style=vesselStyle(design);if(style.family){
- if(style.gantry){const x=style.family===2?-7:-9.8,h=style.gantryHeight;for(const side of [-1,1]){tube([x,1.85,side*2.9],[x,h,side*2.9],.16,paint,10);tube([x+1.4,1.85,side*2.9],[x,h,side*2.9],.09,steel,8);}tube([x,h,-2.9],[x,h,2.9],.2,paint,10);box(x,h,0,.7,.6,1.1,orange);}
+ if(style.gantry){const {x,z,height:h}=gantryPlacement(design);for(const side of [-1,1]){tube([x,1.85,side*z],[x,h,side*z],.16,paint,10);tube([x+1.4,1.85,side*z],[x,h,side*z],.09,steel,8);}tube([x,h,-z],[x,h,z],.2,paint,10);box(x,h,0,.7,.6,1.1,orange);}
  if(style.exhausts===2)for(const z of [-1.65,1.65]){tube([1.2,5.9,z],[1.2,8.2,z],.22,dark,10);tube([1.2,8.2,z],[.7,8.5,z],.24,steel,10);}
  if(style.upperBridge){roundedBox(3.2,6.7,0,3.1,1.4,3.7,.2,paint);box(4.76,6.85,0,.03,.65,2.9,glass,.1);roundedBox(3.2,7.5,0,3.6,.2,4.1,.12,paint);}
  if(style.bowShield)for(const side of [-1,1]){quad([8,2.2,side*2.4],[11.5,2.2,side*.8],[11.5,3.2,side*.8],[8,3.5,side*2.4],paint,.7);}
@@ -95,7 +100,7 @@ export function buildCrewParts(role=0){
  return {torso:torso.array(),head:head.array(),arm:arm.array(),forearm:forearm.array(),thigh:thigh.array(),shin:shin.array()};
 }
 
-export function buildDeckEquipment(){const pot=geometry(),boom=geometry(),rope=geometry(),lid=geometry(),crab=geometry(),hook=geometry(),throwLine=geometry(),door=geometry(),fender=geometry(),retch=geometry(),softRope=geometry(),tote=geometry(),trolley=geometry();
+export function buildDeckEquipment(){const pot=geometry(),boom=geometry(),rope=geometry(),lid=geometry(),crab=geometry(),hook=geometry(),throwLine=geometry(),door=geometry(),fender=geometry(),retch=geometry(),softRope=geometry(),tote=geometry(),trolley=geometry(),haulerRotor=geometry();
  for(const x of [-.85,.85])for(const y of [-.6,.6])pot.tube([x,y,-.85],[x,y,.85],.04,brass,6);for(const x of [-.85,.85])for(const z of [-.85,.85])pot.tube([x,-.6,z],[x,.6,z],.04,brass,6);for(const y of [-.6,.6])for(const z of [-.85,.85])pot.tube([-.85,y,z],[.85,y,z],.04,brass,6);
  for(let i=-.65;i<.8;i+=.25)for(const side of [-1,1]){pot.tube([i,-.6,side*.85],[i,.6,side*.85],.015,brass,4);pot.tube([side*.85,-.6,i],[side*.85,.6,i],.015,brass,4);}pot.tube([0,.6,0],[0,1.1,0],.035,steel,6);
  boom.tube([0,0,0],[3,1.1,0],.13,orange,10);boom.tube([0,-.9,0],[2.6,.9,0],.065,steel,8);rope.tube([0,0,0],[0,1,0],.022,steel,6);
@@ -108,7 +113,8 @@ export function buildDeckEquipment(){const pot=geometry(),boom=geometry(),rope=g
  softRope.tube([0,0,0],[0,1,0],.007,[.29,.26,.19],6,.98);
  tote.roundedBox(0,0,0,.64,.42,.48,.045,[.15,.28,.27],.85);for(const z of [-.25,.25]){tote.tube([-.26,.23,z],[.26,.23,z],.025,[.3,.42,.37],8);tote.box(0,.08,z,.2,.055,.02,[.025,.04,.035],.9);}
  trolley.box(0,.24,0,1.4,.12,.85,steel,.7);for(const x of [-.5,.5])for(const z of [-.4,.4])trolley.tube([x,.14,z-.05],[x,.14,z+.05],.14,dark,12);for(const z of [-.35,.35]){trolley.tube([-.65,.3,z],[-.65,1.05,z],.035,steel);trolley.tube([-.65,1.05,z],[0,1.05,z],.035,steel);}
- return {tote:tote.array(),trolley:trolley.array(),softRope:softRope.array(),door:door.array(),fender:fender.array(),retch:retch.array(),throwLine:throwLine.array(),hook:hook.array(),pot:pot.array(),boom:boom.array(),rope:rope.array(),lid:lid.array(),crab:crab.array()};
+ for(const z of [-.215,.215]){for(let i=0;i<4;i++){const a=i*Math.PI/2;haulerRotor.tube([Math.cos(a)*.13,Math.sin(a)*.13,z],[Math.cos(a)*.35,Math.sin(a)*.35,z],.018,[.46,.49,.45],6);}haulerRotor.tube([.34,0,z],[.4,0,z],.028,[.9,.68,.2],6);}
+ return {haulerRotor:haulerRotor.array(),tote:tote.array(),trolley:trolley.array(),softRope:softRope.array(),door:door.array(),fender:fender.array(),retch:retch.array(),throwLine:throwLine.array(),hook:hook.array(),pot:pot.array(),boom:boom.array(),rope:rope.array(),lid:lid.array(),crab:crab.array()};
 }
 
 export function buildDeckWash(){const g=geometry();for(let x=-11.8;x<-.5;x+=.3)for(let z=-3.4;z<3.4;z+=.3){const r=x+.3,b=z+.3;if(Math.max(Math.abs(z),Math.abs(b))>Math.min(hullWidthAt(x),hullWidthAt(r))-.12)continue;if(x<-.9&&r>-2.9&&z<.55&&b>-1.55)continue;g.quad([x,1.795,z],[x,1.795,b],[r,1.795,b],[r,1.795,z],[.17,.26,.27],.12);}return g.array();}

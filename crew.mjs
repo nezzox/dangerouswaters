@@ -1,4 +1,4 @@
-import {routeOnDeck,canStand,CREW_SPACING,CABIN_DOOR} from './deck-layout.mjs?v=0.17.17';
+import {routeOnDeck,canStand,CREW_SPACING,CABIN_DOOR} from './deck-layout.mjs?v=0.17.19';
 const jobs={
  undock:{label:'Letting go mooring lines',duration:30,targets:[[-10.8,2.8],[-3.8,2.8],[-.45,1.1]]},
  deploy:{label:'Setting pot',duration:14,targets:[[-3.8,2.65],[-5.2,1.5],[-.45,1.2]]},
@@ -10,9 +10,10 @@ const jobs={
 };
 const homes=[[-6,1.5],[-4,1.5],[-2.5,-2.9]],doorOutside=[-.35,CABIN_DOOR.z],inside=[.75,CABIN_DOOR.z];
 export function createCrew(){return {members:homes.map(([x,z],i)=>({x,z,heading:i?Math.PI:0,velocity:0,phase:i*2.1,moving:false,working:false,route:[],home:[x,z],role:i,idle:0,patrol:0,hidden:false,resting:false,restUntil:0,nextRest:65+i*22,blocked:0,sick:null,sickTime:0})),pots:8,job:null,elapsed:0,cruise:0,rough:0,nextSick:150,sickCount:0,door:0,workTime:0,label:'Deck crew standing by',lastActivity:0};}
-function assign(crew,m,target,avoid=false){m.target=target;m.route=routeOnDeck([m.x,m.z],target,crew.pots,avoid?crew.members.filter(p=>p!==m&&!p.hidden):[],m.hidden||m.resting||m.exiting||target===inside);m.blocked=0;}
+function assign(crew,m,target,avoid=false){if(!canStand(target[0],target[1],crew.pots,m.hidden||m.resting||target===inside,crew.design||{})){let nearest=null;for(let x=-11;x<-.3;x+=.25)for(let z=-2.75;z<3;z+=.25)if(canStand(x,z,crew.pots,false,crew.design||{})){const d=Math.hypot(x-target[0],z-target[1]);if(!nearest||d<nearest.d)nearest={x,z,d};}if(nearest)target=[nearest.x,nearest.z];}m.target=target;m.route=routeOnDeck([m.x,m.z],target,crew.pots,avoid?crew.members.filter(p=>p!==m&&!p.hidden):[],m.hidden||m.resting||m.exiting||target===inside,crew.design||{});m.blocked=0;}
 export function commandCrew(crew,kind){const job=jobs[kind];if(!job)return false;crew.job={...job,kind};crew.workTime=0;crew.label=job.label;crew.cruise=0;crew.members.forEach((m,i)=>{m.exiting=m.hidden;m.resting=false;m.sick=null;m.working=false;assign(crew,m,job.targets[i]);});return true;}
 function tick(crew,dt,waves,options){
+ if(crew.layoutKey!==((options.design?.id||'')+'/'+(options.deck??crew.pots))){crew.layoutKey=(options.design?.id||'')+'/'+(options.deck??crew.pots);crew.design=options.design||{};crew.pots=options.deck??crew.pots;for(const m of crew.members){if(!m.hidden&&!canStand(m.x,m.z,crew.pots,false,crew.design)){let best=null;for(let x=-11;x<-.3;x+=.25)for(let z=-2.75;z<3;z+=.25)if(canStand(x,z,crew.pots,false,crew.design)&&!crew.members.some(p=>p!==m&&Math.hypot(p.x-x,p.z-z)<CREW_SPACING)){const d=Math.hypot(m.x-x,m.z-z);if(!best||d<best.d)best={x,z,d};}if(best){m.x=best.x;m.z=best.z;m.route=[];}}if(m.target)assign(crew,m,m.target);}}
  crew.elapsed+=dt;const speed=Math.abs(options.speed||0),cruising=!crew.job&&speed>2;
  if(crew.pots!==(options.deck??crew.pots)){crew.pots=options.deck;for(const m of crew.members)if(m.target)assign(crew,m,m.target);}
  crew.cruise=cruising?crew.cruise+dt:0;crew.rough=waves>4&&speed>1&&!crew.job?crew.rough+dt:0;
@@ -29,7 +30,7 @@ function tick(crew,dt,waves,options){
   m.moving=false;const targetPace=m.route.length?Math.min(pace,Math.max(.35,Math.hypot(m.route.at(-1)[0]-m.x,m.route.at(-1)[1]-m.z)*2.5)):0;m.velocity+=(targetPace-m.velocity)*(1-Math.exp(-dt*6));let budget=m.velocity*dt;
   while(m.route.length&&budget>0){if((m.resting||m.exiting)&&m.x>-.85&&Math.abs(m.z-CABIN_DOOR.z)<.5&&crew.door<.9)break;const [x,z]=m.route[0],dx=x-m.x,dz=z-m.z,d=Math.hypot(dx,dz);if(d<.015){m.route.shift();continue;}const travel=Math.min(d,budget),nx=m.x+dx/d*travel,nz=m.z+dz/d*travel,visible=nx<.3;
    if(visible&&crew.members.some(p=>p!==m&&!p.hidden&&Math.hypot(p.x-nx,p.z-nz)<CREW_SPACING)){m.blocked+=dt;break;}
-   if(!canStand(nx,nz,crew.pots,m.hidden||m.resting||m.exiting)){m.blocked+=dt;break;}
+   if(!canStand(nx,nz,crew.pots,m.hidden||m.resting||m.exiting,crew.design||{})){m.blocked+=dt;break;}
    const turn=Math.atan2(dz,dx)-m.heading;m.heading+=Math.atan2(Math.sin(turn),Math.cos(turn))*Math.min(1,dt*9);m.x=nx;m.z=nz;if(m.x<-.9)m.exiting=false;m.hidden=!visible;m.phase+=travel*3.8;budget-=travel;m.moving=true;m.blocked=0;if(travel===d)m.route.shift();
   }
   if(m.blocked>.65&&m.target)assign(crew,m,m.target,true);
