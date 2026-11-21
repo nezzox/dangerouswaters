@@ -1,15 +1,11 @@
 {
-  "version": "0.18.27",
+  "version": "0.18.28",
   "notes": {
     "en": [
-      "Keep sailing with the expanded chart or message open. Set a waypoint by right-clicking the sea.",
-      "Rare diesel leaks leave a temporary slick. Tows find clear water near the harbor.",
-      "Haul at High Speed now costs $2,000."
+      "Nearby fleet and multiplayer boats now cast searchlight beams."
     ],
     "sv": [
-      "Fortsätt segla med förstorat sjökort eller öppet meddelande. Högerklicka på havet för att sätta en waypoint.",
-      "Sällsynta dieselläckor lämnar en tillfällig fläck. Bogsering placerar båten på fritt vatten vid hamnen.",
-      "Halning i hög fart kostar nu 20 000 kr."
+      "Flottbåtar och andra spelares båtar lyser nu upp vattnet med sina strålkastare."
     ]
   }
 }

@@ -21,7 +21,8 @@ class Handler(BaseHTTPRequestHandler):
    data=json.loads(self.rfile.read(n));room=data.get('room','').upper();token=data.get('token','');state=data['state']
    if not re.fullmatch(r'[A-Z0-9]{6}',room) or not re.fullmatch(r'[a-f0-9]{32}',token): raise ValueError()
    if not isinstance(state,dict) or not isinstance(state.get('pots'),list) or len(state['pots'])>200: raise ValueError()
-   state={k:state[k] for k in ('name','boat','x','y','heading','hour','landed','earned','pots','isHost','berth','fleet') if k in state}
+   state={k:state[k] for k in ('name','boat','x','y','heading','hour','landed','earned','pots','isHost','berth','fleet','lights') if k in state}
+   state['lights']=state.get('lights') is not False
    state['id']=hashlib.sha256((room+token).encode()).hexdigest()[:16]
    if not isinstance(state.get('name'),str) or not 1<=len(state['name'])<=24: raise ValueError()
    if any(not isinstance(state.get(k),(int,float)) or not math.isfinite(state[k]) or not -1000000000000<state[k]<1000000000000 for k in ('x','y','heading','hour','landed','earned')): raise ValueError()
