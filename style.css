@@ -71,3 +71,5 @@
 #pickup-all{grid-column:1/-1}#pickup-all[aria-pressed=true]{border-color:var(--amber);color:var(--amber)}
 
 .crab-species-legend{display:flex;flex-wrap:wrap;gap:4px 10px;font:9px monospace;margin:8px 0;line-height:1.5}
+
+.simulation .volume-control{display:inline-flex;align-items:center;gap:5px;white-space:nowrap;font:9px monospace}.volume-control input{width:80px;accent-color:var(--amber)}.volume-control output{min-width:3em}

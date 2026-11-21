@@ -1,4 +1,4 @@
-import {CRAB_SPECIES} from './crab-species.mjs?v=0.18.14';
+import {CRAB_SPECIES} from './crab-species.mjs?v=0.18.15';
 // Saved money/prices remain in legacy SEK units. Fixed game conversion: 10 SEK = 1 USD.
 // Translation is applied at the presentation boundary; save data and simulation never change language.
 let language='en';
@@ -276,6 +276,7 @@ const sv={
 };
 sv['Crab species']='Krabbarter';
 for(const species of Object.values(CRAB_SPECIES))sv[species.en]=species.sv;
+sv['VOLUME']='VOLYM';sv['Sound volume']='Ljudvolym';
 const lookup=new Map(Object.entries(sv).map(([key,value])=>[key.toLowerCase(),value]));
 const escape=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
 const phrases=new RegExp(`(?<![\\p{L}\\p{N}])(?:${[...lookup.keys()].sort((a,b)=>b.length-a.length).map(escape).join('|')})(?![\\p{L}\\p{N}])`,'giu');
