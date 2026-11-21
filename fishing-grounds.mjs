@@ -1,4 +1,4 @@
-import {FISHING_GROUNDS,clearWater,isLand,inWorld,nearestWater} from './world.mjs?v=0.18.13';
+import {FISHING_GROUNDS,clearWater,isLand,inWorld,nearestWater} from './world.mjs?v=0.18.14';
 // Gameplay approximation: deterministic slow migration, at most 37.5 m/game hour.
 // Tracks reverse along proven water-only segments instead of jumping across islands.
 const HOURS=36,STEP=900;
@@ -10,13 +10,13 @@ const coreOffsets=tracks.map(track=>{
  for(let attempt=0;attempt<128;attempt++){
   const angle=(track.id+1)*2.399963229728653+attempt*2.399963229728653;
   const radius=.18+.34*(((Math.sin((track.id+1)*12.9898+attempt*7.233)*43758.5453)%1+1)%1);
-  const u=Math.cos(angle)*4000*radius,v=Math.sin(angle)*2600*radius,c=Math.cos(-.4),s=Math.sin(-.4),offset={x:u*c-v*s,y:u*s+v*c};
+  const u=Math.cos(angle)*4000*(track.size||1)*radius,v=Math.sin(angle)*2600*(track.size||1)*radius,c=Math.cos(-.4),s=Math.sin(-.4),offset={x:u*c-v*s,y:u*s+v*c};
   if(track.points.slice(1).every((p,i)=>waterSegment({x:track.points[i].x+offset.x,y:track.points[i].y+offset.y},{x:p.x+offset.x,y:p.y+offset.y})))return offset;
  }
  throw Error('No water-only crab core offset for '+track.name);
 });
 function crabCore(g){const offset=coreOffsets[g.id]||coreOffsets[0];return {x:g.x+offset.x,y:g.y+offset.y,rx:g.rx*.3,ry:g.ry*.3,angle:g.angle};}
-export function groundsAt(hour=0){return tracks.map(track=>{const time=Math.max(0,Number.isFinite(hour)?hour:0)/HOURS,index=Math.floor(time)%(track.points.length-1),t=time-Math.floor(time),u=t*t*(3-2*t),a=track.points[index],b=track.points[index+1];return{id:track.id,name:track.name,x:a.x+(b.x-a.x)*u,y:a.y+(b.y-a.y)*u,rx:4000,ry:2600,angle:-.4};});}
+export function groundsAt(hour=0){return tracks.map(track=>{const time=Math.max(0,Number.isFinite(hour)?hour:0)/HOURS,index=Math.floor(time)%(track.points.length-1),t=time-Math.floor(time),u=t*t*(3-2*t),a=track.points[index],b=track.points[index+1];return{id:track.id,name:track.name,region:track.region,species:track.species,size:track.size,x:a.x+(b.x-a.x)*u,y:a.y+(b.y-a.y)*u,rx:4000*(track.size||1),ry:2600*(track.size||1),angle:-.4};});}
 export function crabAbundance(x,y,hour=0){if(!inWorld(x,y)||isLand(x,y))return 0;return Math.max(.12,...groundsAt(hour).map(g=>{const offset=coreOffsets[g.id],dx=x-g.x-offset.x,dy=y-g.y-offset.y,c=Math.cos(g.angle),s=Math.sin(g.angle),u=(c*dx+s*dy)/(g.rx*.55),v=(-s*dx+c*dy)/(g.ry*.55);return groundPotential(g,'crab',hour)*Math.exp(-2*(u*u+v*v));}));}
 export function soakedAbundance(p,hour){if(p.legacyAbundance!==undefined)return p.legacyAbundance;const elapsed=Math.max(0,hour-p.setAt);return [1/6,.5,5/6].reduce((sum,t)=>sum+crabAbundance(p.x,p.y,p.setAt+elapsed*t),0)/3;}
 
@@ -30,3 +30,5 @@ export function crabHotspot(g,rank,hour=0){return rank>=5?{...crabCore(g),potent
 
 // Direction along the current water-only segment, including its next leg at a turn.
 export function groundMotion(g,rank,hour=0){if(!(rank>=4))return null;const track=tracks[g.id];if(!track)return null;const time=Math.max(0,Number.isFinite(hour)?hour:0)/HOURS,index=Math.floor(time)%(track.points.length-1),a=track.points[index],b=track.points[index+1],dx=b.x-a.x,dy=b.y-a.y,length=Math.hypot(dx,dy);return length>.001?{x:dx/length,y:dy/length}:null;}
+
+export function crabGroundAt(point,hour=0){let best=null,score=Infinity;for(const g of groundsAt(hour)){const dx=point.x-g.x,dy=point.y-g.y,c=Math.cos(g.angle),s=Math.sin(g.angle),q=((c*dx+s*dy)/g.rx)**2+((-s*dx+c*dy)/g.ry)**2;if(q<=1&&q<score){best=g;score=q;}}return best;}

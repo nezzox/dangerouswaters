@@ -1,23 +1,24 @@
-import {landCrab,addCrabCatch} from './catch-value.mjs?v=0.18.13';
-import {intelligentSetSignal} from './sonar-signal.mjs?v=0.18.13';
-import {nextPotNumber} from './pot-numbers.mjs?v=0.18.13';
-import {deckSign} from './vessel-profile.mjs?v=0.18.13';
-import {solarCharge,electricBurn,energyPrice} from './energy.mjs?v=0.18.13';
-import {potDropLocal} from './crane-style.mjs?v=0.18.13';
-import {resolveFleetContact} from './vessel-collision.mjs?v=0.18.13';
-import {potCatchAt} from './pot-soak.mjs?v=0.18.13';
-import {fuelBurnRate} from './fuel-economy.mjs?v=0.18.13';
-import {prepareRareCatch,awardRareCatch,rareValue,rareById} from './rare-catch.mjs?v=0.18.13';
-import {SEA_WEAR_SCALE} from './balance.mjs?v=0.18.13';
-import {crabAbundance,salmonAbundance} from './fishing-grounds.mjs?v=0.18.13';
-export {groundsAt} from './fishing-grounds.mjs?v=0.18.13';
-import {WORLD_VERSION,WORLD_BOUNDS,FISHING_GROUNDS,isLand,inWorld,clearWater} from './world.mjs?v=0.18.13';
-import {planSeaRoute,seaLane} from './navigation.mjs?v=0.18.13';
-import {tickFleet} from './fleet.mjs?v=0.18.13';
-import {ensureCareer,vesselStats,settleLanding} from './career.mjs?v=0.18.13';
-import {tickIncidents,blocksDeck} from './incidents.mjs?v=0.18.13';
-import {BERTH,quayPoint,buildDockRoute,dockRouteDuration,dockingPose,vesselIntersectsHarbor,castOffPosition,buildCastOffRoute} from './harbor.mjs?v=0.18.13';
-export {BERTH} from './harbor.mjs?v=0.18.13';
+import {crabSpeciesName} from './crab-species.mjs?v=0.18.14';
+import {landCrab,addCrabCatch,captureCrabSpecies} from './catch-value.mjs?v=0.18.14';
+import {intelligentSetSignal} from './sonar-signal.mjs?v=0.18.14';
+import {nextPotNumber} from './pot-numbers.mjs?v=0.18.14';
+import {deckSign} from './vessel-profile.mjs?v=0.18.14';
+import {solarCharge,electricBurn,energyPrice} from './energy.mjs?v=0.18.14';
+import {potDropLocal} from './crane-style.mjs?v=0.18.14';
+import {resolveFleetContact} from './vessel-collision.mjs?v=0.18.14';
+import {potCatchAt} from './pot-soak.mjs?v=0.18.14';
+import {fuelBurnRate} from './fuel-economy.mjs?v=0.18.14';
+import {prepareRareCatch,awardRareCatch,rareValue,rareById} from './rare-catch.mjs?v=0.18.14';
+import {SEA_WEAR_SCALE} from './balance.mjs?v=0.18.14';
+import {crabAbundance,salmonAbundance} from './fishing-grounds.mjs?v=0.18.14';
+export {groundsAt} from './fishing-grounds.mjs?v=0.18.14';
+import {WORLD_VERSION,WORLD_BOUNDS,FISHING_GROUNDS,isLand,inWorld,clearWater} from './world.mjs?v=0.18.14';
+import {planSeaRoute,seaLane} from './navigation.mjs?v=0.18.14';
+import {tickFleet} from './fleet.mjs?v=0.18.14';
+import {ensureCareer,vesselStats,settleLanding} from './career.mjs?v=0.18.14';
+import {tickIncidents,blocksDeck} from './incidents.mjs?v=0.18.14';
+import {BERTH,quayPoint,buildDockRoute,dockRouteDuration,dockingPose,vesselIntersectsHarbor,castOffPosition,buildCastOffRoute} from './harbor.mjs?v=0.18.14';
+export {BERTH} from './harbor.mjs?v=0.18.14';
 export const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 export const PORT={x:BERTH.x,y:BERTH.y};
 export const DECK_LIMIT_KNOTS=5;
@@ -110,10 +111,10 @@ function stepSimulation(s,dt){
  const requested=(s.deckJob?clamp(command,-4.9,4.9):command)/1.94384,target=clamp(requested,-top*.35,top)*power;
  s.throttle=clamp(requested/top,-.35,1)*power;s.speed+=(target-s.speed)*(1-Math.exp(-dt*.24));
  if(s.deckJob&&!blocksDeck(s)&&!(s.incident?.system==='net'&&s.deckJob.kind.startsWith('net'))){const j=s.deckJob;j.elapsed+=dt*(s.incident?.system==='crew'?.5:1);if(j.kind==='deploy'&&!j.released&&j.elapsed>=j.duration*.9)j.released={...releasePoint(s),at:s.hour};if(j.elapsed>=j.duration){
- if(j.kind==='deploy'){if(j.intelligent&&s.career.intelligentAutoSet)s.intelligentSetRunout=300;const drop=j.released||{...releasePoint(s),at:s.hour};s.pots.push({id:nextPotNumber(s.pots),x:drop.x,y:drop.y,setAt:drop.at});s.nextPot=nextPotNumber(s.pots);notify(s,'Pot deployed. Clear the range ring before setting another.');}
+ if(j.kind==='deploy'){if(j.intelligent&&s.career.intelligentAutoSet)s.intelligentSetRunout=300;const drop=j.released||{...releasePoint(s),at:s.hour};s.pots.push({id:nextPotNumber(s.pots),x:drop.x,y:drop.y,setAt:drop.at,crabSpecies:captureCrabSpecies(drop,drop.at)});s.nextPot=nextPotNumber(s.pots);notify(s,'Pot deployed. Clear the range ring before setting another.');}
  else if(j.kind==='netSet'){s.nets.push({id:s.nextPot++,x:j.x,y:j.y,setAt:s.hour});notify(s,'Salmon net set. Let it soak, then return within 120 meters.');}
  else if(j.kind==='netHaul'){const net=s.nets.find(n=>n.id===j.netId);if(net){const kg=Math.min(j.catchKg,Math.max(0,stats.capacity-s.cargo-s.salmon));s.salmon+=kg;s.lastHaul={kg,species:'salmon'};s.nets=s.nets.filter(n=>n.id!==j.netId);notify(s,`${kg} kg salmon sorted into the hold.`);revealRare(s,j.rareId,'salmon');}}
- else {const p=s.pots.find(p=>p.id===j.potId);if(p){const kg=Math.min(j.catchKg,Math.max(0,stats.capacity-s.cargo-(s.salmon||0)));addCrabCatch(s,kg,p);s.lastHaul={kg,species:'crab'};s.deck++;s.pots=s.pots.filter(p=>p.id!==j.potId);s.nextPot=nextPotNumber(s.pots);notify(s,`Pot ${j.potId} emptied. ${kg} kg of crab sorted into the hold.`);revealRare(s,j.rareId,'crab');}}s.deckJob=null;}}
+ else {const p=s.pots.find(p=>p.id===j.potId);if(p){const kg=Math.min(j.catchKg,Math.max(0,stats.capacity-s.cargo-(s.salmon||0)));addCrabCatch(s,kg,p);s.lastHaul={kg,species:'crab',crabSpecies:captureCrabSpecies(p)};s.deck++;s.pots=s.pots.filter(p=>p.id!==j.potId);s.nextPot=nextPotNumber(s.pots);notify(s,`Pot ${j.potId} emptied. ${kg} kg of crab sorted into the hold.${s.lastHaul.crabSpecies?` ${crabSpeciesName(s.lastHaul.crabSpecies)}.`:''}`);revealRare(s,j.rareId,'crab');}}s.deckJob=null;}}
  const previous={x:s.x,y:s.y,heading:s.heading,career:s.career};
  s.heading+=s.rudder*stats.steer*dt*(.07+Math.abs(s.speed)*.024)*(s.speed<0?-1:1);
  s.x+=Math.cos(s.heading)*s.speed*dt;s.y+=Math.sin(s.heading)*s.speed*dt;

@@ -69,3 +69,5 @@
 #intelligent-auto-set{grid-column:1/-1}.fleet-head{display:flex;align-items:flex-start;justify-content:space-between;gap:15px}.fleet-head button{margin:0;white-space:nowrap}.fleet-service-auto{display:flex;align-items:center;gap:9px;margin-top:12px;font:11px/1.5 monospace}.fleet-upgrade{border-top:1px solid var(--line);margin-top:15px;padding-top:12px}.fleet-sale-confirm{border:1px solid var(--amber);padding:12px;margin-top:12px}
 
 #pickup-all{grid-column:1/-1}#pickup-all[aria-pressed=true]{border-color:var(--amber);color:var(--amber)}
+
+.crab-species-legend{display:flex;flex-wrap:wrap;gap:4px 10px;font:9px monospace;margin:8px 0;line-height:1.5}

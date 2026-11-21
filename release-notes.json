@@ -1,11 +1,15 @@
 {
-  "version": "0.18.13",
+  "version": "0.18.14",
   "notes": {
     "en": [
-      "Added Reymonds spot in eastern Bristol Bay, with consistently high crab potential."
+      "Rebuilt crab grounds as 69 larger fields in seven species regions, including Reymonds spot.",
+      "Added golden, red and blue king crab, snow crab and Tanner crab, with historical landing-price benchmarks.",
+      "Chart colors, species labels and prices now distinguish the fisheries. Your boat and fleet use species prices plus the existing voyage premium."
     ],
     "sv": [
-      "Lagt till Reymonds spot i östra Bristol Bay, med genomgående hög krabbpotential."
+      "Byggt om krabbfälten till 69 större områden i sju artregioner, inklusive Reymonds spot.",
+      "Lagt till guld-, röd och blå kungskrabba, snökrabba och tannerkrabba med historiska landningspriser som riktmärke.",
+      "Kartfärger, artnamn och priser skiljer nu fisket åt. Din båt och flottan använder artpriser plus den befintliga avståndsbonusen."
     ]
   }
 }
