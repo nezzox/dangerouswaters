@@ -82,3 +82,5 @@
 @media(max-width:760px){.side-instruments{right:160px;width:145px;top:82px;max-height:calc(100dvh - 190px)}.side-instruments .sonar-panel,.side-instruments .leaderboard{padding:10px}.world-controls{font-size:8px}.world-controls button{margin-left:0;font-size:8px}}
 
 .world-panel .world-controls{margin:0;flex-wrap:nowrap}.world-panel .world-controls>span{white-space:nowrap}.world-panel .world-controls small{flex-shrink:0}.world-panel .world-controls button{white-space:nowrap}.side-instruments .leaderboard{width:100%}
+
+.legend-player{display:inline-block;width:6px;height:6px;background:#d496ee;margin-right:4px}

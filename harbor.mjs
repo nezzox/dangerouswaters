@@ -1,23 +1,25 @@
-import {boatById} from './catalog.mjs?v=0.18.20';
-import {isLand} from './world.mjs?v=0.18.20';
-import {planSeaRoute} from './navigation.mjs?v=0.18.20';
+import {boatById} from './catalog.mjs?v=0.18.21';
+import {isLand} from './world.mjs?v=0.18.21';
+import {planSeaRoute} from './navigation.mjs?v=0.18.21';
 // Shared frame on the new geographic quay. Positive inland points onto its apron.
 export const QUAY={x:47.3186402115,y:-70.0756194544,tx:-.811539539913,ty:.584297505692,deck:6.8};
 QUAY.heading=Math.atan2(QUAY.ty,QUAY.tx);
 export function quayPoint(along=0,inland=0){return{x:QUAY.x+QUAY.tx*along-QUAY.ty*inland,y:QUAY.y+QUAY.ty*along+QUAY.tx*inland};}
 export const BERTH={...quayPoint(0,-6),heading:QUAY.heading};
+export const BERTHS=[0,50,-50,-100,-150,-200].map(along=>({...quayPoint(along,-6),heading:QUAY.heading}));
+export function chooseBerth(s,boats=[]){return BERTHS.find(b=>!vesselIntersectsHarbor({...s,...b})&&boats.every(o=>Math.hypot(o.x-b.x,o.y-b.y)>Math.max(45,(boatById(s.career?.boat).length+boatById(o.boat).length)*.6)))||null;}
 const angle=a=>Math.atan2(Math.sin(a),Math.cos(a));
 // Only real geographic land and piers obstruct navigation; the retired timber docks have no hitboxes.
 export function vesselIntersectsHarbor(s){const boat=boatById(s.career?.boat),c=Math.cos(s.heading),n=Math.sin(s.heading),hx=boat.length*.55,hz=boat.beam*.55;for(const u of [-hx,0,hx])for(const v of [-hz,0,hz])if(isLand(s.x+c*u-n*v,s.y+n*u+c*v))return true;return false;}
-export function buildDockRoute(s){const legs=[];let at={x:s.x,y:s.y,heading:s.heading};const add=(x,y,h,label)=>{const d=Math.hypot(x-at.x,y-at.y),turn=angle(h-at.heading);if(d<.01&&Math.abs(turn)<.01)return;const to={x,y,heading:at.heading+turn},duration=Math.max(1.5*d/1.7,Math.abs(turn)/.23,1);legs.push({from:{...at},to,duration,label});at=to;};
- const localU=(s.x-BERTH.x)*QUAY.tx+(s.y-BERTH.y)*QUAY.ty,localN=(s.x-QUAY.x)*QUAY.ty-(s.y-QUAY.y)*QUAY.tx;
- if(Math.abs(localU)<1&&localN>=5.9&&Math.abs(angle(s.heading-BERTH.heading))<.03){add(BERTH.x,BERTH.y,BERTH.heading,'Closing alongside the quay');return legs;}
+export function buildDockRoute(s,berth=BERTH){const legs=[];let at={x:s.x,y:s.y,heading:s.heading};const add=(x,y,h,label)=>{const d=Math.hypot(x-at.x,y-at.y),turn=angle(h-at.heading);if(d<.01&&Math.abs(turn)<.01)return;const to={x,y,heading:at.heading+turn},duration=Math.max(1.5*d/1.7,Math.abs(turn)/.23,1);legs.push({from:{...at},to,duration,label});at=to;};
+ const localU=(s.x-berth.x)*QUAY.tx+(s.y-berth.y)*QUAY.ty,localN=(s.x-QUAY.x)*QUAY.ty-(s.y-QUAY.y)*QUAY.tx;
+ if(Math.abs(localU)<1&&localN>=5.9&&Math.abs(angle(s.heading-berth.heading))<.03){add(berth.x,berth.y,berth.heading,'Closing alongside the quay');return legs;}
  // Move sideways away from shore before turning, as a pilot-assisted maneuver.
  const escape=Math.max(0,70-localN);if(escape>0)add(at.x+QUAY.ty*escape,at.y-QUAY.tx*escape,at.heading,'Clearing the quay');
- const staging=quayPoint(0,-75),route=planSeaRoute(at,staging);
+ const along=(berth.x-BERTH.x)*QUAY.tx+(berth.y-BERTH.y)*QUAY.ty,staging=quayPoint(along,-75),route=planSeaRoute(at,staging);
  if(!route)return [];
  for(const waypoint of route){const heading=Math.atan2(waypoint.y-at.y,waypoint.x-at.x);if(Math.hypot(waypoint.x-at.x,waypoint.y-at.y)>.1){add(at.x,at.y,heading,'Aligning clear of the quay');add(waypoint.x,waypoint.y,heading,'Approaching the service quay');}}
- add(at.x,at.y,BERTH.heading,'Aligning alongside the quay');add(BERTH.x,BERTH.y,BERTH.heading,'Closing alongside the quay');return legs;
+ add(at.x,at.y,berth.heading,'Aligning alongside the quay');add(berth.x,berth.y,berth.heading,'Closing alongside the quay');return legs;
 }
 export function dockRouteDuration(route){return route.reduce((sum,l)=>sum+l.duration,0);}
 export function dockingPose(route,elapsed){let time=elapsed;for(const leg of route){if(time>leg.duration){time-=leg.duration;continue;}const t=Math.max(0,Math.min(1,time/leg.duration)),u=t*t*(3-2*t),a=leg.from,b=leg.to,dx=b.x-a.x,dy=b.y-a.y,heading=a.heading+(b.heading-a.heading)*u;return {x:a.x+dx*u,y:a.y+dy*u,heading,speed:(dx*Math.cos(heading)+dy*Math.sin(heading))*6*t*(1-t)/leg.duration};}return {...(route.at(-1)?.to||BERTH),speed:0};}
@@ -27,7 +29,7 @@ export function dockingStage(route,elapsed){let time=elapsed;for(const leg of ro
 // Pilot/thruster assist: move broadside offshore before allowing a turn.
 export function castOffPosition(s){
  const boat=boatById(s.career?.boat),offshore=(s.x-QUAY.x)*QUAY.ty-(s.y-QUAY.y)*QUAY.tx;
- if(Math.hypot(s.x-BERTH.x,s.y-BERTH.y)>120||offshore>Math.max(25,boat.length*.7))return null;
+ if(Math.min(...BERTHS.map(b=>Math.hypot(s.x-b.x,s.y-b.y)))>120||offshore>Math.max(25,boat.length*.7))return null;
  for(let d=12;d<=140;d+=2){const at={...s,x:s.x+QUAY.ty*d,y:s.y-QUAY.tx*d};let clear=true;
   for(let a=0;a<Math.PI*2;a+=Math.PI/24)if(vesselIntersectsHarbor({...at,heading:a})){clear=false;break;}
   if(clear)return {x:at.x,y:at.y,heading:Math.atan2(-QUAY.tx,QUAY.ty)};

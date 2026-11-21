@@ -1,13 +1,13 @@
 {
-  "version": "0.18.20",
+  "version": "0.18.21",
   "notes": {
     "en": [
-      "Smoothed other players’ boat movement and stabilized leaderboard amounts.",
-      "Increased travel speed slightly at higher throttle settings."
+      "Added five additional harbor berths and collision handling for other players’ vessels.",
+      "Other players’ boats and buoys now use a distinct violet chart color."
     ],
     "sv": [
-      "Mjukare rörelser för andra spelares båtar och stabilare belopp i topplistan.",
-      "Ökat färdhastigheten lite vid högre fartinställningar."
+      "Lagt till fem kajplatser och kollision mot andra spelares båtar.",
+      "Andra spelares båtar och bojar visas nu i en tydlig lila färg på sjökortet."
     ]
   }
 }
