@@ -1,21 +1,11 @@
 {
-  "version": "0.18.11",
+  "version": "0.18.12",
   "notes": {
     "en": [
-      "Lamp upgrades now increase light intensity, beam width and reach, including water reflections and visible beams.",
-      "Improved boat rendering precision and shadow projection far from harbor.",
-      "Filtered fine surface detail to reduce shimmer while moving.",
-      "Fixed the underwater hull mask that could leave a blue strip beneath the vessel.",
-      "Moved misplaced side fittings inside forward-working hulls and fixed overlapping net-drum surfaces.",
-      "Added light edge-aware antialiasing to soften jagged railings, cables and cages."
+      "Crab Grounds Knowledge IV now reveals migration-direction arrows on the minimap and planning chart."
     ],
     "sv": [
-      "Lampuppgraderingar ökar nu ljusstyrka, spridning och räckvidd, även för vattenreflexer och synliga ljuskäglor.",
-      "Förbättrad precision i båtens 3D-grafik och skuggor långt från hamnen.",
-      "Filtrerade fina ytstrukturer för att minska flimmer under rörelse.",
-      "Rättat vattenmasken som kunde lämna en blå remsa under skrovet.",
-      "Flyttat in felplacerade sidobeslag på båtar med omvänt arbetsdäck och rättat överlappande ytor på nättrumman.",
-      "Lagt till lätt kantutjämning för mjukare relingar, vajrar och tinor."
+      "Kunskap om krabbvatten IV visar nu vandringsriktningen med pilar på minimappen och planeringskartan."
     ]
   }
 }

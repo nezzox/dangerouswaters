@@ -70,7 +70,7 @@ const sv={
  "TO DESTINATION":"TILL MÅLET",
  "Company-wide training; most disciplines have five ranks.":"Utbildning för hela företaget; de flesta färdigheter har fem nivåer.",
  "Automatically set pots after clearing the buoy range ring":"Sätt tinor automatiskt när båten lämnat bojens avståndsring",
- "Unlock crab ground potential forecasts; higher ranks narrow uncertainty and add 6% yield per rank; rank V reveals dense crab cores on the chart":"Lås upp prognoser för krabbfält; högre nivåer minskar osäkerheten och ger 6 % mer fångst per nivå. Nivå V visar täta bestånd på sjökortet.",
+ "Unlock crab ground potential forecasts; higher ranks narrow uncertainty and add 6% yield per rank; rank IV shows migration direction; rank V reveals dense crab cores on the chart":"Lås upp prognoser för krabbfält; högre nivåer minskar osäkerheten och ger 6 % mer fångst per nivå. Nivå IV visar vandringsriktningen och nivå V visar täta bestånd på sjökortet.",
  "Requires Auto Haul. Plots a continuous working-side route through all your own pots, oldest first, and enables Auto Haul. Stops when the hold is full.":"Kräver automatisk halning. Planerar en sammanhängande rutt på rätt arbetssida genom alla egna tinor, äldsta först, och aktiverar automatisk halning. Stannar vid fullt lastrum.",
  "Solar-assisted battery electric; shore charging;":"Batteridrift med solcellsstöd och landladdning;",
  "Purchase Auto Set I first.":"Köp automatisk sättning I först.",

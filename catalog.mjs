@@ -8,7 +8,7 @@ export const SKILL_SYSTEMS=[
  ['sort','Catch sorting','Crew',3200,'Haul/sort cycle 7% faster per rank'],
  ['repair','Damage control','Safety',6000,'Incident repairs 15% faster per rank'],
  ['fuel','Economical helm','Navigation',5000,'Fuel use reduced by 4% per rank'],
- ['crab','Crab grounds knowledge','Fishing',5500,'Unlock crab ground potential forecasts; higher ranks narrow uncertainty and add 6% yield per rank; rank V reveals dense crab cores on the chart'],
+ ['crab','Crab grounds knowledge','Fishing',5500,'Unlock crab ground potential forecasts; higher ranks narrow uncertainty and add 6% yield per rank; rank IV shows migration direction; rank V reveals dense crab cores on the chart'],
  ['salmon','Salmon reading','Fishing',6500,'Unlock salmon ground potential forecasts; higher ranks narrow uncertainty and add 8% yield per rank'],
  ['price','Market negotiation','Business',8000,'Catch prices +2.5% per rank'],
  ['bait','Bait preparation','Fishing',3000,'Bait cost reduced by 6% per rank'],

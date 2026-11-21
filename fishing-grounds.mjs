@@ -1,4 +1,4 @@
-import {FISHING_GROUNDS,clearWater,isLand,inWorld,nearestWater} from './world.mjs?v=0.18.11';
+import {FISHING_GROUNDS,clearWater,isLand,inWorld,nearestWater} from './world.mjs?v=0.18.12';
 // Gameplay approximation: deterministic slow migration, at most 37.5 m/game hour.
 // Tracks reverse along proven water-only segments instead of jumping across islands.
 const HOURS=36,STEP=900;
@@ -27,3 +27,6 @@ export function salmonAbundance(x,y,hour=0){if(!inWorld(x,y)||isLand(x,y))return
 
 // Rank V reveals the dense core of the same abundance field used by pots and sonar.
 export function crabHotspot(g,rank,hour=0){return rank>=5?{...crabCore(g),potential:groundPotential(g,'crab',hour)}:null;}
+
+// Direction along the current water-only segment, including its next leg at a turn.
+export function groundMotion(g,rank,hour=0){if(!(rank>=4))return null;const track=tracks[g.id];if(!track)return null;const time=Math.max(0,Number.isFinite(hour)?hour:0)/HOURS,index=Math.floor(time)%(track.points.length-1),a=track.points[index],b=track.points[index+1],dx=b.x-a.x,dy=b.y-a.y,length=Math.hypot(dx,dy);return length>.001?{x:dx/length,y:dy/length}:null;}

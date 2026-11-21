@@ -1,15 +1,15 @@
-import {crabHoldValue,addCrabCatch} from './catch-value.mjs?v=0.18.11';
-import {PARTS,boatById} from './catalog.mjs?v=0.18.11';
-import {solarCharge,electricBurn,energyPrice} from './energy.mjs?v=0.18.11';
-import {recoverFleetContact} from './fleet-recovery.mjs?v=0.18.11';
-import {nearbyGreeting} from './fleet-greetings.mjs?v=0.18.11';
-import {potCatchAt} from './pot-soak.mjs?v=0.18.11';
-import {prepareRareCatch,awardRareCatch,rareValue} from './rare-catch.mjs?v=0.18.11';
-import {FUEL_SCALE,SEA_WEAR_SCALE} from './balance.mjs?v=0.18.11';
-import {groundsAt,crabHotspot} from './fishing-grounds.mjs?v=0.18.11';
-import {nearestWater,geoToWorld,clearWater} from './world.mjs?v=0.18.11';
-import {planSeaRoute,seaLane} from './navigation.mjs?v=0.18.11';
-import {vesselStats,settleLanding,tradeValue} from './career.mjs?v=0.18.11';
+import {crabHoldValue,addCrabCatch} from './catch-value.mjs?v=0.18.12';
+import {PARTS,boatById} from './catalog.mjs?v=0.18.12';
+import {solarCharge,electricBurn,energyPrice} from './energy.mjs?v=0.18.12';
+import {recoverFleetContact} from './fleet-recovery.mjs?v=0.18.12';
+import {nearbyGreeting} from './fleet-greetings.mjs?v=0.18.12';
+import {potCatchAt} from './pot-soak.mjs?v=0.18.12';
+import {prepareRareCatch,awardRareCatch,rareValue} from './rare-catch.mjs?v=0.18.12';
+import {FUEL_SCALE,SEA_WEAR_SCALE} from './balance.mjs?v=0.18.12';
+import {groundsAt,crabHotspot} from './fishing-grounds.mjs?v=0.18.12';
+import {nearestWater,geoToWorld,clearWater} from './world.mjs?v=0.18.12';
+import {planSeaRoute,seaLane} from './navigation.mjs?v=0.18.12';
+import {vesselStats,settleLanding,tradeValue} from './career.mjs?v=0.18.12';
 export function fleetStats(s,b){return vesselStats({...b,career:{boat:b.boat,parts:b.parts,skills:s.career.skills}});}
 export const fleetNoticeCount=s=>(s.career?.fleet||[]).filter(b=>b.upgradeRequest?.status==='pending'||!b.autoService&&(b.unreadMessage||b.request?.status==='pending')).length;
 export function readFleetMessages(s){for(const b of s.career?.fleet||[])b.unreadMessage=false;}
