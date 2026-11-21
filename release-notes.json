@@ -1,13 +1,11 @@
 {
-  "version": "0.18.21",
+  "version": "0.18.22",
   "notes": {
     "en": [
-      "Added five additional harbor berths and collision handling for other players’ vessels.",
-      "Other players’ boats and buoys now use a distinct violet chart color."
+      "The standard simulation speed is now three times faster."
     ],
     "sv": [
-      "Lagt till fem kajplatser och kollision mot andra spelares båtar.",
-      "Andra spelares båtar och bojar visas nu i en tydlig lila färg på sjökortet."
+      "Spelets normala simulationshastighet är nu tre gånger snabbare."
     ]
   }
 }
