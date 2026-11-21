@@ -1,11 +1,11 @@
 {
-  "version": "0.18.22",
+  "version": "0.18.23",
   "notes": {
     "en": [
-      "The standard simulation speed is now three times faster."
+      "Faster multiplayer position updates and smoother movement between updates."
     ],
     "sv": [
-      "Spelets normala simulationshastighet är nu tre gånger snabbare."
+      "Snabbare positionsuppdateringar i multiplayer och mjukare rörelse mellan uppdateringarna."
     ]
   }
 }
