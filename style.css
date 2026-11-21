@@ -101,3 +101,5 @@
 .right-panel .weather-strip{height:10px;margin-bottom:3px}
 .right-panel .weather-details,.right-panel .weather-attribution{font-size:7px;line-height:1.3}
 .right-panel .weather-attribution{margin-top:4px}
+
+.chart-areas{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}

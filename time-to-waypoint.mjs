@@ -1,9 +1,9 @@
-import {travelBoost} from './speed-curve.mjs?v=0.18.31';
-import {vesselStats} from './career.mjs?v=0.18.31';
-import {conditions} from './simulation.mjs?v=0.18.31';
-import {fuelBurnRate} from './fuel-economy.mjs?v=0.18.31';
-import {electricBurn} from './energy.mjs?v=0.18.31';
-import {seaLane} from './navigation.mjs?v=0.18.31';
+import {travelBoost} from './speed-curve.mjs?v=0.18.32';
+import {vesselStats} from './career.mjs?v=0.18.32';
+import {conditions} from './simulation.mjs?v=0.18.32';
+import {fuelBurnRate} from './fuel-economy.mjs?v=0.18.32';
+import {electricBurn} from './energy.mjs?v=0.18.32';
+import {seaLane} from './navigation.mjs?v=0.18.32';
 // Instant travel uses the existing safe route and consumes estimated cruising fuel.
 export function startWaypointTravel(s){const ap=s.autopilot;if(!ap||s.deckJob||s.moored||s.incident||s.skipperMission||s.fuel<=0)return null;const route=ap.route||[ap],index=ap.index||0,points=ap.waypoints||[ap];for(const waypoint of points){const routeIndex=route.findIndex((p,i)=>i>=index&&Math.hypot(p.x-waypoint.x,p.y-waypoint.y)<.01);if(routeIndex>=0)return {ap,routeIndex,waypoint,elapsed:0};}return null;}
 export function advanceWaypointTravel(s,travel){if(s.autopilot!==travel.ap||s.incident||s.deckJob||s.moored||s.fuel<=0)return {done:true,reason:'interrupted',elapsed:0};const nodes=(travel.ap.route||[travel.ap]).slice(travel.ap.index||0,travel.routeIndex+1);let from={x:s.x,y:s.y},distance=0;for(const p of nodes){if(!seaLane(from,p,28))return {done:true,reason:'blocked',elapsed:0};distance+=Math.hypot(p.x-from.x,p.y-from.y);from=p;}const stats=vesselStats(s),top=stats.top/(1+conditions(s).waves*.06),speed=Math.min(top,Math.max(.1,(s.desiredKnots||6)/1.94384)),seconds=distance/(speed*travelBoost(speed)),load=Math.min(1,speed/top),fuel=stats.powertrain==='electric'?electricBurn(load,stats,seconds):fuelBurnRate(load,stats.fuelUse)*seconds;if(fuel>s.fuel)return {done:true,reason:'fuel',elapsed:0};s.fuel=Math.max(0,s.fuel-fuel);const last=nodes.at(-2)||{x:s.x,y:s.y};s.heading=Math.atan2(from.y-last.y,from.x-last.x);s.x=from.x;s.y=from.y;s.speed=0;s.rudder=0;if(travel.routeIndex<(travel.ap.route?.length||1)-1){travel.ap.index=travel.routeIndex+1;if(travel.ap.waypoints?.length)travel.ap.waypoints.shift();}else{s.autopilot=null;s.desiredKnots=0;}return {done:true,reason:'arrived',elapsed:0};}
