@@ -1,6 +1,6 @@
-import {CRAB_GROUND_DATA} from './crab-ground-data.mjs?v=0.18.36';
-import {PORT_PIERS} from './port-data.mjs?v=0.18.36';
-import {COAST_DATA} from './coast-data.mjs?v=0.18.36';
+import {CRAB_GROUND_DATA} from './crab-ground-data.mjs?v=0.18.37';
+import {PORT_PIERS} from './port-data.mjs?v=0.18.37';
+import {COAST_DATA} from './coast-data.mjs?v=0.18.37';
 export const WORLD_VERSION=2;
 export const GEO_ORIGIN={lon:-166.524,lat:53.9034};
 const meters=111319.490793,cos=Math.cos(GEO_ORIGIN.lat*Math.PI/180);
@@ -39,6 +39,7 @@ function coastRingContains(x,y,ring){
 }
 function coastalLand(x,y){for(const p of WORLD_LAND){if(x<p.left||x>p.right||y<p.top||y>p.bottom)continue;if(coastRingContains(x,y,p.outer)&&!p.holes.some(r=>coastRingContains(x,y,r)))return true;}return false;}
 const pierShapes=PORT_PIERS.map(r=>{const points=r.map(([a,b])=>geoToWorld(a,b));return {points,left:Math.min(...points.map(p=>p.x))-4,right:Math.max(...points.map(p=>p.x))+4,top:Math.min(...points.map(p=>p.y))-4,bottom:Math.max(...points.map(p=>p.y))+4};});
+export const ST_PAUL_DIESEL={...geoToWorld(-170.319895,57.1534),range:220};
 const matthewA=geoToWorld(-172.783315,60.41234),matthewB=geoToWorld(-173.004221,60.49018);
 const matthewLength=Math.hypot(matthewB.x-matthewA.x,matthewB.y-matthewA.y);
 const tx=(matthewB.x-matthewA.x)/matthewLength,ty=(matthewB.y-matthewA.y)/matthewLength;

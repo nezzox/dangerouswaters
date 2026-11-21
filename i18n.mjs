@@ -1,4 +1,4 @@
-import {CRAB_SPECIES} from './crab-species.mjs?v=0.18.36';
+import {CRAB_SPECIES} from './crab-species.mjs?v=0.18.37';
 // Saved money/prices remain in legacy SEK units. Fixed game conversion: 10 SEK = 1 USD.
 // Translation is applied at the presentation boundary; save data and simulation never change language.
 let language='en';
@@ -215,7 +215,7 @@ const sv={
  'Rigging pot':'Riggar tinan','Swinging crane outboard':'Svänger ut kranen','Lowering pot':'Sänker tinan','Hoisting pot':'Lyfter tinan','Swinging over the deck':'Svänger in över däcket','Emptying and sorting':'Tömmer och sorterar','Stowing pot':'Ställer undan tinan','Throwing hook toward buoy':'Kastar kroken mot bojen','Retrieving buoy to hauler':'Drar bojen till halaren',
  'DUTCH HARBOR / SERVICE BERTH':'DUTCH HARBOR / SERVICEKAJ','Prepare for the next trip.':'Gör klart för nästa tur.','Dock to trade and unload.':'Lägg till för handel och lossning.','DOCK & UNLOAD CATCH':'LÄGG TILL & LOSSA FÅNGST',
  'REFUEL DIESEL':'TANKA DIESEL','REPAIR HULL':'REPARERA SKROV','FOUR EXTRA POTS':'FYRA EXTRA TINOR','ENGINE':'MOTOR','HOLD':'LASTRUM','Pots':'Tinor',
- 'REQUEST TOW · UP TO':'BESTÄLL BOGSERING · HÖGST','Start over':'Börja om','This replaces your saved season.':'Detta ersätter din sparade säsong.','START NEW SEASON':'STARTA NY SÄSONG',
+ 'ST. PAUL DIESEL':'ST. PAUL DIESEL','REQUEST TOW':'BESTÄLL BOGSERING','REQUEST TOW · UP TO':'BESTÄLL BOGSERING · HÖGST','Start over':'Börja om','This replaces your saved season.':'Detta ersätter din sparade säsong.','START NEW SEASON':'STARTA NY SÄSONG',
  'Close harbor panel':'Stäng hamnpanelen','Close shop and company panel':'Stäng butiken och rederipanelen','Fully upgraded':'Fullt uppgraderad','Level':'Nivå','From':'Från','bait':'bete',
  'fill to':'fyll till','percentage point':'procentenhet','Higher top speed':'Högre toppfart',
  'Dutch Harbor chandlery':'Skeppshandeln i Dutch Harbor','Commission a vessel':'Ta ett nytt fartyg i drift','Your fishing company':'Ditt fiskerederi','Finance & saved season':'Ekonomi & sparad säsong',

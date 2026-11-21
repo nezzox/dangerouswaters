@@ -1,1 +1,1 @@
-{"version": "0.18.36", "notes": {"en": ["Long waypoint routes can now be split into three legs and planned in parallel."], "sv": ["Långa rutter kan nu delas upp i tre etapper och beräknas parallellt."]}}
+{"version": "0.18.37", "notes": {"en": ["Refuel at St. Paul Island. Tow fees now depend on distance and are capped at your available balance."], "sv": ["Tanka vid St. Paul Island. Bogsering kostar mer på längre avstånd, upp till ditt tillgängliga saldo."]}}
