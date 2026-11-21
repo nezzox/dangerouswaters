@@ -1,5 +1,5 @@
-import {hullWaterGLSL} from './deck-water.mjs?v=0.18.37';
-import {seaHeightGLSL} from './sea-spectrum.mjs?v=0.18.37';
+import {hullWaterGLSL} from './deck-water.mjs?v=0.18.38';
+import {seaHeightGLSL} from './sea-spectrum.mjs?v=0.18.38';
 // Shared atmosphere and ocean functions keep lighting and reflections consistent.
 export const common=`
 precision highp float;precision highp int;
@@ -101,7 +101,7 @@ void main(){if(uReflectionPass>.5&&vWorld.y<.04)discard;
  }else if(uKind>2.5){height=grain*.001;rough=max(.58,rough);base*=.91+grain*.1;}
  base=mix(base,vec3(.23,.085,.032),rust);base*=1.-seam*.22;
  float wet=clamp(uWeather.z*.6+(.48-macro)*.5,0.,.8)*detail;rough=max(.085,rough*(1.-wet*.55));base*=1.-wet*.13;
- if(detail>.5){vec3 dx=dFdx(vRelative),dy=dFdy(vRelative),r1=cross(dy,n),r2=cross(n,dx);float det=dot(dx,r1);n=normalize(n-sign(det)*(dFdx(height)*r1+dFdy(height)*r2)/max(abs(det),.0001));}
+ if(detail>.5&&uKind<3.5){vec3 dx=dFdx(vRelative),dy=dFdy(vRelative),r1=cross(dy,n),r2=cross(n,dx);float det=dot(dx,r1);n=normalize(n-sign(det)*(dFdx(height)*r1+dFdy(height)*r2)/max(abs(det),.0001));}
  vec3 l=sunDir(),f0=mix(vec3(.045),base*.5,(1.-painted)*.3);float shade=shadowAt(vShadow,uShadow),skyVisibility=.75+.25*n.y,contact=1.;
  if(uKind>.5&&uKind<1.5&&n.y>.5&&vLocal.y<2.){float cabin=length(max(abs(vLocal.xz-vec2(3.4,0.))-vec2(3.3,2.65),0.));contact=.5+.5*smoothstep(0.,1.6,cabin);}
  vec3 ambient=mix(vec3(.14,.21,.27),vec3(.43,.49,.5),n.y*.5+.5)*(.11+.89*uDaylight);

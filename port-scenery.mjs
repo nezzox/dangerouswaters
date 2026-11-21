@@ -1,11 +1,11 @@
-import {QUAY,quayPoint,berthsAt} from './harbor.mjs?v=0.18.37';
-import {geometry} from './geometry.mjs?v=0.18.37';
-import {WORLD_LAND,isLand} from './world.mjs?v=0.18.37';
-import {groundHeight} from './geography-mesh.mjs?v=0.18.37';
+import {QUAY,quayPoint,berthsAt} from './harbor.mjs?v=0.18.38';
+import {geometry} from './geometry.mjs?v=0.18.38';
+import {WORLD_LAND,isLand} from './world.mjs?v=0.18.38';
+import {groundHeight} from './geography-mesh.mjs?v=0.18.38';
 const asphalt=[.16,.18,.18],concrete=[.36,.37,.34],steel=[.29,.33,.33],dark=[.07,.09,.085];
 // Interpreted Ballyhoo Road industrial frontage, fitted to the geographic shoreline.
 // No satellite imagery is shipped; the source coastline remains authoritative.
-export function buildPortScenery(selected=QUAY){const g=geometry();let index=0;
+export function buildPortScenery(selected=QUAY,local=false){const g=geometry();let index=0;
  if(selected===QUAY)for(const land of WORLD_LAND){if(land.right< -1300||land.left>1100||land.bottom< -1500||land.top>650)continue;
  for(let i=1;i<land.outer.length;i++){const a=land.outer[i-1],b=land.outer[i],dx=b.x-a.x,dy=b.y-a.y,length=Math.hypot(dx,dy);if(length<8)continue;
  const tx=dx/length,ty=dy/length,mx=(a.x+b.x)/2,my=(a.y+b.y)/2;let nx=-ty,ny=tx;
@@ -43,4 +43,6 @@ export function buildPortScenery(selected=QUAY){const g=geometry();let index=0;
  for(let h=base+1;h<22;h+=2){const a=point(along-1,7),b=point(along+1,9);g.tube([a.x,h,a.y],[b.x,h+2,b.y],.08,steel,6);}
  g.box(mast.x,22,mast.y,3,3,3,[.64,.28,.10]);g.box(mast.x,23.7,mast.y,3.5,.3,3.5,steel);
  g.box(bin.x,base+1,bin.y,5,2,4,steel);g.box(bin.x,base+2.05,bin.y,4.5,.15,3.5,dark);}
- } return g.array();}
+ }
+ if(local)for(let i=0;i<g.data.length;i+=11){g.data[i]-=selected.x;g.data[i+2]-=selected.y;}
+ return g.array();}
