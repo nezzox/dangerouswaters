@@ -1,1 +1,1 @@
-{"version": "0.18.34", "notes": {"en": ["Chart waypoint routes are now planned in the background."], "sv": ["Rutter till waypoints på sjökortet beräknas nu i bakgrunden."]}}
+{"version": "0.18.35", "notes": {"en": ["Long waypoint searches try three routes in parallel. Coastline checks are faster."], "sv": ["Långa ruttsökningar provar tre alternativ samtidigt. Kontrollen mot kustlinjen går snabbare."]}}

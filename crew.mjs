@@ -1,6 +1,6 @@
-import {rackFootprints,potBounds} from './vessel-style.mjs?v=0.18.34';
-import {crewStations,crewAction} from './crew-stations.mjs?v=0.18.34';
-import {walkableDeck,routeOnDeck,canStand,CREW_SPACING,CABIN_DOOR} from './deck-layout.mjs?v=0.18.34';
+import {rackFootprints,potBounds} from './vessel-style.mjs?v=0.18.35';
+import {crewStations,crewAction} from './crew-stations.mjs?v=0.18.35';
+import {walkableDeck,routeOnDeck,canStand,CREW_SPACING,CABIN_DOOR} from './deck-layout.mjs?v=0.18.35';
 const jobs={
  secure:{label:'Lashing pots to transport racks',duration:12,targets:[]},
  undock:{label:'Letting go mooring lines',duration:30,targets:[[-10.8,2.8],[-3.8,2.8],[-.45,1.1]]},

@@ -1,6 +1,6 @@
-import {CRAB_GROUND_DATA} from './crab-ground-data.mjs?v=0.18.34';
-import {PORT_PIERS} from './port-data.mjs?v=0.18.34';
-import {COAST_DATA} from './coast-data.mjs?v=0.18.34';
+import {CRAB_GROUND_DATA} from './crab-ground-data.mjs?v=0.18.35';
+import {PORT_PIERS} from './port-data.mjs?v=0.18.35';
+import {COAST_DATA} from './coast-data.mjs?v=0.18.35';
 export const WORLD_VERSION=2;
 export const GEO_ORIGIN={lon:-166.524,lat:53.9034};
 const meters=111319.490793,cos=Math.cos(GEO_ORIGIN.lat*Math.PI/180);
@@ -11,7 +11,33 @@ export const WORLD_BOUNDS={left:nw.x,right:se.x,top:nw.y,bottom:se.y};
 export const WORLD_CENTER={x:(nw.x+se.x)/2,y:(nw.y+se.y)/2};
 export const WORLD_LAND=COAST_DATA.map(p=>{const outer=p.outer.map(([a,b])=>geoToWorld(a,b)),holes=p.holes.map(r=>r.map(([a,b])=>geoToWorld(a,b)));return {outer,holes,left:Math.min(...outer.map(p=>p.x)),right:Math.max(...outer.map(p=>p.x)),top:Math.min(...outer.map(p=>p.y)),bottom:Math.max(...outer.map(p=>p.y))};});
 export function pointInRing(x,y,ring){let inside=false;for(let i=0,j=ring.length-1;i<ring.length;j=i++){const a=ring[i],b=ring[j];if((a.y>y)!==(b.y>y)&&x<(b.x-a.x)*(y-a.y)/(b.y-a.y)+a.x)inside=!inside;}return inside;}
-function coastalLand(x,y){for(const p of WORLD_LAND){if(x<p.left||x>p.right||y<p.top||y>p.bottom)continue;if(pointInRing(x,y,p.outer)&&!p.holes.some(r=>pointInRing(x,y,r)))return true;}return false;}
+// A point-in-polygon ray can cross only edges that span its latitude.
+const coastBands=new WeakMap(),coastBandSize=4096;
+function coastRingContains(x,y,ring){
+ if(ring.length<64)return pointInRing(x,y,ring);
+ let bands=coastBands.get(ring);
+ if(!bands){
+  bands=new Map();
+  for(let i=0,j=ring.length-1;i<ring.length;j=i++){
+   const a=ring[i],b=ring[j];
+   if(a.y===b.y)continue;
+   const low=Math.floor(Math.min(a.y,b.y)/coastBandSize),high=Math.floor(Math.max(a.y,b.y)/coastBandSize);
+   for(let row=low;row<=high;row++){
+    if(!bands.has(row))bands.set(row,[]);
+    bands.get(row).push(a,b);
+   }
+  }
+  coastBands.set(ring,bands);
+ }
+ const edges=bands.get(Math.floor(y/coastBandSize));
+ let inside=false;
+ if(edges)for(let i=0;i<edges.length;i+=2){
+  const a=edges[i],b=edges[i+1];
+  if((a.y>y)!==(b.y>y)&&x<(b.x-a.x)*(y-a.y)/(b.y-a.y)+a.x)inside=!inside;
+ }
+ return inside;
+}
+function coastalLand(x,y){for(const p of WORLD_LAND){if(x<p.left||x>p.right||y<p.top||y>p.bottom)continue;if(coastRingContains(x,y,p.outer)&&!p.holes.some(r=>coastRingContains(x,y,r)))return true;}return false;}
 const pierShapes=PORT_PIERS.map(r=>{const points=r.map(([a,b])=>geoToWorld(a,b));return {points,left:Math.min(...points.map(p=>p.x))-4,right:Math.max(...points.map(p=>p.x))+4,top:Math.min(...points.map(p=>p.y))-4,bottom:Math.max(...points.map(p=>p.y))+4};});
 const matthewA=geoToWorld(-172.783315,60.41234),matthewB=geoToWorld(-173.004221,60.49018);
 const matthewLength=Math.hypot(matthewB.x-matthewA.x,matthewB.y-matthewA.y);

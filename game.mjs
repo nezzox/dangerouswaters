@@ -1,41 +1,41 @@
-import {seaLane} from './navigation.mjs?v=0.18.34';
-import {newWorldCode,newPlayerToken,cleanPlayerName,createMultiplayer,createPeerSmoother} from './multiplayer.mjs?v=0.18.34';
-import {startWaypointTravel,advanceWaypointTravel} from './time-to-waypoint.mjs?v=0.18.34';
-import {CRAB_SPECIES,crabSpeciesName} from './crab-species.mjs?v=0.18.34';
-import {LIGHTING_PROFILES} from './light-upgrades.mjs?v=0.18.34';
-import {claimFirstBoatGrant,firstBoatNotice} from './first-boat.mjs?v=0.18.34';
-import {crabPriceAt,crabHoldValue} from './catch-value.mjs?v=0.18.34';
-import {watchDonations,appendDonation} from './donation-feed.mjs?v=0.18.34';
-import {DONATION_FEED_URL} from './donation-config.mjs?v=0.18.34';
-import {watchUpdates,formatUpdateNotice} from './update-check.mjs?v=0.18.34';
-import {energyPrice} from './energy.mjs?v=0.18.34';
-import {createMessageQueue} from './message-queue.mjs?v=0.18.34';
-import {visibleFleet} from './fleet-visuals.mjs?v=0.18.34';
-import {transitionWeather} from './weather-transition.mjs?v=0.18.34';
-import {ownedUpgrades,createRadioFeed,createLastHaul} from './hud-status.mjs?v=0.18.34';
-import {createIntro} from './intro.mjs?v=0.18.34';
-import {fleetNoticeCount} from './fleet.mjs?v=0.18.34';
-import {redeemDeveloperCode} from './developer-code.mjs?v=0.18.34';
-import {potSoakStage} from './pot-soak.mjs?v=0.18.34';
-import {createLiveWeather} from './live-weather.mjs?v=0.18.34';
-import {dockingStage,PORT_QUAYS,nearestQuay} from './harbor.mjs?v=0.18.34';
-import {fuelEconomy} from './fuel-economy.mjs?v=0.18.34';
-import {scanSonar,drawSonar} from './sonar.mjs?v=0.18.34';
-import {rareCount,rareValue} from './rare-catch.mjs?v=0.18.34';
-import {clipChartWater} from './chart-water.mjs?v=0.18.34';
-import {groundsAt,groundReport,crabHotspot,groundMotion} from './fishing-grounds.mjs?v=0.18.34';
-import {createSoundscape} from './soundscape.mjs?v=0.18.34';
-import {WORLD_LAND,WORLD_CENTER,WORLD_BOUNDS,PLACES,worldToGeo} from './world.mjs?v=0.18.34';
-import {getLanguage,setLanguage,translateText,localizeTree} from './i18n.mjs?v=0.18.34';
-import {createShop} from './shop.mjs?v=0.18.34';
-import {restoreSeason,seasonJSON} from './saves.mjs?v=0.18.34';
-import {vesselStats,toggleAutomation} from './career.mjs?v=0.18.34';
-import {pickupAllPots,skipperCommand,createGame,step,conditions,weatherAt,setWeatherMode,depthAt,PORT,distance,nearPort,handlePot,dock,undock,canUndock,service,rescue,getUnstuck,clamp,potAction,POT_RANGE,jobProgress,setAutopilot,autopilotRouteStart,applyAutopilotRoute,setRudder,potBearing,workingSide} from './simulation.mjs?v=0.18.34';
-import {createOcean,drawFallback} from './ocean.mjs?v=0.18.34';
-import {createScene} from './scene.mjs?v=0.18.34';
-import {drawGroundMotion,createChartView,chartPoint,chartWorld,panChart,zoomChart,followVessel,fitPots,updateChartFollow} from './chart.mjs?v=0.18.34';
-import {createWake} from './wake.mjs?v=0.18.34';
-import {advanceVoyage} from './voyage.mjs?v=0.18.34';
+import {seaLane} from './navigation.mjs?v=0.18.35';
+import {newWorldCode,newPlayerToken,cleanPlayerName,createMultiplayer,createPeerSmoother} from './multiplayer.mjs?v=0.18.35';
+import {startWaypointTravel,advanceWaypointTravel} from './time-to-waypoint.mjs?v=0.18.35';
+import {CRAB_SPECIES,crabSpeciesName} from './crab-species.mjs?v=0.18.35';
+import {LIGHTING_PROFILES} from './light-upgrades.mjs?v=0.18.35';
+import {claimFirstBoatGrant,firstBoatNotice} from './first-boat.mjs?v=0.18.35';
+import {crabPriceAt,crabHoldValue} from './catch-value.mjs?v=0.18.35';
+import {watchDonations,appendDonation} from './donation-feed.mjs?v=0.18.35';
+import {DONATION_FEED_URL} from './donation-config.mjs?v=0.18.35';
+import {watchUpdates,formatUpdateNotice} from './update-check.mjs?v=0.18.35';
+import {energyPrice} from './energy.mjs?v=0.18.35';
+import {createMessageQueue} from './message-queue.mjs?v=0.18.35';
+import {visibleFleet} from './fleet-visuals.mjs?v=0.18.35';
+import {transitionWeather} from './weather-transition.mjs?v=0.18.35';
+import {ownedUpgrades,createRadioFeed,createLastHaul} from './hud-status.mjs?v=0.18.35';
+import {createIntro} from './intro.mjs?v=0.18.35';
+import {fleetNoticeCount} from './fleet.mjs?v=0.18.35';
+import {redeemDeveloperCode} from './developer-code.mjs?v=0.18.35';
+import {potSoakStage} from './pot-soak.mjs?v=0.18.35';
+import {createLiveWeather} from './live-weather.mjs?v=0.18.35';
+import {dockingStage,PORT_QUAYS,nearestQuay} from './harbor.mjs?v=0.18.35';
+import {fuelEconomy} from './fuel-economy.mjs?v=0.18.35';
+import {scanSonar,drawSonar} from './sonar.mjs?v=0.18.35';
+import {rareCount,rareValue} from './rare-catch.mjs?v=0.18.35';
+import {clipChartWater} from './chart-water.mjs?v=0.18.35';
+import {groundsAt,groundReport,crabHotspot,groundMotion} from './fishing-grounds.mjs?v=0.18.35';
+import {createSoundscape} from './soundscape.mjs?v=0.18.35';
+import {WORLD_LAND,WORLD_CENTER,WORLD_BOUNDS,PLACES,worldToGeo} from './world.mjs?v=0.18.35';
+import {getLanguage,setLanguage,translateText,localizeTree} from './i18n.mjs?v=0.18.35';
+import {createShop} from './shop.mjs?v=0.18.35';
+import {restoreSeason,seasonJSON} from './saves.mjs?v=0.18.35';
+import {vesselStats,toggleAutomation} from './career.mjs?v=0.18.35';
+import {pickupAllPots,skipperCommand,createGame,step,conditions,weatherAt,setWeatherMode,depthAt,PORT,distance,nearPort,handlePot,dock,undock,canUndock,service,rescue,getUnstuck,clamp,potAction,POT_RANGE,jobProgress,setAutopilot,autopilotRouteStart,applyAutopilotRoute,setRudder,potBearing,workingSide} from './simulation.mjs?v=0.18.35';
+import {createOcean,drawFallback} from './ocean.mjs?v=0.18.35';
+import {createScene} from './scene.mjs?v=0.18.35';
+import {drawGroundMotion,createChartView,chartPoint,chartWorld,panChart,zoomChart,followVessel,fitPots,updateChartFollow} from './chart.mjs?v=0.18.35';
+import {createWake} from './wake.mjs?v=0.18.35';
+import {advanceVoyage} from './voyage.mjs?v=0.18.35';
 let sonarFrame='';const radioFeed=createRadioFeed(),messageQueue=createMessageQueue();let ownedSignature='';const lastHaulDisplay=createLastHaul();
 const wake=createWake();
 const $=id=>document.getElementById(id),canvas=$('world'),ctx=canvas.getContext('2d'),sea=$('ocean'),chart=$('chart'),map=chart.getContext('2d');
@@ -91,9 +91,11 @@ chart.addEventListener('wheel',e=>{e.preventDefault();e.stopPropagation();const 
 chart.addEventListener('pointerdown',e=>{if(e.button!==0)return;e.preventDefault();chartDrag=chartCursor(e);chart.setPointerCapture(e.pointerId);chart.dataset.dragging='true';});
 chart.addEventListener('pointermove',e=>{if(!chartDrag)return;const p=chartCursor(e);panChart(chartView,p.x-chartDrag.x,p.y-chartDrag.y);chartDrag=p;drawChart();});
 for(const event of ['pointerup','pointercancel','lostpointercapture'])chart.addEventListener(event,()=>{chartDrag=null;chart.dataset.dragging='false';if(event==='pointerup')focusChartTarget();});
-let waypointWorker=null, planningWaypoint=false;
+const waypointWorkers=new Set();
+let planningWaypoint=false;
 function cancelWaypointSearch(){
- waypointWorker?.terminate();waypointWorker=null;planningWaypoint=false;
+ for(const worker of waypointWorkers)worker.terminate();
+ waypointWorkers.clear();planningWaypoint=false;
 }
 function requestWaypoint(target,append){
  cancelWaypointSearch();
@@ -101,12 +103,10 @@ function requestWaypoint(target,append){
  const noRoute=()=>{state.message='No navigable route to destination. Choose a point in open water.';updateUI();};
  if(!target||!start){noRoute();return;}
  const from={x:start.x,y:start.y};
- let worker;
- try{worker=new Worker(new URL('./waypoint-worker.mjs?v=0.18.34',import.meta.url),{type:'module'});}
- catch{if(!setAutopilot(state,target.x,target.y,append,{remaining:60000,deadline:performance.now()+180}))noRoute();else{save();updateUI();}return;}
- waypointWorker=worker;planningWaypoint=true;
- worker.onmessage=({data:route})=>{
-  if(waypointWorker!==worker)return;
+ const finish=(worker,route)=>{
+  if(!waypointWorkers.delete(worker))return;
+  worker.terminate();
+  if(!route?.length&&waypointWorkers.size)return;
   cancelWaypointSearch();
   if(state!==vessel||state.autopilot!==previous){updateUI();return;}
   const now=autopilotRouteStart(state,append);
@@ -118,8 +118,23 @@ function requestWaypoint(target,append){
   if(!applyAutopilotRoute(state,target.x,target.y,append,route)){noRoute();return;}
   save();updateUI();
  };
- worker.onerror=()=>{if(waypointWorker===worker){cancelWaypointSearch();noRoute();}};
- worker.postMessage({from,target});updateUI();
+ const searchGrids=[{}, {resolution:105,margin:.45,maxNodes:35000}, {resolution:65,margin:.8,maxNodes:35000}];
+ for(const grid of searchGrids){
+  try{
+   const worker=new Worker(new URL('./waypoint-worker.mjs?v=0.18.35',import.meta.url),{type:'module'});
+   waypointWorkers.add(worker);
+   worker.onmessage=({data})=>finish(worker,data);
+   worker.onerror=()=>finish(worker,null);
+   worker.postMessage({from,target,grid});
+  }catch{ /* Another worker may still be available. */ }
+ }
+ if(!waypointWorkers.size){
+  if(!setAutopilot(state,target.x,target.y,append,{remaining:60000,deadline:performance.now()+180}))noRoute();
+  else{save();updateUI();}
+  return;
+ }
+ planningWaypoint=true;
+ updateUI();
 }
 canvas.addEventListener('contextmenu',e=>{
  if(!started||document.querySelector('dialog[open]'))return;
