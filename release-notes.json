@@ -1,1 +1,1 @@
-{"version": "0.18.39", "notes": {"en": ["Stabilized the waterline at distant ports and prevented moored vessels from snapping back after contact."], "sv": ["Stabilare vattenlinje vid avlägsna hamnar. Förtöjda båtar rycker inte längre tillbaka efter kontakt."]}}
+{"version": "0.18.40", "notes": {"en": ["Kept open-water waves from slicing through the deck at the bow and stern."], "sv": ["Havsvågorna hålls under däckskanten vid fören och aktern."]}}

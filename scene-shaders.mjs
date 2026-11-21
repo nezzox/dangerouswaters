@@ -1,5 +1,5 @@
-import {hullWaterGLSL} from './deck-water.mjs?v=0.18.39';
-import {seaHeightGLSL} from './sea-spectrum.mjs?v=0.18.39';
+import {hullWaterGLSL} from './deck-water.mjs?v=0.18.40';
+import {seaHeightGLSL} from './sea-spectrum.mjs?v=0.18.40';
 // Shared atmosphere and ocean functions keep lighting and reflections consistent.
 export const common=`
 precision highp float;precision highp int;
@@ -37,12 +37,12 @@ vec3 finishColor(vec3 c,vec3 world){if(uReflectionPass>.5)return c/(1.+c);float 
 `;
 export const oceanVertex=`#version 300 es
 ${common}
-layout(location=0) in vec3 aPosition;uniform vec2 uCenter;out vec3 vWorld;out vec4 vShadow;out vec2 vWaterLocal;
-void main(){vWaterLocal=aPosition.xz;vec3 p=aPosition;p.xz+=uCenter;p.y=oceanHeight(vWaterLocal)+wakeAt(p.xz).w;vWorld=p;vec4 local=vec4(vWaterLocal.x,p.y,vWaterLocal.y,1.);vShadow=uLightVP*local;gl_Position=uVP*local;}`;
+layout(location=0) in vec3 aPosition;uniform vec2 uCenter;uniform vec3 uHullOffset;out vec3 vWorld;out vec4 vShadow;out vec2 vWaterLocal;
+void main(){vWaterLocal=aPosition.xz;vec3 p=aPosition;p.xz+=uCenter;p.y=oceanHeight(vWaterLocal)+wakeAt(p.xz).w;p.y=containOceanCrest(vec3(vWaterLocal.x,p.y,vWaterLocal.y)-uHullOffset)+uHullOffset.y;vWorld=p;vec4 local=vec4(vWaterLocal.x,p.y,vWaterLocal.y,1.);vShadow=uLightVP*local;gl_Position=uVP*local;}`;
 export const oceanFragment=`#version 300 es
 ${common}
-in vec3 vWorld;in vec4 vShadow;in vec2 vWaterLocal;uniform vec4 uDieselSlick;uniform vec2 uCenter;uniform sampler2D uShadow;uniform sampler2D uReflection;uniform mat4 uReflectionVP;out vec4 outColor;
-void main(){if(insideHullWater(vWorld))discard;vec2 p=vWorld.xz;vec4 field=seaField(vWaterLocal),wake=wakeAt(p);float h=field.x;vec2 slope=field.yz+wake.yz;vec2 detail=vWaterLocal+mod(uCenter,25600.);
+in vec3 vWorld;in vec4 vShadow;in vec2 vWaterLocal;uniform vec3 uHullOffset;uniform vec4 uDieselSlick;uniform vec2 uCenter;uniform sampler2D uShadow;uniform sampler2D uReflection;uniform mat4 uReflectionVP;out vec4 outColor;
+void main(){if(insideHullLocal(hullLocalPoint(vec3(vWaterLocal.x,vWorld.y,vWaterLocal.y)-uHullOffset)))discard;vec2 p=vWorld.xz;vec4 field=seaField(vWaterLocal),wake=wakeAt(p);float h=field.x;vec2 slope=field.yz+wake.yz;vec2 detail=vWaterLocal+mod(uCenter,25600.);
 {vec2 k=vec2(1.9727300,1.1825128);float rippleFilter=1.-smoothstep(.55,2.5,length(fwidth(vWaterLocal))*2.3);slope+=normalize(k)*cos(dot(vWaterLocal,k)+mod(dot(mod(uCenter,25600.),k),6.2831853)-uDetailTime*4.7500526+0.000+2.3*noise(detail*.67+vec2(0.000,uDetailTime*.03)))*0.0350000*rippleFilter*(.35+uWeather.x*.14)*(.35+.9*noise(detail*.19+k*7.));}
 {vec2 k=vec2(3.0404593,2.4424593);float rippleFilter=1.-smoothstep(.55,2.5,length(fwidth(vWaterLocal))*3.9);slope+=normalize(k)*cos(dot(vWaterLocal,k)+mod(dot(mod(uCenter,25600.),k),6.2831853)-uDetailTime*6.1853860+2.170+2.3*noise(detail*.67+vec2(2.170,uDetailTime*.03)))*0.0250000*rippleFilter*(.35+uWeather.x*.14)*(.35+.9*noise(detail*.19+k*7.));}
 {vec2 k=vec2(6.4150080,1.9333061);float rippleFilter=1.-smoothstep(.55,2.5,length(fwidth(vWaterLocal))*6.7);slope+=normalize(k)*cos(dot(vWaterLocal,k)+mod(dot(mod(uCenter,25600.),k),6.2831853)-uDetailTime*8.1072190+4.340+2.3*noise(detail*.67+vec2(4.340,uDetailTime*.03)))*0.0194444*rippleFilter*(.35+uWeather.x*.14)*(.35+.9*noise(detail*.19+k*7.));}

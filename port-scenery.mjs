@@ -1,7 +1,7 @@
-import {QUAY,quayPoint,berthsAt} from './harbor.mjs?v=0.18.39';
-import {geometry} from './geometry.mjs?v=0.18.39';
-import {WORLD_LAND,isLand} from './world.mjs?v=0.18.39';
-import {groundHeight} from './geography-mesh.mjs?v=0.18.39';
+import {QUAY,quayPoint,berthsAt} from './harbor.mjs?v=0.18.40';
+import {geometry} from './geometry.mjs?v=0.18.40';
+import {WORLD_LAND,isLand} from './world.mjs?v=0.18.40';
+import {groundHeight} from './geography-mesh.mjs?v=0.18.40';
 const asphalt=[.16,.18,.18],concrete=[.36,.37,.34],steel=[.29,.33,.33],dark=[.07,.09,.085];
 // Interpreted Ballyhoo Road industrial frontage, fitted to the geographic shoreline.
 // No satellite imagery is shipped; the source coastline remains authoritative.
