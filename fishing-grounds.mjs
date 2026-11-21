@@ -1,4 +1,4 @@
-import {FISHING_GROUNDS,clearWater,isLand,inWorld,nearestWater} from './world.mjs?v=0.18.12';
+import {FISHING_GROUNDS,clearWater,isLand,inWorld,nearestWater} from './world.mjs?v=0.18.13';
 // Gameplay approximation: deterministic slow migration, at most 37.5 m/game hour.
 // Tracks reverse along proven water-only segments instead of jumping across islands.
 const HOURS=36,STEP=900;
@@ -21,7 +21,7 @@ export function crabAbundance(x,y,hour=0){if(!inWorld(x,y)||isLand(x,y))return 0
 export function soakedAbundance(p,hour){if(p.legacyAbundance!==undefined)return p.legacyAbundance;const elapsed=Math.max(0,hour-p.setAt);return [1/6,.5,5/6].reduce((sum,t)=>sum+crabAbundance(p.x,p.y,p.setAt+elapsed*t),0)/3;}
 
 // Fictional seasonal productivity, shared by actual yield and uncertain player forecasts.
-export function groundPotential(g,species,hour=0){if(g.id===0&&species==='crab')return 1;return Math.max(.3,Math.min(1,.64+.22*Math.sin(g.id*2.17+(species==='salmon'?2.8:0))+.13*Math.sin(hour/72+g.id)));}
+export function groundPotential(g,species,hour=0){if(g.name==='Reymonds spot'&&species==='crab')return .94+.04*Math.sin(hour/72+g.id);if(g.id===0&&species==='crab')return 1;return Math.max(.3,Math.min(1,.64+.22*Math.sin(g.id*2.17+(species==='salmon'?2.8:0))+.13*Math.sin(hour/72+g.id)));}
 export function groundReport(g,species,rank,hour=0){if(!(rank>0))return null;rank=Math.min(5,Math.floor(rank));const value=groundPotential(g,species,hour)*100,margin=30-rank*5,error=Math.sin(g.id*3.4+hour/120+(species==='salmon'?1:0))*margin*.4,mid=Math.round((value+error)/5)*5;return {low:Math.max(0,mid-margin),high:Math.min(100,mid+margin)};}
 export function salmonAbundance(x,y,hour=0){if(!inWorld(x,y)||isLand(x,y))return 0;return Math.max(.15,...groundsAt(hour).map(g=>groundPotential(g,'salmon',hour)*Math.exp(-((x-g.x)**2+(y-g.y)**2)/(g.rx*g.ry*.3))));}
 

@@ -1,11 +1,11 @@
 {
-  "version": "0.18.12",
+  "version": "0.18.13",
   "notes": {
     "en": [
-      "Crab Grounds Knowledge IV now reveals migration-direction arrows on the minimap and planning chart."
+      "Added Reymonds spot in eastern Bristol Bay, with consistently high crab potential."
     ],
     "sv": [
-      "Kunskap om krabbvatten IV visar nu vandringsriktningen med pilar på minimappen och planeringskartan."
+      "Lagt till Reymonds spot i östra Bristol Bay, med genomgående hög krabbpotential."
     ]
   }
 }
