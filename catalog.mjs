@@ -35,6 +35,7 @@ export const PART_SYSTEMS=[
 ].map(([key,name,group,base,description])=>({key,name,group,base,description}));
 SKILL_SYSTEMS.push({key:'intelligentAutoSet',name:'Intelligent Auto Set',group:'Automation',base:1500000,maxRank:1,description:'Requires Auto Set I and installed sonar. Deploy only when the sonar lower crab estimate exceeds 50%. Existing speed and spacing limits still apply.'});
 SKILL_SYSTEMS.push({key:'highSpeedHaul',name:'Haul at high speed',group:'Crew',base:20000,maxRank:1,description:'Set and haul crab pots below 7 knots.'});
+SKILL_SYSTEMS.push({key:'maxSpeedHauling',name:'Max Speed Hauling',group:'Crew',base:200000,maxRank:1,description:'Set and haul crab pots at up to 13 knots.'});
 SKILL_SYSTEMS.push({key:'pickupAll',name:'Pickup All Pots',group:'Automation',base:1500000,maxRank:1,description:'Requires Auto Haul. Plots a continuous working-side route through all your own pots, oldest first, and enables Auto Haul. Stops when the hold is full.'});
 const ranks=(systems,prefix)=>systems.flatMap(d=>Array.from({length:d.maxRank||5},(_,i)=>({id:`${prefix}-${d.key}-${i+1}`,key:d.key,rank:i+1,maxRank:d.maxRank||5,name:d.maxRank===1?d.name:`${d.name} ${['I','II','III','IV','V'][i]}`,group:d.group,price:Math.round(d.base*(i+1)**2.15/100)*100,description:d.description,requires:i?`${prefix}-${d.key}-${i}`:null})));
 export const SKILLS=ranks(SKILL_SYSTEMS,'skill'),PARTS=ranks(PART_SYSTEMS,'part');
