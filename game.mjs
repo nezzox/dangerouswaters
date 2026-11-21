@@ -1,46 +1,46 @@
-import {newWorldCode,newPlayerToken,cleanPlayerName,createMultiplayer} from './multiplayer.mjs?v=0.18.18';
-import {startWaypointTravel,advanceWaypointTravel} from './time-to-waypoint.mjs?v=0.18.18';
-import {CRAB_SPECIES,crabSpeciesName} from './crab-species.mjs?v=0.18.18';
-import {LIGHTING_PROFILES} from './light-upgrades.mjs?v=0.18.18';
-import {claimFirstBoatGrant,firstBoatNotice} from './first-boat.mjs?v=0.18.18';
-import {crabPriceAt,crabHoldValue} from './catch-value.mjs?v=0.18.18';
-import {watchDonations,appendDonation} from './donation-feed.mjs?v=0.18.18';
-import {DONATION_FEED_URL} from './donation-config.mjs?v=0.18.18';
-import {watchUpdates,formatUpdateNotice} from './update-check.mjs?v=0.18.18';
-import {energyPrice} from './energy.mjs?v=0.18.18';
-import {createMessageQueue} from './message-queue.mjs?v=0.18.18';
-import {visibleFleet} from './fleet-visuals.mjs?v=0.18.18';
-import {transitionWeather} from './weather-transition.mjs?v=0.18.18';
-import {ownedUpgrades,createRadioFeed,createLastHaul} from './hud-status.mjs?v=0.18.18';
-import {createIntro} from './intro.mjs?v=0.18.18';
-import {fleetNoticeCount} from './fleet.mjs?v=0.18.18';
-import {redeemDeveloperCode} from './developer-code.mjs?v=0.18.18';
-import {potSoakStage} from './pot-soak.mjs?v=0.18.18';
-import {createLiveWeather} from './live-weather.mjs?v=0.18.18';
-import {dockingStage} from './harbor.mjs?v=0.18.18';
-import {fuelEconomy} from './fuel-economy.mjs?v=0.18.18';
-import {scanSonar,drawSonar} from './sonar.mjs?v=0.18.18';
-import {rareCount,rareValue} from './rare-catch.mjs?v=0.18.18';
-import {clipChartWater} from './chart-water.mjs?v=0.18.18';
-import {groundsAt,groundReport,crabHotspot,groundMotion} from './fishing-grounds.mjs?v=0.18.18';
-import {createSoundscape} from './soundscape.mjs?v=0.18.18';
-import {WORLD_LAND,WORLD_CENTER,WORLD_BOUNDS,PLACES,worldToGeo} from './world.mjs?v=0.18.18';
-import {getLanguage,setLanguage,translateText,localizeTree} from './i18n.mjs?v=0.18.18';
-import {createShop} from './shop.mjs?v=0.18.18';
-import {restoreSeason,seasonJSON} from './saves.mjs?v=0.18.18';
-import {vesselStats,toggleAutomation} from './career.mjs?v=0.18.18';
-import {pickupAllPots,skipperCommand,createGame,step,conditions,weatherAt,setWeatherMode,depthAt,PORT,distance,nearPort,handlePot,dock,undock,canUndock,service,rescue,clamp,potAction,POT_RANGE,jobProgress,setAutopilot,setRudder,potBearing,workingSide} from './simulation.mjs?v=0.18.18';
-import {createOcean,drawFallback} from './ocean.mjs?v=0.18.18';
-import {createScene} from './scene.mjs?v=0.18.18';
-import {drawGroundMotion,createChartView,chartPoint,chartWorld,panChart,zoomChart,followVessel,updateChartFollow} from './chart.mjs?v=0.18.18';
-import {createWake} from './wake.mjs?v=0.18.18';
-import {advanceVoyage} from './voyage.mjs?v=0.18.18';
+import {newWorldCode,newPlayerToken,cleanPlayerName,createMultiplayer} from './multiplayer.mjs?v=0.18.19';
+import {startWaypointTravel,advanceWaypointTravel} from './time-to-waypoint.mjs?v=0.18.19';
+import {CRAB_SPECIES,crabSpeciesName} from './crab-species.mjs?v=0.18.19';
+import {LIGHTING_PROFILES} from './light-upgrades.mjs?v=0.18.19';
+import {claimFirstBoatGrant,firstBoatNotice} from './first-boat.mjs?v=0.18.19';
+import {crabPriceAt,crabHoldValue} from './catch-value.mjs?v=0.18.19';
+import {watchDonations,appendDonation} from './donation-feed.mjs?v=0.18.19';
+import {DONATION_FEED_URL} from './donation-config.mjs?v=0.18.19';
+import {watchUpdates,formatUpdateNotice} from './update-check.mjs?v=0.18.19';
+import {energyPrice} from './energy.mjs?v=0.18.19';
+import {createMessageQueue} from './message-queue.mjs?v=0.18.19';
+import {visibleFleet} from './fleet-visuals.mjs?v=0.18.19';
+import {transitionWeather} from './weather-transition.mjs?v=0.18.19';
+import {ownedUpgrades,createRadioFeed,createLastHaul} from './hud-status.mjs?v=0.18.19';
+import {createIntro} from './intro.mjs?v=0.18.19';
+import {fleetNoticeCount} from './fleet.mjs?v=0.18.19';
+import {redeemDeveloperCode} from './developer-code.mjs?v=0.18.19';
+import {potSoakStage} from './pot-soak.mjs?v=0.18.19';
+import {createLiveWeather} from './live-weather.mjs?v=0.18.19';
+import {dockingStage} from './harbor.mjs?v=0.18.19';
+import {fuelEconomy} from './fuel-economy.mjs?v=0.18.19';
+import {scanSonar,drawSonar} from './sonar.mjs?v=0.18.19';
+import {rareCount,rareValue} from './rare-catch.mjs?v=0.18.19';
+import {clipChartWater} from './chart-water.mjs?v=0.18.19';
+import {groundsAt,groundReport,crabHotspot,groundMotion} from './fishing-grounds.mjs?v=0.18.19';
+import {createSoundscape} from './soundscape.mjs?v=0.18.19';
+import {WORLD_LAND,WORLD_CENTER,WORLD_BOUNDS,PLACES,worldToGeo} from './world.mjs?v=0.18.19';
+import {getLanguage,setLanguage,translateText,localizeTree} from './i18n.mjs?v=0.18.19';
+import {createShop} from './shop.mjs?v=0.18.19';
+import {restoreSeason,seasonJSON} from './saves.mjs?v=0.18.19';
+import {vesselStats,toggleAutomation} from './career.mjs?v=0.18.19';
+import {pickupAllPots,skipperCommand,createGame,step,conditions,weatherAt,setWeatherMode,depthAt,PORT,distance,nearPort,handlePot,dock,undock,canUndock,service,rescue,clamp,potAction,POT_RANGE,jobProgress,setAutopilot,setRudder,potBearing,workingSide} from './simulation.mjs?v=0.18.19';
+import {createOcean,drawFallback} from './ocean.mjs?v=0.18.19';
+import {createScene} from './scene.mjs?v=0.18.19';
+import {drawGroundMotion,createChartView,chartPoint,chartWorld,panChart,zoomChart,followVessel,updateChartFollow} from './chart.mjs?v=0.18.19';
+import {createWake} from './wake.mjs?v=0.18.19';
+import {advanceVoyage} from './voyage.mjs?v=0.18.19';
 let sonarFrame='';const radioFeed=createRadioFeed(),messageQueue=createMessageQueue();let ownedSignature='';const lastHaulDisplay=createLastHaul();
 const wake=createWake();
 const $=id=>document.getElementById(id),canvas=$('world'),ctx=canvas.getContext('2d'),sea=$('ocean'),chart=$('chart'),map=chart.getContext('2d');
 const sandbox=document.body.dataset.sandbox==='true';
 let state=createGame(),saved=false,saveAvailable=true;const multiplayer=createMultiplayer();
-if(sandbox){state.money=9000000;state.hour=11;state.message='Isolated career test: your real season is untouched.';}
+if(sandbox){state.money=9000000;state.hour=11;if(document.body.dataset.layoutCheck==='true')state.career.parts.sonar=3;state.message='Isolated career test: your real season is untouched.';}
 else try{const loaded=restoreSeason(JSON.parse(localStorage.getItem('dangerous-waters-v1')));if(loaded){state=loaded;saved=true;}}catch{}
 let preferredLanguage=state.language||'en';if(!sandbox)try{preferredLanguage=localStorage.getItem('dangerous-waters-language')||preferredLanguage;}catch{}setLanguage(preferredLanguage);state.language=getLanguage();
 for(const context of [ctx,map]){const drawText=context.fillText.bind(context);context.fillText=(text,...args)=>drawText(translateText(text),...args);}
@@ -231,5 +231,5 @@ updateUI();requestAnimationFrame(frame);
 
 function groundForecast(g){return ['crab','salmon'].map(species=>{const report=groundReport(g,species,state.career.skills[species]||0,state.hour);return report?`${species==='crab'?'C':'S'} EST. ${report.low}–${report.high}%`:'';}).filter(Boolean).join(' · ');}
 
-function updateSonar(){const scan=scanSonar(state),panel=$('sonar-panel');panel.hidden=!scan;if(!scan)return;const right=document.querySelector('.right-panel');if(innerWidth<=760){if(panel.parentElement!==right)right.insertBefore(panel,right.querySelector('.catch'));}else if(panel.parentElement!==document.body)document.body.append(panel);
+function updateSonar(){const scan=scanSonar(state),panel=$('sonar-panel');panel.hidden=!scan;if(!scan)return;
  const key=[scan.grade,scan.tick,state.x.toFixed(1),state.y.toFixed(1),state.heading.toFixed(2)].join('/');if(key===sonarFrame)return;sonarFrame=key;drawSonar($('sonar-screen'),scan);$('sonar-grade').textContent=`${scan.grade}/5 · ${scan.name}`;$('sonar-depth').textContent=`DEPTH ${scan.depth} M · RANGE ±${scan.radius} M`;$('sonar-readings').textContent=`CRAB ${scan.crab.low}–${scan.crab.high}% · FISH ${scan.salmon.low}–${scan.salmon.high}%`;$('sonar-screen').setAttribute('aria-label',`Bottom sonar: ${scan.depth} meters deep. Crab signal ${scan.crab.low} to ${scan.crab.high} percent. Fish signal ${scan.salmon.low} to ${scan.salmon.high} percent.`);}
