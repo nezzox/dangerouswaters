@@ -1,4 +1,4 @@
-import {CRAB_SPECIES} from './crab-species.mjs?v=0.18.16';
+import {CRAB_SPECIES} from './crab-species.mjs?v=0.18.17';
 // Saved money/prices remain in legacy SEK units. Fixed game conversion: 10 SEK = 1 USD.
 // Translation is applied at the presentation boundary; save data and simulation never change language.
 let language='en';
@@ -277,6 +277,7 @@ const sv={
 sv['Crab species']='Krabbarter';
 for(const species of Object.values(CRAB_SPECIES))sv[species.en]=species.sv;
 sv['VOLUME']='VOLYM';sv['Sound volume']='Ljudvolym';
+Object.assign(sv,{'TIME TO WAYPOINT':'TID TILL RUTTPUNKT','CANCEL TRAVEL':'AVBRYT RESAN','Time to waypoint cancelled.':'Resan till ruttpunkten avbröts.','Travelling to next waypoint…':'Reser till nästa ruttpunkt…','Next waypoint reached.':'Nästa ruttpunkt nådd.','Time to waypoint stopped: check the vessel or route.':'Resan avbröts: kontrollera båten eller rutten.','Set an autopilot waypoint and finish any active work or repairs first.':'Ange en ruttpunkt och avsluta pågående arbete eller reparation först.'});
 const lookup=new Map(Object.entries(sv).map(([key,value])=>[key.toLowerCase(),value]));
 const escape=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
 const phrases=new RegExp(`(?<![\\p{L}\\p{N}])(?:${[...lookup.keys()].sort((a,b)=>b.length-a.length).map(escape).join('|')})(?![\\p{L}\\p{N}])`,'giu');

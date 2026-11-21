@@ -1,11 +1,11 @@
 {
-  "version": "0.18.16",
+  "version": "0.18.17",
   "notes": {
     "en": [
-      "Secret one time cheat code added"
+      "Added Time to Waypoint: simulate the voyage to the next planned waypoint, including fuel, time and incidents."
     ],
     "sv": [
-      "Secret one time cheat code added"
+      "Lagt till Tid till ruttpunkt: simulera resan till nästa ruttpunkt med bränsle, tid och händelser."
     ]
   }
 }
