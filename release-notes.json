@@ -1,11 +1,1 @@
-{
-  "version": "0.18.28",
-  "notes": {
-    "en": [
-      "Nearby fleet and multiplayer boats now cast searchlight beams."
-    ],
-    "sv": [
-      "Flottbåtar och andra spelares båtar lyser nu upp vattnet med sina strålkastare."
-    ]
-  }
-}
+{"version": "0.18.29", "notes": {"en": ["Focus the expanded chart on your own pots."], "sv": ["Centrera det förstorade sjökortet på dina egna tinor."]}}

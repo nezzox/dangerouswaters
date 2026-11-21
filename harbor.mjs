@@ -1,6 +1,6 @@
-import {boatById} from './catalog.mjs?v=0.18.28';
-import {isLand,MATTHEW_QUAY} from './world.mjs?v=0.18.28';
-import {planSeaRoute} from './navigation.mjs?v=0.18.28';
+import {boatById} from './catalog.mjs?v=0.18.29';
+import {isLand,MATTHEW_QUAY} from './world.mjs?v=0.18.29';
+import {planSeaRoute} from './navigation.mjs?v=0.18.29';
 // Shared frame on the new geographic quay. Positive inland points onto its apron.
 export const QUAY={x:47.3186402115,y:-70.0756194544,tx:-.811539539913,ty:.584297505692,deck:6.8};
 QUAY.heading=Math.atan2(QUAY.ty,QUAY.tx);
