@@ -30,7 +30,7 @@ export const PART_SYSTEMS=[
  ['chiller','Refrigeration','Storage',24000,'Catch prices +2% per grade'],['pumps','Emergency pumps','Safety',15000,'Incident repairs 10% faster per grade'],
  ['radio','Safety communications','Electronics',17000,'Incident frequency reduced by 4% per grade'],['stabilizer','Roll stabilizers','Hull',25000,'Roll response reduced by 7% per grade'],
  ['winch','Pot winch','Deck',18000,'Haul/sort cycle 10% faster per grade'],['freezer','Bait freezer','Storage',11000,'Bait cost reduced by 5% per grade'],
- ['lights','Deck floodlights','Electronics',9000,'Pot deployment 5% faster per grade'],['landing','Landing conveyor','Deck',16000,'Harbor unloading 8% faster per grade'],
+ ['lights','Deck floodlights','Electronics',9000,'Brighter, wider and longer-reaching work lights per grade; pot deployment 5% faster per grade'],['landing','Landing conveyor','Deck',16000,'Harbor unloading 8% faster per grade'],
  ['workshop','Onboard workshop','Safety',20000,'Fuel/repair service prices reduced by 5% per grade'],['quarters','Crew accommodation','Hull',26000,'One additional berth per grade; crew increases work rate']
 ].map(([key,name,group,base,description])=>({key,name,group,base,description}));
 SKILL_SYSTEMS.push({key:'intelligentAutoSet',name:'Intelligent Auto Set',group:'Automation',base:1500000,maxRank:1,description:'Requires Auto Set I and installed sonar. Deploy only when the sonar lower crab estimate exceeds 50%. Existing speed and spacing limits still apply.'});

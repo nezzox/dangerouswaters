@@ -6,6 +6,7 @@ export function setLanguage(value){language=value==='sv'?'sv':'en';return langua
 export const toInternalMoney=(amount,locale=language)=>amount*(locale==='sv'?1:10);
 export function formatMoney(amount,locale=language){const sv=locale==='sv',n=amount/(sv?1:10),fraction=Math.abs(n-Math.round(n))>.000001;return new Intl.NumberFormat(sv?'sv-SE':'en-US',{style:'currency',currency:sv?'SEK':'USD',minimumFractionDigits:fraction?2:0,maximumFractionDigits:2}).format(n);}
 const sv={
+ 'Brighter, wider and longer-reaching work lights per grade; pot deployment 5% faster per grade':'Starkare arbetsljus med bredare ljuskäglor och längre räckvidd per nivå; tinsättning går 5 % snabbare per nivå',
  "for":"för",
  "to":"till",
  "Aft wheelhouse / forward working deck;":"Styrhytt akterut och arbetsdäck förut;",

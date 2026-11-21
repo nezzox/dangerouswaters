@@ -1,8 +1,8 @@
-import {deckSign,hullPaint} from './vessel-profile.mjs?v=0.18.10';
-import {craneColor} from './crane-style.mjs?v=0.18.10';
-import {lineHaulerMounts} from './line-hauler.mjs?v=0.18.10';
-import {vesselStyle,rackPositions,rackFrames,gantryPlacement} from './vessel-style.mjs?v=0.18.10';
-import {HULL_STATIONS,hullWidthAt} from './fenders.mjs?v=0.18.10';
+import {deckSign,hullPaint} from './vessel-profile.mjs?v=0.18.11';
+import {craneColor} from './crane-style.mjs?v=0.18.11';
+import {lineHaulerMounts} from './line-hauler.mjs?v=0.18.11';
+import {vesselStyle,rackPositions,rackFrames,gantryPlacement} from './vessel-style.mjs?v=0.18.11';
+import {HULL_STATIONS,hullWidthAt} from './fenders.mjs?v=0.18.11';
 const steel=[.19,.24,.25],paint=[.68,.7,.64],dark=[.045,.08,.1],glass=[.055,.13,.17],brass=[.43,.31,.13],orange=[.72,.29,.065];
 export function geometry(){const data=[];
  function tri(a,b,c,color,rough=.6,emit=0){const u=b.map((x,i)=>x-a[i]),v=c.map((x,i)=>x-a[i]),n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]],len=Math.hypot(...n);if(len<1e-8)return;for(const p of [a,b,c])data.push(...p,...n.map(x=>x/len),...color,rough,emit);}
@@ -57,7 +57,7 @@ export function buildVessel(potCount=8,design={}){const orange=craneColor(design
  const rubber=[.035,.045,.042];for(const side of [-1,1]){for(let i=0;i<32;i++){const a=i*Math.PI/16,b=(i+1)*Math.PI/16,point=(t,r,d)=>[x+Math.cos(t)*r,y+Math.sin(t)*r,z+d];quad(point(a,.42,side*.16),point(b,.42,side*.16),point(b,.24,side*.025),point(a,.24,side*.025),rubber,.88);quad(point(a,.42,side*.16),point(a,.36,side*.21),point(b,.36,side*.21),point(b,.42,side*.16),rubber,.88);}tube([x,y,z+side*.2],[x,y,z+side*.23],.12,steel,16);}
  for(const dx of [-.3,.3])tube([x+dx,1.85,z-.27],[x+dx,y+.05,z-.27],.045,paint,8);tube([x-.34,y+.05,z-.27],[x+.34,y+.05,z-.27],.045,paint,8);tube([x,y,z-.4],[x,y,z-.23],.15,orange,12);tube([x+.33,y-.22,z-.12],[x+.33,y-.22,z+.12],.12,rubber,16);tube([x+.33,y-.22,z-.23],[x+.33,y-.22,z-.13],.045,steel,8);
  }
- if(design.salmon){for(const x of [-8.8,-6.7]){tube([x,1.8,-1.8],[x,3,-1.8],.09,steel);tube([x,1.8,0],[x,3,0],.09,steel);}tube([-7.75,2.8,-1.9],[-7.75,2.8,.1],.7,[.15,.28,.25],16);for(let z=-1.8;z<.1;z+=.12)tube([-7.75,2.8,z],[-7.75,2.8,z+.035],.72,[.3,.39,.31],12);}
+ if(design.salmon){for(const x of [-8.8,-6.7]){tube([x,1.8,-1.8],[x,3,-1.8],.09,steel);tube([x,1.8,0],[x,3,0],.09,steel);}tube([-7.75,2.8,-1.9],[-7.75,2.8,.1],.7,[.15,.28,.25],16);for(let z=-1.8;z<.1;z+=.12)tube([-7.75,2.8,z],[-7.75,2.8,z+.035],.76,[.3,.39,.31],16);}
  // Raised transport racks provide real headroom below the central row.
  for(const p of rackFrames(design)){const [sx,sy,sz]=p.scale,top=p.y-.64*sy;for(const x of [-.82,.82])for(const z of [-.8,.8])tube([p.x+x*sx,1.74,p.z+z*sz],[p.x+x*sx,top,p.z+z*sz],.045,steel,8);for(const z of [-.8,.8])tube([p.x-.86*sx,top,p.z+z*sz],[p.x+.86*sx,top,p.z+z*sz],.055,steel,8);for(const x of [-.82,.82])tube([p.x+x*sx,top,p.z-.86*sz],[p.x+x*sx,top,p.z+.86*sz],.055,steel,8);}
  // Wire cages remain open so the deck and cage shadows can be seen through them.
@@ -70,8 +70,8 @@ export function buildVessel(potCount=8,design={}){const orange=craneColor(design
  for(const side of [-1,1])for(let i=0;i<16;i++){const a=i*Math.PI/8,b=(i+1)*Math.PI/8;tube([6.+Math.cos(a)*.48,3.4+Math.sin(a)*.48,side*2.76],[6.+Math.cos(b)*.48,3.4+Math.sin(b)*.48,side*2.76],.11,i%4===0?paint:orange,6);}
  // Rubber fenders, window seals and wipers, mooring cleats, hoses and fittings.
  for(const side of [-1,1]){
-  for(const x of [-10.7,8.5]){tube([x,1.85,side*2.45],[x,2.1,side*2.45],.09,steel,12);tube([x-.32,2.1,side*2.45],[x+.32,2.1,side*2.45],.07,steel,12);}
-  for(let x=-10.8;x<8;x+=1.8)box(x,1.94,side*(x<4?3.5:2.8),.4,.13,.04,dark,.85);
+  for(const x of [-10.7,8.5]){const z=orientation>0?2.45:Math.min(2.45,hullWidthAt(orientation*x,design)-.35);tube([x,1.85,side*z],[x,2.1,side*z],.09,steel,12);tube([x-.32,2.1,side*z],[x+.32,2.1,side*z],.07,steel,12);}
+  for(let x=-10.8;x<8;x+=1.8)box(x,1.94,side*(orientation>0?(x<4?3.5:2.8):(Math.min(hullWidthAt(orientation*(x-.2),design),hullWidthAt(orientation*(x+.2),design))-.045)),.4,.13,.04,dark,.85);
  }
  for(let i=0;i<44;i++){const a=i*Math.PI/11,b=(i+1)*Math.PI/11,r=.48+Math.floor(i/22)*.12;tube([-5.7+Math.cos(a)*r,1.83+i*.001,2.25+Math.sin(a)*r],[-5.7+Math.cos(b)*r,1.83+(i+1)*.001,2.25+Math.sin(b)*r],.04,[.36,.31,.2],8);}
  roundedBox(-.45,6.8,-1.5,.9,1.7,1.1,.14,steel,.5);for(let y=6.2;y<7.4;y+=.15)box(-.91,y,-1.5,.025,.055,.8,dark,.8);

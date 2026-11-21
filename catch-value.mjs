@@ -1,4 +1,4 @@
-import {geoToWorld} from './world.mjs?v=0.18.10';
+import {geoToWorld} from './world.mjs?v=0.18.11';
 const harbor=geoToWorld(-166.524,53.9034);
 // Gameplay reward for longer voyages: base rate inside 20 km, up to 5x at 1,620 km.
 export function crabPriceAt(point){const distance=Math.hypot(point.x-harbor.x,point.y-harbor.y),progress=Math.max(0,Math.min(1,(distance-20000)/1600000));return 65*(1+4*progress**.75);}
