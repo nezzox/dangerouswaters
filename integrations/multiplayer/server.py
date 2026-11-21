@@ -17,17 +17,29 @@ class Handler(BaseHTTPRequestHandler):
   if self.path!='/dangerouswaters-worlds/sync': return self.reply(404,{'error':'not found'})
   try:
    n=int(self.headers.get('Content-Length','0'))
-   if n<1 or n>24000: raise ValueError()
+   if n<1 or n>2000000: raise ValueError()
    data=json.loads(self.rfile.read(n));room=data.get('room','').upper();token=data.get('token','');state=data['state']
    if not re.fullmatch(r'[A-Z0-9]{6}',room) or not re.fullmatch(r'[a-f0-9]{32}',token): raise ValueError()
    if not isinstance(state,dict) or not isinstance(state.get('pots'),list) or len(state['pots'])>200: raise ValueError()
-   state={k:state[k] for k in ('name','boat','x','y','heading','hour','landed','earned','pots','isHost','berth') if k in state}
+   state={k:state[k] for k in ('name','boat','x','y','heading','hour','landed','earned','pots','isHost','berth','fleet') if k in state}
    state['id']=hashlib.sha256((room+token).encode()).hexdigest()[:16]
    if not isinstance(state.get('name'),str) or not 1<=len(state['name'])<=24: raise ValueError()
    if any(not isinstance(state.get(k),(int,float)) or not math.isfinite(state[k]) or not -1000000000000<state[k]<1000000000000 for k in ('x','y','heading','hour','landed','earned')): raise ValueError()
    if not isinstance(state.get('boat'),str) or not re.fullmatch(r'nordvind|boat-\d{1,2}-\d{1,2}',state['boat']): raise ValueError()
    for p in state.get('pots',[]):
     if not isinstance(p,dict) or any(not isinstance(p.get(k),(int,float)) or not math.isfinite(p[k]) or not -5000000<p[k]<5000000 for k in ('x','y','id')): raise ValueError()
+   fleet=state.get('fleet',[])
+   if not isinstance(fleet,list) or len(fleet)>100: raise ValueError()
+   clean_fleet=[]
+   for b in fleet:
+    if not isinstance(b,dict) or not isinstance(b.get('id'),str) or len(b['id'])>64 or not isinstance(b.get('name'),str) or len(b['name'])>40 or not isinstance(b.get('boat'),str) or not re.fullmatch(r'nordvind|boat-\d{1,2}-\d{1,2}',b['boat']): raise ValueError()
+    if any(not isinstance(b.get(k),(int,float)) or not math.isfinite(b[k]) or abs(b[k])>5000000 for k in ('x','y','heading')): raise ValueError()
+    pots=b.get('pots',[])
+    if not isinstance(pots,list) or len(pots)>200: raise ValueError()
+    for p in pots:
+     if not isinstance(p,dict) or any(not isinstance(p.get(k),(int,float)) or not math.isfinite(p[k]) or abs(p[k])>5000000 for k in ('x','y','id')): raise ValueError()
+    clean_fleet.append({k:b[k] for k in ('id','name','boat','x','y','heading','pots') if k in b})
+   state['fleet']=clean_fleet
    berth=state.get('berth')
    if berth is not None and (not isinstance(berth,dict) or any(not isinstance(berth.get(k),(int,float)) or not math.isfinite(berth[k]) or abs(berth[k])>5000000 for k in ('x','y'))): raise ValueError()
    create=data.get('create') is True

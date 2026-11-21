@@ -1,6 +1,6 @@
-import {CRAB_GROUND_DATA} from './crab-ground-data.mjs?v=0.18.24';
-import {PORT_PIERS} from './port-data.mjs?v=0.18.24';
-import {COAST_DATA} from './coast-data.mjs?v=0.18.24';
+import {CRAB_GROUND_DATA} from './crab-ground-data.mjs?v=0.18.25';
+import {PORT_PIERS} from './port-data.mjs?v=0.18.25';
+import {COAST_DATA} from './coast-data.mjs?v=0.18.25';
 export const WORLD_VERSION=2;
 export const GEO_ORIGIN={lon:-166.524,lat:53.9034};
 const meters=111319.490793,cos=Math.cos(GEO_ORIGIN.lat*Math.PI/180);
@@ -13,7 +13,12 @@ export const WORLD_LAND=COAST_DATA.map(p=>{const outer=p.outer.map(([a,b])=>geoT
 export function pointInRing(x,y,ring){let inside=false;for(let i=0,j=ring.length-1;i<ring.length;j=i++){const a=ring[i],b=ring[j];if((a.y>y)!==(b.y>y)&&x<(b.x-a.x)*(y-a.y)/(b.y-a.y)+a.x)inside=!inside;}return inside;}
 function coastalLand(x,y){for(const p of WORLD_LAND){if(x<p.left||x>p.right||y<p.top||y>p.bottom)continue;if(pointInRing(x,y,p.outer)&&!p.holes.some(r=>pointInRing(x,y,r)))return true;}return false;}
 const pierShapes=PORT_PIERS.map(r=>{const points=r.map(([a,b])=>geoToWorld(a,b));return {points,left:Math.min(...points.map(p=>p.x))-4,right:Math.max(...points.map(p=>p.x))+4,top:Math.min(...points.map(p=>p.y))-4,bottom:Math.max(...points.map(p=>p.y))+4};});
-export function isLand(x,y){if(coastalLand(x,y))return true;for(const pier of pierShapes){if(x<pier.left||x>pier.right||y<pier.top||y>pier.bottom)continue;const p=pier.points,closed=Math.hypot(p[0].x-p.at(-1).x,p[0].y-p.at(-1).y)<.1;if(closed&&pointInRing(x,y,p))return true;for(let i=1;i<p.length;i++){const a=p[i-1],b=p[i],dx=b.x-a.x,dy=b.y-a.y,t=Math.max(0,Math.min(1,((x-a.x)*dx+(y-a.y)*dy)/(dx*dx+dy*dy||1)));if(Math.hypot(x-a.x-t*dx,y-a.y-t*dy)<3)return true;}}return false;}
+const matthewA=geoToWorld(-172.783315,60.41234),matthewB=geoToWorld(-173.004221,60.49018);
+const matthewLength=Math.hypot(matthewB.x-matthewA.x,matthewB.y-matthewA.y);
+const tx=(matthewB.x-matthewA.x)/matthewLength,ty=(matthewB.y-matthewA.y)/matthewLength;
+export const MATTHEW_QUAY={name:'St Matthew Harbor',x:(matthewA.x+matthewB.x)/2+ty*32,y:(matthewA.y+matthewB.y)/2-tx*32,tx,ty,deck:6.8,heading:Math.atan2(ty,tx)};
+function matthewPier(x,y){const q=MATTHEW_QUAY,dx=x-q.x,dy=y-q.y,u=dx*q.tx+dy*q.ty,v=-dx*q.ty+dy*q.tx;return u>=-228&&u<=78&&v>=0&&v<=40;}
+export function isLand(x,y){if(matthewPier(x,y)||coastalLand(x,y))return true;for(const pier of pierShapes){if(x<pier.left||x>pier.right||y<pier.top||y>pier.bottom)continue;const p=pier.points,closed=Math.hypot(p[0].x-p.at(-1).x,p[0].y-p.at(-1).y)<.1;if(closed&&pointInRing(x,y,p))return true;for(let i=1;i<p.length;i++){const a=p[i-1],b=p[i],dx=b.x-a.x,dy=b.y-a.y,t=Math.max(0,Math.min(1,((x-a.x)*dx+(y-a.y)*dy)/(dx*dx+dy*dy||1)));if(Math.hypot(x-a.x-t*dx,y-a.y-t*dy)<3)return true;}}return false;}
 export const inWorld=(x,y)=>Number.isFinite(x)&&Number.isFinite(y)&&x>=nw.x&&x<=se.x&&y>=nw.y&&y<=se.y;
 export function clearWater(x,y,radius=28){return !isLand(x,y)&&[0,1,2,3,4,5,6,7].every(i=>!isLand(x+Math.cos(i*Math.PI/4)*radius,y+Math.sin(i*Math.PI/4)*radius));}
 export function nearestWater(x,y){if(clearWater(x,y))return {x,y};for(let r=35;r<=3500;r+=35)for(let i=0;i<24;i++){const a=i*Math.PI/12,nx=x+Math.cos(a)*r,ny=y+Math.sin(a)*r;if(clearWater(nx,ny))return {x:nx,y:ny};}return {x:180,y:100};}

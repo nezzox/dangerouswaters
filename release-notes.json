@@ -1,7 +1,15 @@
 {
-  "version": "0.18.24",
+  "version": "0.18.25",
   "notes": {
-    "en": ["Safer multiplayer docking, separate quay cranes and a Get Unstuck button."],
-    "sv": ["Säkrare dockning i multiplayer, separata kajkranar och en knapp för att komma loss."]
+    "en": [
+      "Shared fleets, faster multiplayer sync, and safer docking.",
+      "Six berths at St Matthew Harbor, passing greetings and 7-knot crab pot work.",
+      "Improved offshore water detail and Swedish panel layout."
+    ],
+    "sv": [
+      "Gemensamt synliga flottor, snabbare multiplayer och säkrare dockning.",
+      "Sex kajplatser på St Matthew, hälsningar till sjöss och tinhantering i upp till 7 knop.",
+      "Bättre vattendetaljer långt ute till havs och bättre plats för svensk menytext."
+    ]
   }
 }

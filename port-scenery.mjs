@@ -1,12 +1,12 @@
-import {QUAY,quayPoint,BERTHS,BERTH} from './harbor.mjs?v=0.18.24';
-import {geometry} from './geometry.mjs?v=0.18.24';
-import {WORLD_LAND,isLand} from './world.mjs?v=0.18.24';
-import {groundHeight} from './geography-mesh.mjs?v=0.18.24';
+import {QUAY,quayPoint,berthsAt} from './harbor.mjs?v=0.18.25';
+import {geometry} from './geometry.mjs?v=0.18.25';
+import {WORLD_LAND,isLand} from './world.mjs?v=0.18.25';
+import {groundHeight} from './geography-mesh.mjs?v=0.18.25';
 const asphalt=[.16,.18,.18],concrete=[.36,.37,.34],steel=[.29,.33,.33],dark=[.07,.09,.085];
 // Interpreted Ballyhoo Road industrial frontage, fitted to the geographic shoreline.
 // No satellite imagery is shipped; the source coastline remains authoritative.
-export function buildPortScenery(){const g=geometry();let index=0;
- for(const land of WORLD_LAND){if(land.right< -1300||land.left>1100||land.bottom< -1500||land.top>650)continue;
+export function buildPortScenery(selected=QUAY){const g=geometry();let index=0;
+ if(selected===QUAY)for(const land of WORLD_LAND){if(land.right< -1300||land.left>1100||land.bottom< -1500||land.top>650)continue;
  for(let i=1;i<land.outer.length;i++){const a=land.outer[i-1],b=land.outer[i],dx=b.x-a.x,dy=b.y-a.y,length=Math.hypot(dx,dy);if(length<8)continue;
  const tx=dx/length,ty=dy/length,mx=(a.x+b.x)/2,my=(a.y+b.y)/2;let nx=-ty,ny=tx;
  if(!isLand(mx+nx*8,my+ny*8)){nx=-nx;ny=-ny;}if(!isLand(mx+nx*15,my+ny*15))continue;
@@ -29,10 +29,18 @@ export function buildPortScenery(){const g=geometry();let index=0;
  for(let k=0;k<4;k++){const q=p(k*3-5,7);g.box(q[0],base+.45,q[2],2,.8,1.5,[.43,.35,.22]);}
  }} }
  // The service crane is part of this quay, with its foundation on the apron.
- for(const berth of BERTHS){const along=(berth.x-BERTH.x)*QUAY.tx+(berth.y-BERTH.y)*QUAY.ty,mast=quayPoint(along,8),bin=quayPoint(along-14,21),base=QUAY.deck;
+ for(const quay of [selected]){
+ const point=(u,v)=>quayPoint(u,v,quay);
+ if(quay!==QUAY){
+  const corners=[point(-228,0),point(-228,40),point(78,40),point(78,0)];
+  const vertex=(i,h)=>[corners[i].x,h,corners[i].y];
+  g.quad(...[0,1,2,3].map(i=>vertex(i,quay.deck)),concrete);
+  for(let i=0;i<4;i++){const j=(i+1)%4;g.quad(vertex(i,-2),vertex(j,-2),vertex(j,quay.deck),vertex(i,quay.deck),concrete);}
+ }
+ for(const berth of berthsAt(quay)){const along=(berth.x-quay.x)*quay.tx+(berth.y-quay.y)*quay.ty,mast=point(along,8),bin=point(along-14,21),base=quay.deck;
  g.box(mast.x,base+.3,mast.y,5,.6,5,concrete,.95);
- for(const u of [-1.7,1.7])for(const v of [-1.7,1.7]){const a=quayPoint(along+u,8+v),b=quayPoint(along+u*.4,8+v*.4);g.tube([a.x,base+.6,a.y],[b.x,23,b.y],.18,[.64,.28,.10],8);}
- for(let h=base+1;h<22;h+=2){const a=quayPoint(along-1,7),b=quayPoint(along+1,9);g.tube([a.x,h,a.y],[b.x,h+2,b.y],.08,steel,6);}
+ for(const u of [-1.7,1.7])for(const v of [-1.7,1.7]){const a=point(along+u,8+v),b=point(along+u*.4,8+v*.4);g.tube([a.x,base+.6,a.y],[b.x,23,b.y],.18,[.64,.28,.10],8);}
+ for(let h=base+1;h<22;h+=2){const a=point(along-1,7),b=point(along+1,9);g.tube([a.x,h,a.y],[b.x,h+2,b.y],.08,steel,6);}
  g.box(mast.x,22,mast.y,3,3,3,[.64,.28,.10]);g.box(mast.x,23.7,mast.y,3.5,.3,3.5,steel);
  g.box(bin.x,base+1,bin.y,5,2,4,steel);g.box(bin.x,base+2.05,bin.y,4.5,.15,3.5,dark);}
- return g.array();}
+ } return g.array();}
