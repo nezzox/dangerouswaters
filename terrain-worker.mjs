@@ -1,2 +1,2 @@
-import {buildGeography} from './geography-mesh.mjs?v=0.18.8';
+import {buildGeography} from './geography-mesh.mjs?v=0.18.9';
 self.onmessage=({data})=>{try{const vertices=buildGeography(data.x,data.y);self.postMessage({id:data.id,vertices},[vertices.buffer]);}catch(error){self.postMessage({id:data.id,error:String(error)});}};

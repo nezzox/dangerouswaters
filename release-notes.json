@@ -1,17 +1,19 @@
 {
-  "version": "0.18.8",
+  "version": "0.18.9",
   "notes": {
     "en": [
-      "Dense crab cores now occupy varied off-center locations inside each fishing ground.",
-      "Sonar, pot catches and rank V chart markers use the same water-only moving habitat.",
-      "Intelligent Auto Set holds working speed for another 300 traveled meters after each deployment.",
-      "Added 26 grounds across the Bering Sea, for 42 total."
+      "Sound starts enabled when you take command.",
+      "Crab caught farther from harbor earns more; mixed cargo retains its catch-location value.",
+      "Your first purchased boat unlocks a film and a one-time $50,000 upgrade fund.",
+      "Pickup All uses one collection waypoint per pot, with no extra offshore staging points.",
+      "Expanded Swedish translations, including fleet radio and update popups."
     ],
     "sv": [
-      "Täta krabbestånd ligger nu på varierande platser inom fiskeområdena, bortom mitten.",
-      "Sonar, fångster och kartans nivå V-markeringar följer samma bestånd och stannar i vatten.",
-      "Intelligent Auto Set håller arbetsfarten i ytterligare 300 körda meter efter varje sättning.",
-      "26 nya fiskeområden över Berings hav, totalt 42."
+      "Ljudet är på från start när du tar kommandot.",
+      "Krabba fångad längre från hamnen betalas bättre; lasten behåller fångstplatsens värde.",
+      "Ditt första båtköp låser upp en film och en engångsfond på 500 000 kr till uppgraderingar.",
+      "Hämta alla tinor använder en upptagningspunkt per tina, utan extra punkter på öppet hav.",
+      "Utökade svenska översättningar, även för flottradion och uppdateringsrutan."
     ]
   }
 }
