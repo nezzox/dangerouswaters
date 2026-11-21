@@ -1,15 +1,15 @@
-import {crabHoldValue,addCrabCatch,captureCrabSpecies} from './catch-value.mjs?v=0.18.38';
-import {PARTS,boatById} from './catalog.mjs?v=0.18.38';
-import {solarCharge,electricBurn,energyPrice} from './energy.mjs?v=0.18.38';
-import {recoverFleetContact} from './fleet-recovery.mjs?v=0.18.38';
-import {nearbyGreeting} from './fleet-greetings.mjs?v=0.18.38';
-import {potCatchAt} from './pot-soak.mjs?v=0.18.38';
-import {prepareRareCatch,awardRareCatch,rareValue} from './rare-catch.mjs?v=0.18.38';
-import {FUEL_SCALE,SEA_WEAR_SCALE} from './balance.mjs?v=0.18.38';
-import {groundsAt,crabHotspot} from './fishing-grounds.mjs?v=0.18.38';
-import {nearestWater,geoToWorld,clearWater} from './world.mjs?v=0.18.38';
-import {planSeaRoute,seaLane} from './navigation.mjs?v=0.18.38';
-import {vesselStats,settleLanding,tradeValue} from './career.mjs?v=0.18.38';
+import {crabHoldValue,addCrabCatch,captureCrabSpecies} from './catch-value.mjs?v=0.18.39';
+import {PARTS,boatById} from './catalog.mjs?v=0.18.39';
+import {solarCharge,electricBurn,energyPrice} from './energy.mjs?v=0.18.39';
+import {recoverFleetContact} from './fleet-recovery.mjs?v=0.18.39';
+import {nearbyGreeting} from './fleet-greetings.mjs?v=0.18.39';
+import {potCatchAt} from './pot-soak.mjs?v=0.18.39';
+import {prepareRareCatch,awardRareCatch,rareValue} from './rare-catch.mjs?v=0.18.39';
+import {FUEL_SCALE,SEA_WEAR_SCALE} from './balance.mjs?v=0.18.39';
+import {groundsAt,crabHotspot} from './fishing-grounds.mjs?v=0.18.39';
+import {nearestWater,geoToWorld,clearWater} from './world.mjs?v=0.18.39';
+import {planSeaRoute,seaLane} from './navigation.mjs?v=0.18.39';
+import {vesselStats,settleLanding,tradeValue} from './career.mjs?v=0.18.39';
 export function fleetStats(s,b){return vesselStats({...b,career:{boat:b.boat,parts:b.parts,skills:s.career.skills}});}
 export const fleetNoticeCount=s=>(s.career?.fleet||[]).filter(b=>b.upgradeRequest?.status==='pending'||!b.autoService&&(b.unreadMessage||b.request?.status==='pending')).length;
 export function readFleetMessages(s){for(const b of s.career?.fleet||[])b.unreadMessage=false;}

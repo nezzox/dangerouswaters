@@ -1,4 +1,4 @@
-import {planSeaRoute} from './navigation.mjs?v=0.18.38';
+import {planSeaRoute} from './navigation.mjs?v=0.18.39';
 self.onmessage=({data:{from,target,grid}})=>{
  const budget={remaining:2500000,deadline:performance.now()+12000};
  self.postMessage(planSeaRoute(from,target,false,budget,grid));

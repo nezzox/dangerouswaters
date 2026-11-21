@@ -1,26 +1,26 @@
-import {ST_PAUL_DIESEL} from './world.mjs?v=0.18.38';
-import {travelBoost} from './speed-curve.mjs?v=0.18.38';
-import {crabSpeciesName} from './crab-species.mjs?v=0.18.38';
-import {landCrab,addCrabCatch,captureCrabSpecies} from './catch-value.mjs?v=0.18.38';
-import {intelligentSetSignal} from './sonar-signal.mjs?v=0.18.38';
-import {nextPotNumber} from './pot-numbers.mjs?v=0.18.38';
-import {deckSign} from './vessel-profile.mjs?v=0.18.38';
-import {solarCharge,electricBurn,energyPrice} from './energy.mjs?v=0.18.38';
-import {potDropLocal} from './crane-style.mjs?v=0.18.38';
-import {resolveFleetContact} from './vessel-collision.mjs?v=0.18.38';
-import {potCatchAt} from './pot-soak.mjs?v=0.18.38';
-import {fuelBurnRate} from './fuel-economy.mjs?v=0.18.38';
-import {prepareRareCatch,awardRareCatch,rareValue,rareById} from './rare-catch.mjs?v=0.18.38';
-import {SEA_WEAR_SCALE} from './balance.mjs?v=0.18.38';
-import {crabAbundance,salmonAbundance} from './fishing-grounds.mjs?v=0.18.38';
-export {groundsAt} from './fishing-grounds.mjs?v=0.18.38';
-import {WORLD_VERSION,WORLD_BOUNDS,FISHING_GROUNDS,isLand,inWorld,clearWater} from './world.mjs?v=0.18.38';
-import {planSeaRoute,seaLane} from './navigation.mjs?v=0.18.38';
-import {tickFleet} from './fleet.mjs?v=0.18.38';
-import {ensureCareer,vesselStats,settleLanding} from './career.mjs?v=0.18.38';
-import {tickIncidents,blocksDeck} from './incidents.mjs?v=0.18.38';
-import {BERTH,nearestQuay,chooseBerth,quayPoint,buildDockRoute,dockRouteDuration,dockingPose,vesselIntersectsHarbor,castOffPosition,buildCastOffRoute} from './harbor.mjs?v=0.18.38';
-export {BERTH} from './harbor.mjs?v=0.18.38';
+import {ST_PAUL_DIESEL} from './world.mjs?v=0.18.39';
+import {travelBoost} from './speed-curve.mjs?v=0.18.39';
+import {crabSpeciesName} from './crab-species.mjs?v=0.18.39';
+import {landCrab,addCrabCatch,captureCrabSpecies} from './catch-value.mjs?v=0.18.39';
+import {intelligentSetSignal} from './sonar-signal.mjs?v=0.18.39';
+import {nextPotNumber} from './pot-numbers.mjs?v=0.18.39';
+import {deckSign} from './vessel-profile.mjs?v=0.18.39';
+import {solarCharge,electricBurn,energyPrice} from './energy.mjs?v=0.18.39';
+import {potDropLocal} from './crane-style.mjs?v=0.18.39';
+import {resolveFleetContact} from './vessel-collision.mjs?v=0.18.39';
+import {potCatchAt} from './pot-soak.mjs?v=0.18.39';
+import {fuelBurnRate} from './fuel-economy.mjs?v=0.18.39';
+import {prepareRareCatch,awardRareCatch,rareValue,rareById} from './rare-catch.mjs?v=0.18.39';
+import {SEA_WEAR_SCALE} from './balance.mjs?v=0.18.39';
+import {crabAbundance,salmonAbundance} from './fishing-grounds.mjs?v=0.18.39';
+export {groundsAt} from './fishing-grounds.mjs?v=0.18.39';
+import {WORLD_VERSION,WORLD_BOUNDS,FISHING_GROUNDS,isLand,inWorld,clearWater} from './world.mjs?v=0.18.39';
+import {planSeaRoute,seaLane} from './navigation.mjs?v=0.18.39';
+import {tickFleet} from './fleet.mjs?v=0.18.39';
+import {ensureCareer,vesselStats,settleLanding} from './career.mjs?v=0.18.39';
+import {tickIncidents,blocksDeck} from './incidents.mjs?v=0.18.39';
+import {BERTH,nearestQuay,chooseBerth,quayPoint,buildDockRoute,dockRouteDuration,dockingPose,vesselIntersectsHarbor,castOffPosition,buildCastOffRoute} from './harbor.mjs?v=0.18.39';
+export {BERTH} from './harbor.mjs?v=0.18.39';
 export const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 export const PORT={x:BERTH.x,y:BERTH.y};
 export const DECK_LIMIT_KNOTS=5;
@@ -98,7 +98,7 @@ function advancePickupAll(s){
  if(!s.deckJob&&distance(s,pot)<POT_RANGE&&canWorkPots(s)&&workingSide(s,pot)&&!blocksDeck(s))handlePot(s,pot.id);
 }
 export function nearPort(s){return distance(s,PORT)<230||distance(s,nearestQuay(s))<230||(s.moored&&Math.hypot(s.x-s.moored.x,s.y-s.moored.y)<2);}
-export function step(s,dt){if(s.paused)return;const start={x:s.x,y:s.y,heading:s.heading},prior=new Map([...(s.career?.fleet||[]),...(s.remotePlayers||[])].map(b=>[b.id,{x:b.x,y:b.y,heading:b.heading}]));stepSimulation(s,dt);const hit=resolveFleetContact(s,start,prior,dt);if(s.intelligentSetRunout>0)s.intelligentSetRunout=Math.max(0,s.intelligentSetRunout-Math.hypot(s.x-start.x,s.y-start.y));if(hit&&s.deckJob?.kind==='unload'&&s.deckJob.elapsed<s.deckJob.approach){s.deckJob=null;Object.assign(s,start,{speed:0});notify(s,'Berth occupied. Docking stopped; choose another berth.');return;}if(hit&&s.message!==`Hull contact with ${hit.name}. Maneuver clear.`)notify(s,`Hull contact with ${hit.name}. Maneuver clear.`);}
+export function step(s,dt){if(s.paused)return;const start={x:s.x,y:s.y,heading:s.heading},prior=new Map([...(s.career?.fleet||[]),...(s.remotePlayers||[])].map(b=>[b.id,{x:b.x,y:b.y,heading:b.heading}]));stepSimulation(s,dt);const hit=s.moored?null:resolveFleetContact(s,start,prior,dt);if(s.intelligentSetRunout>0)s.intelligentSetRunout=Math.max(0,s.intelligentSetRunout-Math.hypot(s.x-start.x,s.y-start.y));if(hit&&s.deckJob?.kind==='unload'&&s.deckJob.elapsed<s.deckJob.approach){s.deckJob=null;Object.assign(s,start,{speed:0});notify(s,'Berth occupied. Docking stopped; choose another berth.');return;}if(hit&&s.message!==`Hull contact with ${hit.name}. Maneuver clear.`)notify(s,`Hull contact with ${hit.name}. Maneuver clear.`);}
 export function autoSetOpportunity(s,stats=vesselStats(s)){const c=s.career;if(s.skipperMission?.kind==='pickupAll'||!c||!c.skills.autoDeploy||c.fishing!=='crab'||nearPort(s)||blocksDeck(s))return false;if(s.deckJob)return s.deckJob.kind==='deploy';return !!((c.autoDeploy||c.intelligentAutoSet&&c.skills.intelligentAutoSet&&intelligentSetSignal(s))&&s.deck>0&&s.money>=stats.baitCost&&s.pots.every(p=>distance(s,p)>=stats.spacing));}
 export function autoHaulApproach(s,stats=vesselStats(s)){const c=s.career;if(!c?.autoHaul||!c.skills.autoHaul||c.fishing!=='crab'||nearPort(s)||blocksDeck(s)||s.cargo+s.salmon>=stats.capacity)return false;if(s.deckJob)return s.deckJob.kind==='haul';const reach=POT_RANGE+Math.max(45,Math.abs(s.speed)*12);return s.pots.some(p=>{if(s.hour-p.setAt<stats.minSoak||distance(s,p)>reach)return false;const b=potBearing(s,p);return b.along>=-POT_RANGE&&Math.abs(b.starboard)<POT_RANGE*.9&&(stats.hauler==='both'||stats.hauler==='stern'||(stats.hauler==='port'?b.starboard<0:b.starboard>0));});}
 function stepSimulation(s,dt){
