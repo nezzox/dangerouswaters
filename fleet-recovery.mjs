@@ -1,7 +1,7 @@
-import {vesselStats} from './career.mjs?v=0.18.42';
-import {hullContact} from './vessel-collision.mjs?v=0.18.42';
-import {clearWater} from './world.mjs?v=0.18.42';
-import {vesselIntersectsHarbor} from './harbor.mjs?v=0.18.42';
+import {vesselStats} from './career.mjs?v=0.18.43';
+import {hullContact} from './vessel-collision.mjs?v=0.18.43';
+import {clearWater} from './world.mjs?v=0.18.43';
+import {vesselIntersectsHarbor} from './harbor.mjs?v=0.18.43';
 // Short, low-speed contact recovery takes priority over routing, work and port requests.
 // Keep heading fixed initially: turning a long hull while touching would sweep into the player.
 export function recoverFleetContact(s,b,stats,dt){

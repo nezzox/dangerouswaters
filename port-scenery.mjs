@@ -1,7 +1,7 @@
-import {QUAY,quayPoint,berthsAt} from './harbor.mjs?v=0.18.42';
-import {geometry} from './geometry.mjs?v=0.18.42';
-import {WORLD_LAND,isLand} from './world.mjs?v=0.18.42';
-import {groundHeight} from './geography-mesh.mjs?v=0.18.42';
+import {QUAY,quayPoint,berthsAt} from './harbor.mjs?v=0.18.43';
+import {geometry} from './geometry.mjs?v=0.18.43';
+import {WORLD_LAND,isLand} from './world.mjs?v=0.18.43';
+import {groundHeight} from './geography-mesh.mjs?v=0.18.43';
 const asphalt=[.16,.18,.18],concrete=[.36,.37,.34],steel=[.29,.33,.33],dark=[.07,.09,.085];
 export const MATTHEW_FLOODLIGHTS=[-215,-122,-37,61];
 function buildMatthewDetails(g,quay){
@@ -33,8 +33,24 @@ function buildMatthewDetails(g,quay){
  for(const u of MATTHEW_FLOODLIGHTS){
   g.tube(at(u,5),at(u,5,10),.18,steel,8);
   block(u,4.8,1.7,.85,9.6,10.4,dark);
-  block(u,4.32,1.5,.14,9.7,10.3,[.84,.92,1],1.1);
+  block(u,4.32,1.5,.14,9.7,10.3,[1.,.73,.25],.55);
  }
+}
+// A small break spot and a striped windsock give the Dutch Harbor waterfront some character.
+function buildDutchBreakSpot(g){
+ const coffee=quayPoint(-75,19),deck=QUAY.deck;
+ g.box(coffee.x,deck+1.3,coffee.y,4,2.6,3,[.30,.43,.42]);
+ g.box(coffee.x,deck+2.72,coffee.y,4.5,.24,3.6,[.57,.30,.18]);
+ g.box(coffee.x,deck+1.72,coffee.y-1.52,2.7,.77,.07,[.83,.64,.35],.35,.32);
+ g.box(coffee.x,deck+1.22,coffee.y-1.77,3,.13,.55,steel);
+ for(const offset of [-5,5]){
+  const bench=quayPoint(-75+offset,17);
+  g.box(bench.x,deck+.55,bench.y,3,.13,.65,[.51,.34,.19]);
+  for(const side of [-1,1])g.box(bench.x+side,deck+.26,bench.y,.16,.52,.5,steel);
+ }
+ const mast=quayPoint(41,12),top=deck+8;
+ g.tube([mast.x,deck,mast.y],[mast.x,top,mast.y],.10,steel,8);
+ for(let i=0;i<5;i++)g.tube([mast.x+i*.49,top-i*.10,mast.y],[mast.x+(i+1)*.49,top-(i+1)*.10,mast.y],.27-i*.030,i%2?[.72,.72,.65]:[.73,.26,.10],8);
 }
 // Interpreted Ballyhoo Road industrial frontage, fitted to the geographic shoreline.
 // No satellite imagery is shipped; the source coastline remains authoritative.
@@ -78,5 +94,6 @@ export function buildPortScenery(selected=QUAY,local=false){const g=geometry();l
  g.box(mast.x,22,mast.y,3,3,3,[.64,.28,.10]);g.box(mast.x,23.7,mast.y,3.5,.3,3.5,steel);
  g.box(bin.x,base+1,bin.y,5,2,4,steel);g.box(bin.x,base+2.05,bin.y,4.5,.15,3.5,dark);}
  }
+ if(selected===QUAY)buildDutchBreakSpot(g);
  if(local)for(let i=0;i<g.data.length;i+=11){g.data[i]-=selected.x;g.data[i+2]-=selected.y;}
  return g.array();}

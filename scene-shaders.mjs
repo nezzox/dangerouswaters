@@ -1,5 +1,5 @@
-import {hullWaterGLSL} from './deck-water.mjs?v=0.18.42';
-import {seaHeightGLSL} from './sea-spectrum.mjs?v=0.18.42';
+import {hullWaterGLSL} from './deck-water.mjs?v=0.18.43';
+import {seaHeightGLSL} from './sea-spectrum.mjs?v=0.18.43';
 // Shared atmosphere and ocean functions keep lighting and reflections consistent.
 export const common=`
 precision highp float;precision highp int;
@@ -36,7 +36,7 @@ vec3 quayLighting(vec3 p){
   float fan=smoothstep(.72,.94,along/max(1.,distance));
   amount+=fan*(1.-smoothstep(6.,115.,distance))*.34+exp(-distance*.13)*.08;
  }
- return vec3(.86,.93,1.)*amount*(1.-smoothstep(.12,.8,uDaylight));
+ return vec3(1.,.73,.25)*amount*.5*(1.-smoothstep(.12,.8,uDaylight));
 }
 vec3 beamFog(vec3 world){if(uLights<.5||uDaylight>.7)return vec3(0.);vec3 sum=vec3(0.);for(int i=0;i<12;i++){float t=(float(i)+.5)/12.;vec3 p=mix(uEye,world,t);sum+=lamps(shipLocal(p),vec3(0,1,0),vec3(0,1,0),true,false);}return sum*.5*(.0016+uWeather.y*.012+uWeather.z*.006)*smoothstep(.6,.07,uDaylight);}
 
