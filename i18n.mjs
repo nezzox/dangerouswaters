@@ -1,4 +1,4 @@
-import {CRAB_SPECIES} from './crab-species.mjs?v=0.18.23';
+import {CRAB_SPECIES} from './crab-species.mjs?v=0.18.24';
 // Saved money/prices remain in legacy SEK units. Fixed game conversion: 10 SEK = 1 USD.
 // Translation is applied at the presentation boundary; save data and simulation never change language.
 let language='en';
@@ -280,6 +280,7 @@ sv['VOLUME']='VOLYM';sv['Sound volume']='Ljudvolym';
 Object.assign(sv,{'SKIP TO WAYPOINT':'HOPPA TILL RUTTPUNKT','Not enough fuel to skip to the waypoint.':'Inte tillräckligt med bränsle för att hoppa till ruttpunkten.','Cannot skip: check the vessel or route.':'Kan inte hoppa: kontrollera båten eller rutten.','TIME TO WAYPOINT':'TID TILL RUTTPUNKT','CANCEL TRAVEL':'AVBRYT RESAN','Time to waypoint cancelled.':'Resan till ruttpunkten avbröts.','Travelling to next waypoint…':'Reser till nästa ruttpunkt…','Next waypoint reached.':'Nästa ruttpunkt nådd.','Time to waypoint stopped: check the vessel or route.':'Resan avbröts: kontrollera båten eller rutten.','Set an autopilot waypoint and finish any active work or repairs first.':'Ange en ruttpunkt och avsluta pågående arbete eller reparation först.'});
 Object.assign(sv,{'LEADERBOARD':'TOPPLISTA','WORLD ID':'VÄRLDS-ID','JOIN WORLD':'ANSLUT TILL VÄRLD','YOUR NAME':'DITT NAMN','Player name':'Spelarnamn','SAVE NAME':'SPARA NAMN','World ID':'Världs-ID','Enter a six-character World ID.':'Ange ett världs-ID med sex tecken.','World not found or server unavailable.':'Världen hittades inte eller servern är inte tillgänglig.','offline':'frånkopplad','online':'ansluten'});
 sv['PLAYERS']='SPELARE';sv['No free harbor berth.']='Ingen ledig kajplats.';
+Object.assign(sv,{'GET UNSTUCK':'KOM LOSS','Vessel moved clear. Ready to steer.':'Båten är flyttad till fritt vatten.','No clear water nearby.':'Inget fritt vatten i närheten.','Berth occupied. Docking stopped; choose another berth.':'Kajplatsen är upptagen. Dockningen avbröts.'});
 const lookup=new Map(Object.entries(sv).map(([key,value])=>[key.toLowerCase(),value]));
 const escape=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
 const phrases=new RegExp(`(?<![\\p{L}\\p{N}])(?:${[...lookup.keys()].sort((a,b)=>b.length-a.length).map(escape).join('|')})(?![\\p{L}\\p{N}])`,'giu');

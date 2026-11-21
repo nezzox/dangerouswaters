@@ -1,13 +1,13 @@
-import {boatById} from './catalog.mjs?v=0.18.23';
-import {isLand} from './world.mjs?v=0.18.23';
-import {planSeaRoute} from './navigation.mjs?v=0.18.23';
+import {boatById} from './catalog.mjs?v=0.18.24';
+import {isLand} from './world.mjs?v=0.18.24';
+import {planSeaRoute} from './navigation.mjs?v=0.18.24';
 // Shared frame on the new geographic quay. Positive inland points onto its apron.
 export const QUAY={x:47.3186402115,y:-70.0756194544,tx:-.811539539913,ty:.584297505692,deck:6.8};
 QUAY.heading=Math.atan2(QUAY.ty,QUAY.tx);
 export function quayPoint(along=0,inland=0){return{x:QUAY.x+QUAY.tx*along-QUAY.ty*inland,y:QUAY.y+QUAY.ty*along+QUAY.tx*inland};}
 export const BERTH={...quayPoint(0,-6),heading:QUAY.heading};
 export const BERTHS=[0,50,-50,-100,-150,-200].map(along=>({...quayPoint(along,-6),heading:QUAY.heading}));
-export function chooseBerth(s,boats=[]){return BERTHS.find(b=>!vesselIntersectsHarbor({...s,...b})&&boats.every(o=>Math.hypot(o.x-b.x,o.y-b.y)>Math.max(45,(boatById(s.career?.boat).length+boatById(o.boat).length)*.6)))||null;}
+export function chooseBerth(s,boats=[]){return BERTHS.find(b=>!vesselIntersectsHarbor({...s,...b})&&boats.every(o=>Math.hypot(o.x-b.x,o.y-b.y)>Math.max(45,(boatById(s.career?.boat).length+boatById(o.boat).length)*.6)&&(!o.berth||Math.hypot(o.berth.x-b.x,o.berth.y-b.y)>40)))||null;}
 const angle=a=>Math.atan2(Math.sin(a),Math.cos(a));
 // Only real geographic land and piers obstruct navigation; the retired timber docks have no hitboxes.
 export function vesselIntersectsHarbor(s){const boat=boatById(s.career?.boat),c=Math.cos(s.heading),n=Math.sin(s.heading),hx=boat.length*.55,hz=boat.beam*.55;for(const u of [-hx,0,hx])for(const v of [-hz,0,hz])if(isLand(s.x+c*u-n*v,s.y+n*u+c*v))return true;return false;}

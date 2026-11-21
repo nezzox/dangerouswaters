@@ -1,11 +1,7 @@
 {
-  "version": "0.18.23",
+  "version": "0.18.24",
   "notes": {
-    "en": [
-      "Faster multiplayer position updates and smoother movement between updates."
-    ],
-    "sv": [
-      "Snabbare positionsuppdateringar i multiplayer och mjukare rörelse mellan uppdateringarna."
-    ]
+    "en": ["Safer multiplayer docking, separate quay cranes and a Get Unstuck button."],
+    "sv": ["Säkrare dockning i multiplayer, separata kajkranar och en knapp för att komma loss."]
   }
 }

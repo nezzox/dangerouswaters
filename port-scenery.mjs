@@ -1,7 +1,7 @@
-import {QUAY,quayPoint} from './harbor.mjs?v=0.18.23';
-import {geometry} from './geometry.mjs?v=0.18.23';
-import {WORLD_LAND,isLand} from './world.mjs?v=0.18.23';
-import {groundHeight} from './geography-mesh.mjs?v=0.18.23';
+import {QUAY,quayPoint,BERTHS,BERTH} from './harbor.mjs?v=0.18.24';
+import {geometry} from './geometry.mjs?v=0.18.24';
+import {WORLD_LAND,isLand} from './world.mjs?v=0.18.24';
+import {groundHeight} from './geography-mesh.mjs?v=0.18.24';
 const asphalt=[.16,.18,.18],concrete=[.36,.37,.34],steel=[.29,.33,.33],dark=[.07,.09,.085];
 // Interpreted Ballyhoo Road industrial frontage, fitted to the geographic shoreline.
 // No satellite imagery is shipped; the source coastline remains authoritative.
@@ -29,10 +29,10 @@ export function buildPortScenery(){const g=geometry();let index=0;
  for(let k=0;k<4;k++){const q=p(k*3-5,7);g.box(q[0],base+.45,q[2],2,.8,1.5,[.43,.35,.22]);}
  }} }
  // The service crane is part of this quay, with its foundation on the apron.
- const mast=quayPoint(0,8),bin=quayPoint(-14,21),base=QUAY.deck;
+ for(const berth of BERTHS){const along=(berth.x-BERTH.x)*QUAY.tx+(berth.y-BERTH.y)*QUAY.ty,mast=quayPoint(along,8),bin=quayPoint(along-14,21),base=QUAY.deck;
  g.box(mast.x,base+.3,mast.y,5,.6,5,concrete,.95);
- for(const u of [-1.7,1.7])for(const v of [-1.7,1.7]){const a=quayPoint(u,8+v),b=quayPoint(u*.4,8+v*.4);g.tube([a.x,base+.6,a.y],[b.x,23,b.y],.18,[.64,.28,.10],8);}
- for(let h=base+1;h<22;h+=2){const a=quayPoint(-1,7),b=quayPoint(1,9);g.tube([a.x,h,a.y],[b.x,h+2,b.y],.08,steel,6);}
+ for(const u of [-1.7,1.7])for(const v of [-1.7,1.7]){const a=quayPoint(along+u,8+v),b=quayPoint(along+u*.4,8+v*.4);g.tube([a.x,base+.6,a.y],[b.x,23,b.y],.18,[.64,.28,.10],8);}
+ for(let h=base+1;h<22;h+=2){const a=quayPoint(along-1,7),b=quayPoint(along+1,9);g.tube([a.x,h,a.y],[b.x,h+2,b.y],.08,steel,6);}
  g.box(mast.x,22,mast.y,3,3,3,[.64,.28,.10]);g.box(mast.x,23.7,mast.y,3.5,.3,3.5,steel);
- g.box(bin.x,base+1,bin.y,5,2,4,steel);g.box(bin.x,base+2.05,bin.y,4.5,.15,3.5,dark);
+ g.box(bin.x,base+1,bin.y,5,2,4,steel);g.box(bin.x,base+2.05,bin.y,4.5,.15,3.5,dark);}
  return g.array();}
