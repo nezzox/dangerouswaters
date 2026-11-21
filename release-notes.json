@@ -1,19 +1,13 @@
 {
-  "version": "0.18.9",
+  "version": "0.18.10",
   "notes": {
     "en": [
-      "Sound starts enabled when you take command.",
-      "Crab caught farther from harbor earns more; mixed cargo retains its catch-location value.",
-      "Your first purchased boat unlocks a film and a one-time $50,000 upgrade fund.",
-      "Pickup All uses one collection waypoint per pot, with no extra offshore staging points.",
-      "Expanded Swedish translations, including fleet radio and update popups."
+      "Fixed deck planks protruding through the bow on all Sockeye and Stern variants.",
+      "Forward-working deckhand routes now stay inside the tapered hull."
     ],
     "sv": [
-      "Ljudet är på från start när du tar kommandot.",
-      "Krabba fångad längre från hamnen betalas bättre; lasten behåller fångstplatsens värde.",
-      "Ditt första båtköp låser upp en film och en engångsfond på 500 000 kr till uppgraderingar.",
-      "Hämta alla tinor använder en upptagningspunkt per tina, utan extra punkter på öppet hav.",
-      "Utökade svenska översättningar, även för flottradion och uppdateringsrutan."
+      "Rättat däcksplankor som stack ut genom fören på alla Sockeye- och Stern-varianter.",
+      "Manskapets gångvägar på de framåtriktade arbetsdäcken håller sig innanför skrovet."
     ]
   }
 }

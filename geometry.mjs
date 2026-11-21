@@ -1,8 +1,8 @@
-import {deckSign,hullPaint} from './vessel-profile.mjs?v=0.18.9';
-import {craneColor} from './crane-style.mjs?v=0.18.9';
-import {lineHaulerMounts} from './line-hauler.mjs?v=0.18.9';
-import {vesselStyle,rackPositions,rackFrames,gantryPlacement} from './vessel-style.mjs?v=0.18.9';
-import {HULL_STATIONS,hullWidthAt} from './fenders.mjs?v=0.18.9';
+import {deckSign,hullPaint} from './vessel-profile.mjs?v=0.18.10';
+import {craneColor} from './crane-style.mjs?v=0.18.10';
+import {lineHaulerMounts} from './line-hauler.mjs?v=0.18.10';
+import {vesselStyle,rackPositions,rackFrames,gantryPlacement} from './vessel-style.mjs?v=0.18.10';
+import {HULL_STATIONS,hullWidthAt} from './fenders.mjs?v=0.18.10';
 const steel=[.19,.24,.25],paint=[.68,.7,.64],dark=[.045,.08,.1],glass=[.055,.13,.17],brass=[.43,.31,.13],orange=[.72,.29,.065];
 export function geometry(){const data=[];
  function tri(a,b,c,color,rough=.6,emit=0){const u=b.map((x,i)=>x-a[i]),v=c.map((x,i)=>x-a[i]),n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]],len=Math.hypot(...n);if(len<1e-8)return;for(const p of [a,b,c])data.push(...p,...n.map(x=>x/len),...color,rough,emit);}
@@ -26,7 +26,13 @@ export function buildVessel(potCount=8,design={}){const orange=craneColor(design
  }const opening=orientation>0?[-2.8,-1]:[1,2.8],cuts=[x,...opening.filter(v=>v>x&&v<xx),xx];for(let j=0;j<cuts.length-1;j++){const l=cuts[j],r=cuts[j+1],lw=a+(b-a)*(l-x)/(xx-x),rw=a+(b-a)*(r-x)/(xx-x);if(l>=opening[0]&&r<=opening[1]){quad([l,1.7,-lw],[l,1.7,-1.4],[r,1.7,-1.4],[r,1.7,-rw],[.25,.29,.23],.82);quad([l,1.7,.4],[l,1.7,lw],[r,1.7,rw],[r,1.7,.4],[.25,.29,.23],.82);}else quad([l,1.7,-lw],[l,1.7,lw],[r,1.7,rw],[r,1.7,-rw],[.25,.29,.23],.82);}}
  box(-11.95,1.,0,.25,2.2,5.6,dark);tube([-12,2.2,-2.8],[-12,2.2,2.8],.08,paint);for(const y of [2.6,3.])tube([-12,y,-2.8],[-12,y,2.8],.04,paint);for(let z=-2.8;z<=2.81;z+=.8)tube([-12,2.15,z],[-12,3.,z],.045,paint);
  const upperStart=g.data.length;
- for(let z=-3.;z<3.;z+=.28)if(z< -1.4||z>.4)box(-5,1.73,z,12,.025,.022,[.13,.17,.14],.9);
+ for(let z=-3.;z<3.;z+=.28)if(z< -1.4||z>.4){
+  if(orientation>0){box(-5,1.73,z,12,.025,.022,[.13,.17,.14],.9);continue;}
+  // Upper fittings are mirrored below. Trim each plank against the physical bow first.
+  const fits=x=>{const physical=-x,i=Math.max(0,sections.findIndex((p,k)=>k<sections.length-1&&physical<=sections[k+1][0])),[a,w]=sections[i],[b,v]=sections[i+1],width=w+(v-w)*(physical-a)/(b-a);return Math.abs(z)+.011+.04<=width;};
+  let start=-11;if(!fits(start)){let lo=start,hi=1;for(let i=0;i<24;i++){const mid=(lo+hi)/2;if(fits(mid))hi=mid;else lo=mid;}start=hi;}
+  box((start+1)/2,1.73,z,1-start,.025,.022,[.13,.17,.14],.9);
+ }
  // Sloping bridge glazing, rounded lower cabin and overhanging roof.
  roundedBox(3.4,2.8,0,6.3,2.1,5.25,design.powertrain==='electric'?.5:.22,paint,.48);
  const front=y=>6.55-(y-3.8)*.6/1.95,sideZ=y=>2.625-(y-3.8)*.305/1.95;

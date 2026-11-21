@@ -1,9 +1,12 @@
-import {rackPositions,rackFootprints,rackFootprintKey,potBounds,rackFrames,rackScale,deckHardware} from './vessel-style.mjs?v=0.18.9';
+import {hullWidthAt} from './fenders.mjs?v=0.18.10';
+import {deckSign} from './vessel-profile.mjs?v=0.18.10';
+import {rackPositions,rackFootprints,rackFootprintKey,potBounds,rackFrames,rackScale,deckHardware} from './vessel-style.mjs?v=0.18.10';
 export const CREW_RADIUS=.26,CREW_SPACING=.62;
 export const CABIN_DOOR={x:.18,z:1.65};
 export function potPositions(count,design={}){return rackPositions(count,design);}
 const rectangle=(x,z,a,b,c,d,r)=>Math.max(a-x,0,x-b)**2+Math.max(c-z,0,z-d)**2<r*r;
 export function canStand(x,z,count=8,door=false,design={}){
+ if(deckSign(design)<0&&Math.abs(z)+CREW_RADIUS+.08>Math.min(hullWidthAt(-x-CREW_RADIUS,design),hullWidthAt(-x+CREW_RADIUS,design)))return false;
  if(x< -11.25||x>-.1||Math.abs(z)>3){if(!(door&&x>=-.3&&x<=.85&&z>=1.3&&z<=2.0))return false;}
  if(rectangle(x,z,-2.95,-.85,-1.55,.65,CREW_RADIUS))return false;
  if(Math.hypot(x+1.5,z-2.1)<.38+CREW_RADIUS||Math.hypot(x+3,z-3.1)<.42+CREW_RADIUS)return false;
