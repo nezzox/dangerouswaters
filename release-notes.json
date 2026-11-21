@@ -1,1 +1,1 @@
-{"version": "0.18.33", "notes": {"en": ["Docking now offers to refuel or recharge the vessel and shows the price.", "Long route searches are bounded. St Matthew has a chart shortcut."], "sv": ["Efter dockning får du frågan om du vill tanka eller ladda, och du ser vad det kostar.", "Långa ruttsökningar begränsas. St Matthew har en genväg på sjökortet."]}}
+{"version": "0.18.34", "notes": {"en": ["Chart waypoint routes are now planned in the background."], "sv": ["Rutter till waypoints på sjökortet beräknas nu i bakgrunden."]}}

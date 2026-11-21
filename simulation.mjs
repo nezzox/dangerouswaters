@@ -1,25 +1,25 @@
-import {travelBoost} from './speed-curve.mjs?v=0.18.33';
-import {crabSpeciesName} from './crab-species.mjs?v=0.18.33';
-import {landCrab,addCrabCatch,captureCrabSpecies} from './catch-value.mjs?v=0.18.33';
-import {intelligentSetSignal} from './sonar-signal.mjs?v=0.18.33';
-import {nextPotNumber} from './pot-numbers.mjs?v=0.18.33';
-import {deckSign} from './vessel-profile.mjs?v=0.18.33';
-import {solarCharge,electricBurn,energyPrice} from './energy.mjs?v=0.18.33';
-import {potDropLocal} from './crane-style.mjs?v=0.18.33';
-import {resolveFleetContact} from './vessel-collision.mjs?v=0.18.33';
-import {potCatchAt} from './pot-soak.mjs?v=0.18.33';
-import {fuelBurnRate} from './fuel-economy.mjs?v=0.18.33';
-import {prepareRareCatch,awardRareCatch,rareValue,rareById} from './rare-catch.mjs?v=0.18.33';
-import {SEA_WEAR_SCALE} from './balance.mjs?v=0.18.33';
-import {crabAbundance,salmonAbundance} from './fishing-grounds.mjs?v=0.18.33';
-export {groundsAt} from './fishing-grounds.mjs?v=0.18.33';
-import {WORLD_VERSION,WORLD_BOUNDS,FISHING_GROUNDS,isLand,inWorld,clearWater} from './world.mjs?v=0.18.33';
-import {planSeaRoute,seaLane} from './navigation.mjs?v=0.18.33';
-import {tickFleet} from './fleet.mjs?v=0.18.33';
-import {ensureCareer,vesselStats,settleLanding} from './career.mjs?v=0.18.33';
-import {tickIncidents,blocksDeck} from './incidents.mjs?v=0.18.33';
-import {BERTH,nearestQuay,chooseBerth,quayPoint,buildDockRoute,dockRouteDuration,dockingPose,vesselIntersectsHarbor,castOffPosition,buildCastOffRoute} from './harbor.mjs?v=0.18.33';
-export {BERTH} from './harbor.mjs?v=0.18.33';
+import {travelBoost} from './speed-curve.mjs?v=0.18.34';
+import {crabSpeciesName} from './crab-species.mjs?v=0.18.34';
+import {landCrab,addCrabCatch,captureCrabSpecies} from './catch-value.mjs?v=0.18.34';
+import {intelligentSetSignal} from './sonar-signal.mjs?v=0.18.34';
+import {nextPotNumber} from './pot-numbers.mjs?v=0.18.34';
+import {deckSign} from './vessel-profile.mjs?v=0.18.34';
+import {solarCharge,electricBurn,energyPrice} from './energy.mjs?v=0.18.34';
+import {potDropLocal} from './crane-style.mjs?v=0.18.34';
+import {resolveFleetContact} from './vessel-collision.mjs?v=0.18.34';
+import {potCatchAt} from './pot-soak.mjs?v=0.18.34';
+import {fuelBurnRate} from './fuel-economy.mjs?v=0.18.34';
+import {prepareRareCatch,awardRareCatch,rareValue,rareById} from './rare-catch.mjs?v=0.18.34';
+import {SEA_WEAR_SCALE} from './balance.mjs?v=0.18.34';
+import {crabAbundance,salmonAbundance} from './fishing-grounds.mjs?v=0.18.34';
+export {groundsAt} from './fishing-grounds.mjs?v=0.18.34';
+import {WORLD_VERSION,WORLD_BOUNDS,FISHING_GROUNDS,isLand,inWorld,clearWater} from './world.mjs?v=0.18.34';
+import {planSeaRoute,seaLane} from './navigation.mjs?v=0.18.34';
+import {tickFleet} from './fleet.mjs?v=0.18.34';
+import {ensureCareer,vesselStats,settleLanding} from './career.mjs?v=0.18.34';
+import {tickIncidents,blocksDeck} from './incidents.mjs?v=0.18.34';
+import {BERTH,nearestQuay,chooseBerth,quayPoint,buildDockRoute,dockRouteDuration,dockingPose,vesselIntersectsHarbor,castOffPosition,buildCastOffRoute} from './harbor.mjs?v=0.18.34';
+export {BERTH} from './harbor.mjs?v=0.18.34';
 export const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 export const PORT={x:BERTH.x,y:BERTH.y};
 export const DECK_LIMIT_KNOTS=5;
@@ -34,7 +34,21 @@ export function potBearing(s,p){const dx=p.x-s.x,dy=p.y-s.y;return {along:dx*Mat
 export function workingSide(s,p){const bearing=potBearing(s,p),layout=vesselStats(s).hauler;return layout==='both'?Math.abs(bearing.starboard)>1:layout==='stern'?bearing.along*deckSign(vesselStats(s))< -1&&Math.abs(bearing.starboard)<Math.max(8,-bearing.along*deckSign(vesselStats(s))):bearing.starboard>1;}
 export function potAction(s,accept=()=>true){const sorted=s.pots.filter(accept).sort((a,b)=>a.setAt-b.setAt||a.id-b.id),eligible=sorted.find(p=>distance(s,p)<POT_RANGE&&workingSide(s,p)),nearest=eligible||sorted[0]||null,meters=nearest?distance(s,nearest):Infinity,starboard=nearest?potBearing(s,nearest).starboard:0;return {pot:nearest,meters,inRange:meters<POT_RANGE,canHaul:meters<POT_RANGE&&workingSide(s,nearest),starboard,kind:meters<POT_RANGE?'haul':'deploy',busy:!!s.deckJob};}
 export function setRudder(s,degrees){s.rudder=clamp(Number.isFinite(degrees)?degrees:0,-35,35)/35;s.autopilot=null;s.skipperMission=null;}
-export function setAutopilot(s,x,y,append=false,routeBudget){s.skipperMission=null;if(!inWorld(x,y))return false;const departure=s.moored?castOffPosition(s):s.deckJob?.kind==='undock'?{x:s.deckJob.targetX,y:s.deckJob.targetY,heading:s.deckJob.targetHeading}:null;if(s.moored&&!departure)return false;const current=append?s.autopilot:null,from=current?{x:current.x,y:current.y}:departure||s,leg=planSeaRoute(from,{x,y},false,routeBudget);if(!leg)return false;if(s.moored&&!undock(s))return false;const existing=current?.route|| (current?[{x:current.x,y:current.y}]:[]),waypoints=current?.waypoints||(current?[{x:current.x,y:current.y}]:[]);s.moored=null;s.autopilot={x,y,route:[...existing,...leg],index:current?.index||0,waypoints:[...waypoints,{x,y}]};if(s.desiredKnots<=0)s.desiredKnots=6;notify(s,current?'Waypoint added to autopilot route.':'Autopilot engaged. Steer with A/D or cancel on the chart.');return true;}
+export function autopilotRouteStart(s,append=false){
+ if(append&&s.autopilot)return s.autopilot;
+ if(s.moored)return castOffPosition(s);
+ if(s.deckJob?.kind==='undock')return {x:s.deckJob.targetX,y:s.deckJob.targetY};
+ return s;
+}
+export function setAutopilot(s,x,y,append=false,routeBudget){
+ const from=autopilotRouteStart(s,append);
+ if(!from||!inWorld(x,y))return false;
+ return applyAutopilotRoute(s,x,y,append,planSeaRoute(from,{x,y},false,routeBudget));
+}
+export function applyAutopilotRoute(s,x,y,append,leg){
+ if(!leg?.length)return false;
+ const current=append?s.autopilot:null;
+ if(s.moored&&!undock(s))return false;const existing=current?.route|| (current?[{x:current.x,y:current.y}]:[]),waypoints=current?.waypoints||(current?[{x:current.x,y:current.y}]:[]);s.skipperMission=null;s.moored=null;s.autopilot={x,y,route:[...existing,...leg],index:current?.index||0,waypoints:[...waypoints,{x,y}]};if(s.desiredKnots<=0)s.desiredKnots=6;notify(s,current?'Waypoint added to autopilot route.':'Autopilot engaged. Steer with A/D or cancel on the chart.');return true;}
 export function releasePoint(s){const stats=vesselStats(s),[rawX,,z]=potDropLocal(stats.hauler),sx=stats.length/24,sz=stats.beam/7.6,x=rawX*deckSign(stats);return {x:s.x+x*sx*Math.cos(s.heading)-z*sz*Math.sin(s.heading),y:s.y+x*sx*Math.sin(s.heading)+z*sz*Math.cos(s.heading)};}
 export function jobProgress(s){return s.deckJob?Math.min(1,s.deckJob.elapsed/s.deckJob.duration):0;}
 export function notify(s,text){s.message=text;s.log.unshift({hour:s.hour,text});s.log=s.log.slice(0,8);return text;}
