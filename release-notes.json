@@ -1,1 +1,1 @@
-{"version": "0.18.35", "notes": {"en": ["Long waypoint searches try three routes in parallel. Coastline checks are faster."], "sv": ["Långa ruttsökningar provar tre alternativ samtidigt. Kontrollen mot kustlinjen går snabbare."]}}
+{"version": "0.18.36", "notes": {"en": ["Long waypoint routes can now be split into three legs and planned in parallel."], "sv": ["Långa rutter kan nu delas upp i tre etapper och beräknas parallellt."]}}
