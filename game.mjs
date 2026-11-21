@@ -1,45 +1,45 @@
-import {newWorldCode,newPlayerToken,cleanPlayerName,createMultiplayer} from './multiplayer.mjs?v=0.18.19';
-import {startWaypointTravel,advanceWaypointTravel} from './time-to-waypoint.mjs?v=0.18.19';
-import {CRAB_SPECIES,crabSpeciesName} from './crab-species.mjs?v=0.18.19';
-import {LIGHTING_PROFILES} from './light-upgrades.mjs?v=0.18.19';
-import {claimFirstBoatGrant,firstBoatNotice} from './first-boat.mjs?v=0.18.19';
-import {crabPriceAt,crabHoldValue} from './catch-value.mjs?v=0.18.19';
-import {watchDonations,appendDonation} from './donation-feed.mjs?v=0.18.19';
-import {DONATION_FEED_URL} from './donation-config.mjs?v=0.18.19';
-import {watchUpdates,formatUpdateNotice} from './update-check.mjs?v=0.18.19';
-import {energyPrice} from './energy.mjs?v=0.18.19';
-import {createMessageQueue} from './message-queue.mjs?v=0.18.19';
-import {visibleFleet} from './fleet-visuals.mjs?v=0.18.19';
-import {transitionWeather} from './weather-transition.mjs?v=0.18.19';
-import {ownedUpgrades,createRadioFeed,createLastHaul} from './hud-status.mjs?v=0.18.19';
-import {createIntro} from './intro.mjs?v=0.18.19';
-import {fleetNoticeCount} from './fleet.mjs?v=0.18.19';
-import {redeemDeveloperCode} from './developer-code.mjs?v=0.18.19';
-import {potSoakStage} from './pot-soak.mjs?v=0.18.19';
-import {createLiveWeather} from './live-weather.mjs?v=0.18.19';
-import {dockingStage} from './harbor.mjs?v=0.18.19';
-import {fuelEconomy} from './fuel-economy.mjs?v=0.18.19';
-import {scanSonar,drawSonar} from './sonar.mjs?v=0.18.19';
-import {rareCount,rareValue} from './rare-catch.mjs?v=0.18.19';
-import {clipChartWater} from './chart-water.mjs?v=0.18.19';
-import {groundsAt,groundReport,crabHotspot,groundMotion} from './fishing-grounds.mjs?v=0.18.19';
-import {createSoundscape} from './soundscape.mjs?v=0.18.19';
-import {WORLD_LAND,WORLD_CENTER,WORLD_BOUNDS,PLACES,worldToGeo} from './world.mjs?v=0.18.19';
-import {getLanguage,setLanguage,translateText,localizeTree} from './i18n.mjs?v=0.18.19';
-import {createShop} from './shop.mjs?v=0.18.19';
-import {restoreSeason,seasonJSON} from './saves.mjs?v=0.18.19';
-import {vesselStats,toggleAutomation} from './career.mjs?v=0.18.19';
-import {pickupAllPots,skipperCommand,createGame,step,conditions,weatherAt,setWeatherMode,depthAt,PORT,distance,nearPort,handlePot,dock,undock,canUndock,service,rescue,clamp,potAction,POT_RANGE,jobProgress,setAutopilot,setRudder,potBearing,workingSide} from './simulation.mjs?v=0.18.19';
-import {createOcean,drawFallback} from './ocean.mjs?v=0.18.19';
-import {createScene} from './scene.mjs?v=0.18.19';
-import {drawGroundMotion,createChartView,chartPoint,chartWorld,panChart,zoomChart,followVessel,updateChartFollow} from './chart.mjs?v=0.18.19';
-import {createWake} from './wake.mjs?v=0.18.19';
-import {advanceVoyage} from './voyage.mjs?v=0.18.19';
+import {newWorldCode,newPlayerToken,cleanPlayerName,createMultiplayer,createPeerSmoother} from './multiplayer.mjs?v=0.18.20';
+import {startWaypointTravel,advanceWaypointTravel} from './time-to-waypoint.mjs?v=0.18.20';
+import {CRAB_SPECIES,crabSpeciesName} from './crab-species.mjs?v=0.18.20';
+import {LIGHTING_PROFILES} from './light-upgrades.mjs?v=0.18.20';
+import {claimFirstBoatGrant,firstBoatNotice} from './first-boat.mjs?v=0.18.20';
+import {crabPriceAt,crabHoldValue} from './catch-value.mjs?v=0.18.20';
+import {watchDonations,appendDonation} from './donation-feed.mjs?v=0.18.20';
+import {DONATION_FEED_URL} from './donation-config.mjs?v=0.18.20';
+import {watchUpdates,formatUpdateNotice} from './update-check.mjs?v=0.18.20';
+import {energyPrice} from './energy.mjs?v=0.18.20';
+import {createMessageQueue} from './message-queue.mjs?v=0.18.20';
+import {visibleFleet} from './fleet-visuals.mjs?v=0.18.20';
+import {transitionWeather} from './weather-transition.mjs?v=0.18.20';
+import {ownedUpgrades,createRadioFeed,createLastHaul} from './hud-status.mjs?v=0.18.20';
+import {createIntro} from './intro.mjs?v=0.18.20';
+import {fleetNoticeCount} from './fleet.mjs?v=0.18.20';
+import {redeemDeveloperCode} from './developer-code.mjs?v=0.18.20';
+import {potSoakStage} from './pot-soak.mjs?v=0.18.20';
+import {createLiveWeather} from './live-weather.mjs?v=0.18.20';
+import {dockingStage} from './harbor.mjs?v=0.18.20';
+import {fuelEconomy} from './fuel-economy.mjs?v=0.18.20';
+import {scanSonar,drawSonar} from './sonar.mjs?v=0.18.20';
+import {rareCount,rareValue} from './rare-catch.mjs?v=0.18.20';
+import {clipChartWater} from './chart-water.mjs?v=0.18.20';
+import {groundsAt,groundReport,crabHotspot,groundMotion} from './fishing-grounds.mjs?v=0.18.20';
+import {createSoundscape} from './soundscape.mjs?v=0.18.20';
+import {WORLD_LAND,WORLD_CENTER,WORLD_BOUNDS,PLACES,worldToGeo} from './world.mjs?v=0.18.20';
+import {getLanguage,setLanguage,translateText,localizeTree} from './i18n.mjs?v=0.18.20';
+import {createShop} from './shop.mjs?v=0.18.20';
+import {restoreSeason,seasonJSON} from './saves.mjs?v=0.18.20';
+import {vesselStats,toggleAutomation} from './career.mjs?v=0.18.20';
+import {pickupAllPots,skipperCommand,createGame,step,conditions,weatherAt,setWeatherMode,depthAt,PORT,distance,nearPort,handlePot,dock,undock,canUndock,service,rescue,clamp,potAction,POT_RANGE,jobProgress,setAutopilot,setRudder,potBearing,workingSide} from './simulation.mjs?v=0.18.20';
+import {createOcean,drawFallback} from './ocean.mjs?v=0.18.20';
+import {createScene} from './scene.mjs?v=0.18.20';
+import {drawGroundMotion,createChartView,chartPoint,chartWorld,panChart,zoomChart,followVessel,updateChartFollow} from './chart.mjs?v=0.18.20';
+import {createWake} from './wake.mjs?v=0.18.20';
+import {advanceVoyage} from './voyage.mjs?v=0.18.20';
 let sonarFrame='';const radioFeed=createRadioFeed(),messageQueue=createMessageQueue();let ownedSignature='';const lastHaulDisplay=createLastHaul();
 const wake=createWake();
 const $=id=>document.getElementById(id),canvas=$('world'),ctx=canvas.getContext('2d'),sea=$('ocean'),chart=$('chart'),map=chart.getContext('2d');
 const sandbox=document.body.dataset.sandbox==='true';
-let state=createGame(),saved=false,saveAvailable=true;const multiplayer=createMultiplayer();
+let state=createGame(),saved=false,saveAvailable=true;const multiplayer=createMultiplayer(),peerSmoother=createPeerSmoother();
 if(sandbox){state.money=9000000;state.hour=11;if(document.body.dataset.layoutCheck==='true')state.career.parts.sonar=3;state.message='Isolated career test: your real season is untouched.';}
 else try{const loaded=restoreSeason(JSON.parse(localStorage.getItem('dangerous-waters-v1')));if(loaded){state=loaded;saved=true;}}catch{}
 let preferredLanguage=state.language||'en';if(!sandbox)try{preferredLanguage=localStorage.getItem('dangerous-waters-language')||preferredLanguage;}catch{}setLanguage(preferredLanguage);state.language=getLanguage();
@@ -73,7 +73,7 @@ function ensureWorldIdentity(){const fresh=!state.ownWorldId||!state.worldId||!s
 let nameWasPaused=false;function requestPlayerName(){if(!cleanPlayerName(state.playerName)){nameWasPaused=state.paused;state.paused=true;localizeTree($('player-name-dialog'));$('player-name-dialog').showModal();}}
 $('player-name-save').onclick=()=>{const name=cleanPlayerName($('player-name-input').value);if(!name)return;state.playerName=name;ensureWorldIdentity();save();$('player-name-dialog').close();state.paused=nameWasPaused;updateUI();};
 $('join-world').onclick=()=>{if(!cleanPlayerName(state.playerName)){requestPlayerName();return;}$('world-input').value='';$('world-error').textContent='';localizeTree($('join-world-dialog'));$('join-world-dialog').showModal();};
-$('join-world-confirm').onclick=async()=>{const id=$('world-input').value.trim().toUpperCase();if(!/^[A-Z0-9]{6}$/.test(id)){$('world-error').textContent=translateText('Enter a six-character World ID.');return;}ensureWorldIdentity();const old=state.worldId;state.worldId=id;multiplayer.reset();await multiplayer.sync(state,id===state.ownWorldId);if(multiplayer.status!=='online'){state.worldId=old;multiplayer.reset();$('world-error').textContent=translateText('World not found or server unavailable.');return;}save();$('world-id').textContent=id;$('join-world-dialog').close();};
+$('join-world-confirm').onclick=async()=>{const id=$('world-input').value.trim().toUpperCase();if(!/^[A-Z0-9]{6}$/.test(id)){$('world-error').textContent=translateText('Enter a six-character World ID.');return;}ensureWorldIdentity();const old=state.worldId;state.worldId=id;multiplayer.reset();peerSmoother.reset();await multiplayer.sync(state,id===state.ownWorldId);if(multiplayer.status!=='online'){state.worldId=old;multiplayer.reset();peerSmoother.reset();$('world-error').textContent=translateText('World not found or server unavailable.');return;}save();$('world-id').textContent=id;$('join-world-dialog').close();};
 const intro=createIntro({dialog:$('intro'),video:$('intro-video'),skip:$('intro-skip'),onFinish:()=>{started=true;state.paused=false;canvas.setAttribute('tabindex','0');canvas.focus();updateUI();requestPlayerName();}});
 $('start').onclick=()=>{enableSound();$('welcome').close();if(saved){started=true;state.paused=false;canvas.setAttribute('tabindex','0');canvas.focus();updateUI();requestPlayerName();}else intro.start();};$('welcome').showModal();
 $('pause').onclick=togglePause;
@@ -112,9 +112,9 @@ function castOffFromControls(){if(undock(state)){state.paused=false;keys.clear()
 $('undock-quick').onclick=castOffFromControls;
 $('undock').onclick=()=>{if(undock(state)){harborWasPaused=false;$('harbor').close();}save();updateUI();};
 $('sell').onclick=()=>{dock(state);if(state.deckJob?.kind==='unload'){harborWasPaused=false;$('harbor').close();}save();updateUI();};for(const b of document.querySelectorAll('[data-service]'))b.onclick=()=>{service(state,b.dataset.service);save();updateUI();};
-$('new-season').onclick=()=>{state=createGame();multiplayer.reset();firstBoatAcknowledgement=false;radioFeed.reset();messageQueue.reset();saved=false;harborWasPaused=false;setTimeSpeed(1);view.x=state.x;view.y=state.y;followVessel(chartView,state);save();$('harbor').close();started=false;state.paused=true;intro.start();updateUI();};
+$('new-season').onclick=()=>{state=createGame();multiplayer.reset();peerSmoother.reset();firstBoatAcknowledgement=false;radioFeed.reset();messageQueue.reset();saved=false;harborWasPaused=false;setTimeSpeed(1);view.x=state.x;view.y=state.y;followVessel(chartView,state);save();$('harbor').close();started=false;state.paused=true;intro.start();updateUI();};
 $('rescue').onclick=()=>{rescue(state);harborWasPaused=false;$('harbor').close();save();updateUI();};
-function changeSeason(action,data){if(action==='boat'&&state.career.firstBoatReward==='pending'){$('career').close();save();return;}if(action==='export'){const url=URL.createObjectURL(new Blob([seasonJSON(state)],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download='dangerous-waters-season.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}else if(action==='import'){const loaded=restoreSeason(data);if(!loaded){company.status('Invalid or incompatible season. Your current save is unchanged.');return;}state=loaded;multiplayer.reset();requestPlayerName();firstBoatAcknowledgement=false;radioFeed.reset();messageQueue.reset();followVessel(chartView,state);company.render();company.status('Season imported.');}save();updateUI();}
+function changeSeason(action,data){if(action==='boat'&&state.career.firstBoatReward==='pending'){$('career').close();save();return;}if(action==='export'){const url=URL.createObjectURL(new Blob([seasonJSON(state)],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download='dangerous-waters-season.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}else if(action==='import'){const loaded=restoreSeason(data);if(!loaded){company.status('Invalid or incompatible season. Your current save is unchanged.');return;}state=loaded;multiplayer.reset();peerSmoother.reset();requestPlayerName();firstBoatAcknowledgement=false;radioFeed.reset();messageQueue.reset();followVessel(chartView,state);company.render();company.status('Season imported.');}save();updateUI();}
 const company=createShop(()=>state,changeSeason);
 let pendingSeason=null;
 $('save-download').onclick=()=>{changeSeason('export');canvas.focus();};
@@ -220,7 +220,7 @@ let backgroundLast=performance.now();
 function backgroundTick(){const now=performance.now(),dt=Math.max(0,(now-backgroundLast)/1000);backgroundLast=now;if(document.hidden&&started&&!state.paused&&!waypointTravel){let remaining=Math.min(dt,30);while(remaining>0&&!state.paused){const slice=Math.min(.1,remaining);clock+=advanceVoyage(state,wake,slice,timeSpeed);remaining-=slice;}saveTimer+=dt;if(saveTimer>10){save();saveTimer=0;}}}
 setInterval(backgroundTick,1000);
 document.addEventListener('visibilitychange',()=>{backgroundTick();last=performance.now();backgroundLast=last;});
-function frame(now){if(started&&state.playerName){ensureWorldIdentity();multiplayer.tick(state,now);if(multiplayer.status==='online'&&state.worldId!==state.ownWorldId&&multiplayer.peers.length){const host=multiplayer.peers.find(p=>p.isHost);if(host&&Number.isFinite(host.hour)&&host.hour>state.hour&&!state.paused)state.hour+=Math.min(.002,(host.hour-state.hour)*.002);}state.remotePlayers=multiplayer.peers.map((p,i)=>({...p,id:'remote-'+p.id,parts:{},engine:0,hold:0,gear:0,color:'#e8bd78'}));$('world-id').textContent=state.worldId;const rows=[{name:state.playerName,landed:state.totalLanded||state.landed||0,earned:state.totalEarned||0},...multiplayer.peers];$('leaderboard-list').textContent=rows.sort((a,b)=>b.landed-a.landed).map(p=>`${p.name} · ${Math.round(p.landed)} kg · ${money(p.earned)}`).join('\n');$('world-status').textContent=multiplayer.status;}if(waypointTravel){const before=waypointTravel.elapsed,result=advanceWaypointTravel(state,waypointTravel);clock+=result.elapsed-before;if(result.done){waypointTravel=null;state.message=result.reason==='arrived'?'Next waypoint reached.':result.reason==='fuel'?'Not enough fuel to skip to the waypoint.':'Cannot skip: check the vessel or route.';save();updateUI();}}backgroundLast=now;weatherPoll+=1;if(state.weatherMode!=='dynamic'&&(weatherPoll===1||weatherPoll%60===0))void liveWeather.update(state);const wallDt=Math.max(0,(now-last)/1000),dt=Math.min(wallDt,.1);last=now;let elapsed=0;fps+=(1/Math.max(wallDt,.001)-fps)*.03;
+function frame(now){if(started&&state.playerName){ensureWorldIdentity();multiplayer.tick(state,now);if(multiplayer.status==='online'&&state.worldId!==state.ownWorldId&&multiplayer.peers.length){const host=multiplayer.peers.find(p=>p.isHost);if(host&&Number.isFinite(host.hour)&&host.hour>state.hour&&!state.paused)state.hour+=Math.min(.002,(host.hour-state.hour)*.002);}state.remotePlayers=peerSmoother.update(multiplayer.peers,now).map((p,i)=>({...p,id:'remote-'+p.id,parts:{},engine:0,hold:0,gear:0,color:'#e8bd78'}));$('world-id').textContent=state.worldId;const rows=[{name:state.playerName,landed:state.totalLanded||state.landed||0,earned:state.totalEarned||0},...multiplayer.peers];const board=rows.sort((a,b)=>b.landed-a.landed).map(p=>`${p.name} · ${Math.round(p.landed)} kg · ${translateText(money(p.earned))}`).join('\n');if($('leaderboard-list').textContent!==board)$('leaderboard-list').textContent=board;$('world-status').textContent=multiplayer.status;}if(waypointTravel){const before=waypointTravel.elapsed,result=advanceWaypointTravel(state,waypointTravel);clock+=result.elapsed-before;if(result.done){waypointTravel=null;state.message=result.reason==='arrived'?'Next waypoint reached.':result.reason==='fuel'?'Not enough fuel to skip to the waypoint.':'Cannot skip: check the vessel or route.';save();updateUI();}}backgroundLast=now;weatherPoll+=1;if(state.weatherMode!=='dynamic'&&(weatherPoll===1||weatherPoll%60===0))void liveWeather.update(state);const wallDt=Math.max(0,(now-last)/1000),dt=Math.min(wallDt,.1);last=now;let elapsed=0;fps+=(1/Math.max(wallDt,.001)-fps)*.03;
  if(started&&!state.paused&&!waypointTravel){if(keys.has('KeyW')||keys.has('ArrowUp'))state.desiredKnots=clamp((state.desiredKnots||0)+dt*2,-3,Math.ceil(vesselStats(state).top*1.94384));if(keys.has('KeyS')||keys.has('ArrowDown'))state.desiredKnots=clamp((state.desiredKnots||0)-dt*2.5,-3,Math.ceil(vesselStats(state).top*1.94384));const helm=(keys.has('KeyD')||keys.has('ArrowRight')?1:0)-(keys.has('KeyA')||keys.has('ArrowLeft')?1:0);if(helm)setRudder(state,state.rudder*35+helm*dt*12);elapsed=advanceVoyage(state,wake,dt,timeSpeed);}
  clock+=started?elapsed:dt;
  view.x+=(state.x-view.x)*(1-Math.exp(-dt*2));view.y+=(state.y-view.y)*(1-Math.exp(-dt*2));visualWeather=transitionWeather(visualWeather,conditions(state),dt,clock,state.x,state.y);const w=visualWeather;const renderKey=[scene3D?.revision||0,clock,width,height,cameraZoom,cameraOverhead,state.paused,state.x,state.y,state.heading,state.deck,state.career.boat,state.lights,state.career.parts.lights||0,...[w.waves,w.fog,w.rain,w.daylight||0,w.windDirection||0,w.waveDirection||0].map(n=>n.toFixed(2))].join('/');if(!state.paused||renderKey!==lastRenderKey){lastRenderKey=renderKey;ctx.clearRect(0,0,width,height);if(scene3D){scene3D.draw(state,w,clock,width,height,dpr,wake);for(const p of state.remotePlayers||[]){const q=scene3D.project(p.x,p.y,12);if(q.visible&&Math.hypot(p.x-state.x,p.y-state.y)<900){ctx.fillStyle="#f3dba9";ctx.font="12px monospace";ctx.fillText(p.name,q.x,q.y);}}drawBuoyLabels();drawLightGlows();}else{if(gpu)renderer.draw(state,w,clock,view);else drawFallback(ctx,w,clock,view,width,height);drawWakeFallback();drawGrounds();drawHarbor();drawPots(clock);drawFleetFallback();drawBoat(w,clock);}atmosphere(w,clock);}

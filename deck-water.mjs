@@ -1,4 +1,4 @@
-import {HULL_STATIONS,hullWidthAt} from './fenders.mjs?v=0.18.19';
+import {HULL_STATIONS,hullWidthAt} from './fenders.mjs?v=0.18.20';
 export const insideHullWater=([x,y,z],design={})=>x>=-12&&x<=12.2&&Math.abs(z)<hullWidthAt(x,design)*(.55+.45*Math.max(0,Math.min(1,(y+1.3)/1.65)))-.035&&y>=-1.3;
 export const createDeckWater=()=>({port:0,starboard:0});
 // A thin draining sheet is separate from the ocean; driven only by rail overtopping.

@@ -1,11 +1,13 @@
 {
-  "version": "0.18.19",
+  "version": "0.18.20",
   "notes": {
     "en": [
-      "Fixed overlapping sonar and leaderboard panels and made World ID controls easier to read."
+      "Smoothed other players’ boat movement and stabilized leaderboard amounts.",
+      "Increased travel speed slightly at higher throttle settings."
     ],
     "sv": [
-      "Rättat överlappningen mellan sonar och topplista och gjort världs-ID-kontrollerna tydligare."
+      "Mjukare rörelser för andra spelares båtar och stabilare belopp i topplistan.",
+      "Ökat färdhastigheten lite vid högre fartinställningar."
     ]
   }
 }
