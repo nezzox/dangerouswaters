@@ -1,8 +1,41 @@
-import {QUAY,quayPoint,berthsAt} from './harbor.mjs?v=0.18.40';
-import {geometry} from './geometry.mjs?v=0.18.40';
-import {WORLD_LAND,isLand} from './world.mjs?v=0.18.40';
-import {groundHeight} from './geography-mesh.mjs?v=0.18.40';
+import {QUAY,quayPoint,berthsAt} from './harbor.mjs?v=0.18.41';
+import {geometry} from './geometry.mjs?v=0.18.41';
+import {WORLD_LAND,isLand} from './world.mjs?v=0.18.41';
+import {groundHeight} from './geography-mesh.mjs?v=0.18.41';
 const asphalt=[.16,.18,.18],concrete=[.36,.37,.34],steel=[.29,.33,.33],dark=[.07,.09,.085];
+export const MATTHEW_FLOODLIGHTS=[-215,-122,-37,61];
+function buildMatthewDetails(g,quay){
+ const base=quay.deck;
+ const at=(u,v,h=0)=>{const p=quayPoint(u,v,quay);return [p.x,base+h,p.y];};
+ function block(u,v,width,depth,bottom,top,color,emit=0){
+  const corners=[[-1,-1],[-1,1],[1,1],[1,-1]];
+  const points=h=>corners.map(([x,y])=>at(u+x*width/2,v+y*depth/2,h));
+  const low=points(bottom),high=points(top);
+  g.quad(...high,color,.78,emit);
+  for(let i=0;i<4;i++){const j=(i+1)%4;g.quad(low[i],low[j],high[j],high[i],color,.78,emit);}
+ }
+ for(const [u,w,h,color] of [[-183,38,9,[.34,.43,.44]],[-89,42,11,[.47,.38,.29]],[28,27,7,[.52,.52,.44]]]){
+  block(u,30,w,18,0,h,color);
+  block(u,30,w+1,19,h,h+.45,steel);
+  for(let x=u-w/2+6;x<u+w/2-3;x+=10){
+   block(x,20.94,5,.12,.2,5,[.19,.23,.25]);
+   block(x,20.8,1.4,.18,5.5,6,[.85,.64,.37],.55);
+  }
+ }
+ for(const [u,v] of [[-217,26],[-210,32],[-137,31],[-48,30],[-39,32],[66,31]]){
+  block(u,v,5,10,0,2.6,[.31,.20,.15]);
+  block(u,v,5.2,10.2,2.6,2.8,steel);
+ }
+ for(let u=-222;u<75;u+=8){
+  block(u,2,3,.19,.012,.032,[.63,.49,.22]);
+  if(u%16===2){g.tube(at(u,1.5),at(u,1.5,.8),.19,steel,8);}
+ }
+ for(const u of MATTHEW_FLOODLIGHTS){
+  g.tube(at(u,5),at(u,5,10),.18,steel,8);
+  block(u,4.8,1.7,.85,9.6,10.4,dark);
+  block(u,4.32,1.5,.14,9.7,10.3,[.84,.92,1],1.1);
+ }
+}
 // Interpreted Ballyhoo Road industrial frontage, fitted to the geographic shoreline.
 // No satellite imagery is shipped; the source coastline remains authoritative.
 export function buildPortScenery(selected=QUAY,local=false){const g=geometry();let index=0;
@@ -32,6 +65,7 @@ export function buildPortScenery(selected=QUAY,local=false){const g=geometry();l
  for(const quay of [selected]){
  const point=(u,v)=>quayPoint(u,v,quay);
  if(quay!==QUAY){
+  buildMatthewDetails(g,quay);
   const corners=[point(-228,0),point(-228,40),point(78,40),point(78,0)];
   const vertex=(i,h)=>[corners[i].x,h,corners[i].y];
   g.quad(...[0,1,2,3].map(i=>vertex(i,quay.deck)),concrete);

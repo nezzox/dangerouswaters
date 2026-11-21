@@ -1,9 +1,10 @@
-import {hullWaterGLSL} from './deck-water.mjs?v=0.18.40';
-import {seaHeightGLSL} from './sea-spectrum.mjs?v=0.18.40';
+import {hullWaterGLSL} from './deck-water.mjs?v=0.18.41';
+import {seaHeightGLSL} from './sea-spectrum.mjs?v=0.18.41';
 // Shared atmosphere and ocean functions keep lighting and reflections consistent.
 export const common=`
 precision highp float;precision highp int;
 uniform vec4 uRemoteLights[4];
+uniform vec4 uQuayLights[4];
 uniform float uDeckSign;uniform vec3 uCraneColor;
 uniform float uReflectionPass;uniform float uKind;uniform float uDaylight;uniform float uLights;uniform vec4 uLampUpgrade;uniform vec3 uRelativeEye;uniform mat4 uMVP;uniform mat4 uShadowMVP;uniform float uHullY;uniform vec4 uWake[48];uniform vec4 uWakeInfo[48];uniform int uWakeCount;uniform float uWakeTime;
 uniform float uDetailTime;uniform vec3 uSea;uniform float uTime;uniform vec4 uWeather;uniform vec4 uBoat;uniform vec3 uEye;uniform mat4 uVP;uniform mat4 uLightVP;
@@ -26,6 +27,17 @@ vec3 remoteBeams(vec3 p){float energy=0.;for(int i=0;i<4;i++){
  float deck=exp(-dist*.12),beam=cone*smoothstep(0.,7.,along)*(1.-smoothstep(12.,105.,dist));
  energy+=deck*.08+beam*(.09+uWeather.y*.16)*exp(-side*.04);
  }return vec3(.66,.84,1.)*energy*(1.-smoothstep(.08,.65,uDaylight));}
+vec3 quayLighting(vec3 p){
+ float amount=0.;
+ for(int i=0;i<4;i++){
+  vec4 lamp=uQuayLights[i];if(lamp.w==0.)continue;
+  vec2 d=p.xz-lamp.xy,forward=vec2(cos(lamp.z),sin(lamp.z));
+  float distance=length(d),along=dot(d,forward);
+  float fan=smoothstep(.72,.94,along/max(1.,distance));
+  amount+=fan*(1.-smoothstep(6.,115.,distance))*.34+exp(-distance*.13)*.08;
+ }
+ return vec3(.86,.93,1.)*amount*(1.-smoothstep(.12,.8,uDaylight));
+}
 vec3 beamFog(vec3 world){if(uLights<.5||uDaylight>.7)return vec3(0.);vec3 sum=vec3(0.);for(int i=0;i<12;i++){float t=(float(i)+.5)/12.;vec3 p=mix(uEye,world,t);sum+=lamps(shipLocal(p),vec3(0,1,0),vec3(0,1,0),true,false);}return sum*.5*(.0016+uWeather.y*.012+uWeather.z*.006)*smoothstep(.6,.07,uDaylight);}
 
 vec3 sunDir(){return normalize(vec3(-.65,.55,-.45));}
@@ -33,7 +45,7 @@ vec3 sky(vec3 ray){float cover=clamp(uWeather.w*.7+uWeather.z*.25,0.,1.);float e
 ${seaHeightGLSL}
 ${hullWaterGLSL}
 float shadowAt(vec4 lightPos,sampler2D shadowMap){vec3 p=lightPos.xyz/lightPos.w*.5+.5;if(any(lessThan(p,vec3(0.)))||any(greaterThan(p,vec3(1.))))return 1.;float s=0.;for(int x=-1;x<=1;x++)for(int y=-1;y<=1;y++){float depth=texture(shadowMap,p.xy+vec2(float(x),float(y))/2048.).r;s+=p.z-.0007<=depth?1.:.24;}return s/9.;}
-vec3 finishColor(vec3 c,vec3 world){if(uReflectionPass>.5)return c/(1.+c);float mist=(1.-exp(-length(world-uEye)*(.00035+uWeather.y*.0028)));c=mix(c,mix(vec3(.019,.032,.05),vec3(.4,.47,.5),uDaylight),mist);c+=beamFog(world)+remoteBeams(world);c*=1.18;c=clamp((c*(2.51*c+.03))/(c*(2.43*c+.59)+.14),0.,1.);return pow(max(c,vec3(0.)),vec3(.4545));}
+vec3 finishColor(vec3 c,vec3 world){if(uReflectionPass>.5)return c/(1.+c);float mist=(1.-exp(-length(world-uEye)*(.00035+uWeather.y*.0028)));c=mix(c,mix(vec3(.019,.032,.05),vec3(.4,.47,.5),uDaylight),mist);c+=beamFog(world)+remoteBeams(world)+quayLighting(world);c*=1.18;c=clamp((c*(2.51*c+.03))/(c*(2.43*c+.59)+.14),0.,1.);return pow(max(c,vec3(0.)),vec3(.4545));}
 `;
 export const oceanVertex=`#version 300 es
 ${common}
@@ -110,7 +122,7 @@ void main(){if(uReflectionPass>.5&&vWorld.y<.04)discard;
  if(glass>.5){float interior=.25+.25*noise(vLocal.xz*5.);c=base*ambient*interior*.2+reflected*(.07+.72*pow(1.-max(0.,dot(n,v)),4.));}
  // Negative surface emission marks matte earth/shore banks; buildings keep their own materials.
  if(vSurface.y< -1.5||(uKind>3.5&&vSurface.y<-.5))c=base*(ambient+vec3(1.1)*max(0.,dot(n,l))*uDaylight*(1.-uWeather.w*.65));
- c+=base*directLamps(vWorld,n,v);c+=vColor*max(0.,vSurface.y)*2.*((vSurface.y>1.1&&uKind<1.5)?uLampUpgrade.y:1.)*(uKind>1.5&&uKind<2.5?max(.12,1.-uDaylight):uLights);
+ c+=base*directLamps(vWorld,n,v);c+=vColor*max(0.,vSurface.y)*2.*((vSurface.y>1.1&&uKind<1.5)?uLampUpgrade.y:1.)*((uKind>1.5&&uKind<2.5||uKind>5.5)?max(.12,1.-uDaylight):uLights);
  outColor=vec4(finishColor(c,vWorld),1.);}`;
 export const depthVertex=`#version 300 es
 precision highp float;layout(location=0) in vec3 aPosition;layout(location=4) in vec3 aInstance;uniform float uInstanced;uniform vec3 uRackScale;uniform mat4 uModel;uniform mat4 uLightVP;uniform mat4 uMVP;void main(){gl_Position=uMVP*vec4(aPosition*mix(vec3(1.),uRackScale,uInstanced)+aInstance*uInstanced,1.);}`;
