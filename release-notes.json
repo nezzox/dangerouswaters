@@ -1,15 +1,13 @@
 {
-  "version": "0.18.25",
+  "version": "0.18.26",
   "notes": {
     "en": [
-      "Shared fleets, faster multiplayer sync, and safer docking.",
-      "Six berths at St Matthew Harbor, passing greetings and 7-knot crab pot work.",
-      "Improved offshore water detail and Swedish panel layout."
+      "Keep sailing with the expanded chart or message open. Set a waypoint by right-clicking the sea.",
+      "Rare diesel leaks leave a temporary slick. Tows find clear water near the harbor."
     ],
     "sv": [
-      "Gemensamt synliga flottor, snabbare multiplayer och säkrare dockning.",
-      "Sex kajplatser på St Matthew, hälsningar till sjöss och tinhantering i upp till 7 knop.",
-      "Bättre vattendetaljer långt ute till havs och bättre plats för svensk menytext."
+      "Fortsätt segla med förstorat sjökort eller öppet meddelande. Högerklicka på havet för att sätta en waypoint.",
+      "Sällsynta dieselläckor lämnar en tillfällig fläck. Bogsering placerar båten på fritt vatten vid hamnen."
     ]
   }
 }

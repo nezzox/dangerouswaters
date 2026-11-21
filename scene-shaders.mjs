@@ -1,5 +1,5 @@
-import {hullWaterGLSL} from './deck-water.mjs?v=0.18.25';
-import {seaHeightGLSL} from './sea-spectrum.mjs?v=0.18.25';
+import {hullWaterGLSL} from './deck-water.mjs?v=0.18.26';
+import {seaHeightGLSL} from './sea-spectrum.mjs?v=0.18.26';
 // Shared atmosphere and ocean functions keep lighting and reflections consistent.
 export const common=`
 precision highp float;precision highp int;
@@ -31,7 +31,7 @@ layout(location=0) in vec3 aPosition;uniform vec2 uCenter;out vec3 vWorld;out ve
 void main(){vWaterLocal=aPosition.xz;vec3 p=aPosition;p.xz+=uCenter;p.y=oceanHeight(p.xz)+wakeAt(p.xz).w;vWorld=p;vShadow=uLightVP*vec4(p,1.);gl_Position=uVP*vec4(p,1.);}`;
 export const oceanFragment=`#version 300 es
 ${common}
-in vec3 vWorld;in vec4 vShadow;in vec2 vWaterLocal;uniform vec2 uCenter;uniform sampler2D uShadow;uniform sampler2D uReflection;uniform mat4 uReflectionVP;out vec4 outColor;
+in vec3 vWorld;in vec4 vShadow;in vec2 vWaterLocal;uniform vec4 uDieselSlick;uniform vec2 uCenter;uniform sampler2D uShadow;uniform sampler2D uReflection;uniform mat4 uReflectionVP;out vec4 outColor;
 void main(){if(insideHullWater(vWorld))discard;vec2 p=vWorld.xz;vec4 field=seaField(p),wake=wakeAt(p);float h=field.x;vec2 slope=field.yz+wake.yz;vec2 detail=vWaterLocal+mod(uCenter,25600.);
 {vec2 k=vec2(1.9727300,1.1825128);float rippleFilter=1.-smoothstep(.55,2.5,length(fwidth(vWaterLocal))*2.3);slope+=normalize(k)*cos(dot(vWaterLocal,k)+mod(dot(mod(uCenter,25600.),k),6.2831853)-uTime*4.7500526+0.000+2.3*noise(detail*.67+vec2(0.000,uTime*.03)))*0.0350000*rippleFilter*(.35+uWeather.x*.14)*(.35+.9*noise(detail*.19+k*7.));}
 {vec2 k=vec2(3.0404593,2.4424593);float rippleFilter=1.-smoothstep(.55,2.5,length(fwidth(vWaterLocal))*3.9);slope+=normalize(k)*cos(dot(vWaterLocal,k)+mod(dot(mod(uCenter,25600.),k),6.2831853)-uTime*6.1853860+2.170+2.3*noise(detail*.67+vec2(2.170,uTime*.03)))*0.0250000*rippleFilter*(.35+uWeather.x*.14)*(.35+.9*noise(detail*.19+k*7.));}
@@ -48,6 +48,7 @@ void main(){if(insideHullWater(vWorld))discard;vec2 p=vWorld.xz;vec4 field=seaFi
  vec3 color=mix(water,reflected,clamp(fresnel,.0204,.95))+vec3(1.,.88,.7)*spec*nl*uDaylight;
  vec2 forward=vec2(cos(uBoat.z),sin(uBoat.z)),delta=p-uBoat.xy;float along=dot(delta,forward),side=abs(dot(delta,vec2(-forward.y,forward.x))),speed=abs(uBoat.w);float bubbles=fbm(detail*1.8-vec2(uTime*.12,0.));float bow=exp(-pow((along-10.8)/2.,2.))*exp(-pow((side-2.)/.9,2.))*clamp(speed/5.,0.,1.);float froth=clamp(wake.x+bow*.3,0.,.6)*smoothstep(.3,.7,bubbles);
  color=mix(color,vec3(.6,.67,.65)*(.1+.9*uDaylight),froth);color*=mix(.72,1.,shadowAt(vShadow,uShadow));color+=waterLamps(vWorld,n,v)+directLamps(vWorld,n,v)*froth*.08;
+ if(uDieselSlick.z>0.){vec2 spill=p-uDieselSlick.xy;float radius=12.+(180.-uDieselSlick.z)*.09,edge=length(spill*vec2(.75,1.2))/radius+noise(spill*.14)*.26;float oil=(1.-smoothstep(.67,1.,edge))*smoothstep(0.,60.,uDieselSlick.z);color=mix(color,vec3(.004,.005,.006),oil*.9);}
  outColor=vec4(finishColor(color,vWorld),1.);}`;
 export const meshVertex=`#version 300 es
 ${common}

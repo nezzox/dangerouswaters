@@ -1,30 +1,30 @@
-import {createAntialias} from './antialias.mjs?v=0.18.25';
-import {LIGHTING_PROFILES} from './light-upgrades.mjs?v=0.18.25';
-import {deckFrame,deckSign} from './vessel-profile.mjs?v=0.18.25';
-import {createTerrainLoader} from './terrain-loader.mjs?v=0.18.25';
-import {craneColor} from './crane-style.mjs?v=0.18.25';
-import {rackScale} from './vessel-style.mjs?v=0.18.25';
-import {createRackInstances} from './rack-instances.mjs?v=0.18.25';
-import {lineHaulerMounts,haulerRunning} from './line-hauler.mjs?v=0.18.25';
-import {netWorkPose} from './deck-work.mjs?v=0.18.25';
-import {visibleFleet,fleetColor} from './fleet-visuals.mjs?v=0.18.25';
-import {fleetStats} from './fleet.mjs?v=0.18.25';
-import {buildPortScenery} from './port-scenery.mjs?v=0.18.25';
-import {buildGeography} from './geography-mesh.mjs?v=0.18.25';
-import {createDeckWater,stepDeckWater} from './deck-water.mjs?v=0.18.25';
-import {dockingStage,QUAY,BERTH,PORT_QUAYS,berthsAt,quayPoint} from './harbor.mjs?v=0.18.25';
-import {vesselStats} from './career.mjs?v=0.18.25';
-import {boatById} from './catalog.mjs?v=0.18.25';
-import {createBuoyancy,stepBuoyancy} from './buoyancy.mjs?v=0.18.25';
-import {buildFoam} from './foam.mjs?v=0.18.25';
-import {fenderPose,createFenderMotion,stepFenderMotion,ropePoints} from './fenders.mjs?v=0.18.25';
-import {inverseTransform,multiply,transform,perspective,lookAt,identity,project} from './math3d.mjs?v=0.18.25';
-import {buildRackPot,buildDeckWash,buildVessel,buildBuoy,buildOceanGrid,buildCrewParts,buildDeckEquipment} from './geometry.mjs?v=0.18.25';
-import {deckWorkPose} from './deck-work.mjs?v=0.18.25';
-import {createCrew,commandCrew,stepCrew,crewPose} from './crew.mjs?v=0.18.25';
-import * as shaders from './scene-shaders.mjs?v=0.18.25';
-export {seaHeight as surfaceHeight} from './sea-spectrum.mjs?v=0.18.25';
-import {seaHeight,seaSettings} from './sea-spectrum.mjs?v=0.18.25';
+import {createAntialias} from './antialias.mjs?v=0.18.26';
+import {LIGHTING_PROFILES} from './light-upgrades.mjs?v=0.18.26';
+import {deckFrame,deckSign} from './vessel-profile.mjs?v=0.18.26';
+import {createTerrainLoader} from './terrain-loader.mjs?v=0.18.26';
+import {craneColor} from './crane-style.mjs?v=0.18.26';
+import {rackScale} from './vessel-style.mjs?v=0.18.26';
+import {createRackInstances} from './rack-instances.mjs?v=0.18.26';
+import {lineHaulerMounts,haulerRunning} from './line-hauler.mjs?v=0.18.26';
+import {netWorkPose} from './deck-work.mjs?v=0.18.26';
+import {visibleFleet,fleetColor} from './fleet-visuals.mjs?v=0.18.26';
+import {fleetStats} from './fleet.mjs?v=0.18.26';
+import {buildPortScenery} from './port-scenery.mjs?v=0.18.26';
+import {buildGeography} from './geography-mesh.mjs?v=0.18.26';
+import {createDeckWater,stepDeckWater} from './deck-water.mjs?v=0.18.26';
+import {dockingStage,QUAY,BERTH,PORT_QUAYS,berthsAt,quayPoint} from './harbor.mjs?v=0.18.26';
+import {vesselStats} from './career.mjs?v=0.18.26';
+import {boatById} from './catalog.mjs?v=0.18.26';
+import {createBuoyancy,stepBuoyancy} from './buoyancy.mjs?v=0.18.26';
+import {buildFoam} from './foam.mjs?v=0.18.26';
+import {fenderPose,createFenderMotion,stepFenderMotion,ropePoints} from './fenders.mjs?v=0.18.26';
+import {inverseTransform,multiply,transform,perspective,lookAt,identity,project} from './math3d.mjs?v=0.18.26';
+import {buildRackPot,buildDeckWash,buildVessel,buildBuoy,buildOceanGrid,buildCrewParts,buildDeckEquipment} from './geometry.mjs?v=0.18.26';
+import {deckWorkPose} from './deck-work.mjs?v=0.18.26';
+import {createCrew,commandCrew,stepCrew,crewPose} from './crew.mjs?v=0.18.26';
+import * as shaders from './scene-shaders.mjs?v=0.18.26';
+export {seaHeight as surfaceHeight} from './sea-spectrum.mjs?v=0.18.26';
+import {seaHeight,seaSettings} from './sea-spectrum.mjs?v=0.18.26';
 function ortho(l,r,b,t,n,f){return new Float64Array([2/(r-l),0,0,0,0,2/(t-b),0,0,0,0,-2/(f-n),0,-(r+l)/(r-l),-(t+b)/(t-b),-(f+n)/(f-n),1]);}
 export function createScene(canvas,{preview=false}={}){
  let currentSea={},haulerAngle=0;const surfaceHeight=(x,z,t,waves)=>seaHeight(x,z,t,waves,currentSea);
@@ -33,7 +33,7 @@ export function createScene(canvas,{preview=false}={}){
  function matrix(location,value){matrixScratch.set(value);gl.uniformMatrix4fv(location,false,matrixScratch);}
  function modelMatrices(p,model){matrix(p.u.uModel,model);if(p.view)matrix(p.u.uMVP,multiply(p.view,model,clipScratch));if(p.light&&p.u.uShadowMVP)matrix(p.u.uShadowMVP,multiply(p.light,model,clipScratch));if(p.eye)gl.uniform3f(p.u.uRelativeEye,p.eye[0]-model[12],p.eye[1]-model[13],p.eye[2]-model[14]);}
  const resources=[],programs=[];let running=true;
- function program(vs,fs){const p=gl.createProgram();for(const [kind,code] of [[gl.VERTEX_SHADER,vs],[gl.FRAGMENT_SHADER,fs]]){const shader=gl.createShader(kind);gl.shaderSource(shader,code);gl.compileShader(shader);if(!gl.getShaderParameter(shader,gl.COMPILE_STATUS)){const message=gl.getShaderInfoLog(shader);gl.deleteShader(shader);throw Error(message);}gl.attachShader(p,shader);gl.deleteShader(shader);}gl.linkProgram(p);if(!gl.getProgramParameter(p,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(p));programs.push(p);const names=['uVP','uLightVP','uModel','uMVP','uShadowMVP','uRelativeEye','uLampUpgrade','uHullOrigin','uTime','uWeather','uSea','uWavePhase[0]','uBoat','uEye','uShadow','uCenter','uPixelRatio','uDaylight','uLights','uHullY','uWake[0]','uWakeInfo[0]','uWakeCount','uWakeTime','uHullRamp','uDeckSign','uCraneColor','uKind','uInstanced','uRackScale','uReflectionPass','uReflection','uReflectionVP','uHullInverse','uDeckWater'];return {p,u:Object.fromEntries(names.map(n=>[n,gl.getUniformLocation(p,n)]))};}
+ function program(vs,fs){const p=gl.createProgram();for(const [kind,code] of [[gl.VERTEX_SHADER,vs],[gl.FRAGMENT_SHADER,fs]]){const shader=gl.createShader(kind);gl.shaderSource(shader,code);gl.compileShader(shader);if(!gl.getShaderParameter(shader,gl.COMPILE_STATUS)){const message=gl.getShaderInfoLog(shader);gl.deleteShader(shader);throw Error(message);}gl.attachShader(p,shader);gl.deleteShader(shader);}gl.linkProgram(p);if(!gl.getProgramParameter(p,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(p));programs.push(p);const names=['uVP','uLightVP','uModel','uMVP','uShadowMVP','uRelativeEye','uLampUpgrade','uHullOrigin','uTime','uWeather','uSea','uWavePhase[0]','uBoat','uEye','uShadow','uCenter','uDieselSlick','uPixelRatio','uDaylight','uLights','uHullY','uWake[0]','uWakeInfo[0]','uWakeCount','uWakeTime','uHullRamp','uDeckSign','uCraneColor','uKind','uInstanced','uRackScale','uReflectionPass','uReflection','uReflectionVP','uHullInverse','uDeckWater'];return {p,u:Object.fromEntries(names.map(n=>[n,gl.getUniformLocation(p,n)]))};}
  function mesh(data,stride=11,kind=0){const vao=gl.createVertexArray(),buffer=gl.createBuffer();gl.bindVertexArray(vao);gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,data,gl.STATIC_DRAW);const sizes=stride===11?[3,3,3,2]:[3];let offset=0;for(let i=0;i<sizes.length;i++){gl.enableVertexAttribArray(i);gl.vertexAttribPointer(i,sizes[i],gl.FLOAT,false,stride*4,offset*4);offset+=sizes[i];}const m={vao,buffer,count:data.length/stride,kind};resources.push(m);return m;}
  function destroyMesh(m){gl.deleteVertexArray(m.vao);gl.deleteBuffer(m.buffer);if(m.instances)gl.deleteBuffer(m.instances);resources.splice(resources.indexOf(m),1);}
  let ocean,solid,depth,spray,foam,vessel,harbor,matthewHarbor,buoy,water,shadowTexture,shadowFrame;
@@ -96,7 +96,15 @@ export function createScene(canvas,{preview=false}={}){
   if(carrying)drawMesh(p,equipment.tote,multiply(root,transform(.4,.85,0)));if(i===4){drawMesh(p,equipment.trolley,multiply(root,transform(.8,0,0)));drawMesh(p,equipment.tote,multiply(root,transform(.9,.55,0)));}
  }}
  function drawHarborCrane(p,s){for(const quay of PORT_QUAYS){if(Math.hypot(s.x-quay.x,s.y-quay.y)>1200)continue;for(const berth of berthsAt(quay)){const j=s.deckJob?.kind==='unload'&&Math.hypot((s.deckJob.berth||BERTH).x-berth.x,(s.deckJob.berth||BERTH).y-berth.y)<1?s.deckJob:null,q=j?Math.max(0,Math.min(1,(j.elapsed-j.approach)/Math.max(1,j.duration-j.approach))):0,phase=Math.min(.999999,q),active=j&&j.elapsed>=j.approach,e=t=>{t=Math.max(0,Math.min(1,t));return t*t*(3-2*t);},swing=!active?0:phase<.38?0:phase<.6?e((phase-.38)/.22):phase<.9?1:1-e((phase-.9)/.1),along=(berth.x-quay.x)*quay.tx+(berth.y-quay.y)*quay.ty,mast=quayPoint(along,8,quay),drop=quayPoint(along-14,21,quay),target={x:berth.x+(drop.x-berth.x)*swing,y:berth.y+(drop.y-berth.y)*swing},angle=Math.atan2(target.y-mast.y,target.x-mast.x),tip=[target.x,25.1,target.y],arm=transform(mast.x,24,mast.y,angle);for(const k of [0,1,2])arm[k]*=Math.hypot(target.x-mast.x,target.y-mast.y)/3;drawMesh(p,equipment.boom,arm);const low=Math.max(3,lastHullY+3),height=!active?18:phase<.2?18-e(phase/.2)*(18-low):phase<.38?low+e((phase-.2)/.18)*(18-low):phase<.6?18:phase<.76?18-e((phase-.6)/.16)*9:phase<.81?9:phase<.9?9+e((phase-.81)/.09)*9:18,sway=active?Math.sin(lastTime*1.7)*.12*Math.sin(phase*Math.PI):0,end=[tip[0]+sway,height,tip[2]+sway*.5];cable(p,identity(),tip,[end[0],end[1]+1.1,end[2]]);if(active&&j.cargoKg>0){const cage=transform(...end,0,phase>.76&&phase<.81?.65:0);for(const offset of [0,4,8]){const length=Math.hypot(cage[offset],cage[offset+1],cage[offset+2]);for(let k=0;k<3;k++)cage[offset+k]/=length;}drawMesh(p,equipment.pot,cage);if(phase>.2&&phase<.79)for(let i=0;i<12;i++)drawMesh(p,equipment.crab,multiply(cage,transform((i%4-1.5)*.35,-.4,(Math.floor(i/4)-1)*.4,i*2.1)));}}}}
- return {label:'3D · WEBGL2',get revision(){return revision;},get crewDiagnostics(){return {deckWater:{...deckWater},hullY:lastHullY,elapsed:crew.elapsed,cruise:crew.cruise,door:crew.door,members:crew.members.map(m=>({x:m.x,z:m.z,hidden:m.hidden,resting:m.resting,route:m.route.length,blocked:m.blocked,target:m.target}))};},get crewStatus(){return lastCrewState?.moored?'Moored alongside':lastCrewState?.deckJob?.kind==='netSet'?'Setting salmon net':lastCrewState?.deckJob?.kind==='netHaul'?'Retrieving salmon net':lastCrewState?.deckJob?.kind==='unload'?(lastCrewState.deckJob.elapsed<lastCrewState.deckJob.approach?`${dockingStage(lastCrewState.deckJob.route||[],lastCrewState.deckJob.elapsed)} · ${Math.ceil(lastCrewState.deckJob.duration-lastCrewState.deckJob.elapsed)} s`:'Harbor crane unloading the hold'):deckVisual?.stage||crew.label;},lightPositions(){if(!lightEnabled)return [];return [[7,5.3,0,false],[-.35,5.4,-2.8,true],[-.35,5.4,2.8,true],[0,5.4,-2.8,false],[0,5.4,2.8,false]].map(([x,y,z,warm])=>{const local=multiply(currentBoat,transform(x,y,z)),p=project(viewProjection,[local[12],local[13],local[14]],size.width,size.height);return {...p,warm:warm&&lampProfile.rank<3,radius:(8+(1-daylight)*19)*lampProfile.glow};});},setZoom(value){zoom=Math.max(.22,Math.min(1.65,value));},setTilt(value){cameraTilt=value;},project(x,y,z=0){return project(viewProjection,[x,z,y],size.width,size.height);},
+ return {label:'3D · WEBGL2',get revision(){return revision;},get crewDiagnostics(){return {deckWater:{...deckWater},hullY:lastHullY,elapsed:crew.elapsed,cruise:crew.cruise,door:crew.door,members:crew.members.map(m=>({x:m.x,z:m.z,hidden:m.hidden,resting:m.resting,route:m.route.length,blocked:m.blocked,target:m.target}))};},get crewStatus(){return lastCrewState?.moored?'Moored alongside':lastCrewState?.deckJob?.kind==='netSet'?'Setting salmon net':lastCrewState?.deckJob?.kind==='netHaul'?'Retrieving salmon net':lastCrewState?.deckJob?.kind==='unload'?(lastCrewState.deckJob.elapsed<lastCrewState.deckJob.approach?`${dockingStage(lastCrewState.deckJob.route||[],lastCrewState.deckJob.elapsed)} · ${Math.ceil(lastCrewState.deckJob.duration-lastCrewState.deckJob.elapsed)} s`:'Harbor crane unloading the hold'):deckVisual?.stage||crew.label;},lightPositions(){if(!lightEnabled)return [];return [[7,5.3,0,false],[-.35,5.4,-2.8,true],[-.35,5.4,2.8,true],[0,5.4,-2.8,false],[0,5.4,2.8,false]].map(([x,y,z,warm])=>{const local=multiply(currentBoat,transform(x,y,z)),p=project(viewProjection,[local[12],local[13],local[14]],size.width,size.height);return {...p,warm:warm&&lampProfile.rank<3,radius:(8+(1-daylight)*19)*lampProfile.glow};});},setZoom(value){zoom=Math.max(.22,Math.min(1.65,value));},setTilt(value){cameraTilt=value;},seaPoint(x,y){
+ const m=viewProjection,nx=2*x/size.width-1,ny=1-2*y/size.height;
+ const a=m[0]-nx*m[3],b=m[8]-nx*m[11],c=nx*m[15]-m[12];
+ const d=m[1]-ny*m[3],e=m[9]-ny*m[11],f=ny*m[15]-m[13],det=a*e-b*d;
+ if(Math.abs(det)<1e-8)return null;
+ const point={x:(c*e-b*f)/det,y:(a*f-c*d)/det};
+ const depth=m[3]*point.x+m[11]*point.y+m[15];
+ return depth>0&&depth<1500?point:null;
+ },project(x,y,z=0){return project(viewProjection,[x,z,y],size.width,size.height);},
  draw(s,w,t,width,height,dpr,wake){if(!running)return;const atMatthew=Math.hypot(s.x-PORT_QUAYS[1].x,s.y-PORT_QUAYS[1].y)<1600;currentSea=w;const dt=Math.min(Math.max(0,t-lastTime),1.5);lastTime=t;if(!s.paused&&haulerRunning(s.deckJob))haulerAngle+=dt*5;size={width,height};daylight=Math.max(.035,Math.sin(((s.hour%24)-6)/12*Math.PI));lightEnabled=s.lights!==false;wakeCount=wake?.points.length||0;wakeTime=wake?.time||0;for(let i=0;i<wakeCount;i++){const point=wake.points[i];wakePositions.set([point.x,point.z,0,0],i*4);wakeInfo.set([Math.cos(point.heading),Math.sin(point.heading),point.energy,point.born],i*4);}const rw=Math.round(width*Math.min(dpr,1.25)),rh=Math.round(height*Math.min(dpr,1.25));if(canvas.width!==rw||canvas.height!==rh){canvas.width=rw;canvas.height=rh;}
   const tk=Math.floor(s.x/500)+'/'+Math.floor(s.y/500);if(tk!==terrainKey){terrainKey=tk;if(terrainLoader)terrainLoader.load(s.x,s.y).then(data=>{if(!running||terrainKey!==tk)return;const next=mesh(data,11,4);if(terrain)destroyMesh(terrain);terrain=next;revision++;});}const stats=vesselStats(s);lampProfile=LIGHTING_PROFILES[Math.max(0,Math.min(5,stats.lightRank||0))];currentDesign=stats;const key=stats.id;if(vesselKey!==key){destroyMesh(vessel);vessel=mesh(buildVessel(0,stats),11,1);vesselKey=key;destroyMesh(washMesh);washMesh=mesh(buildDeckWash(stats));}
   const f=[Math.cos(s.heading),Math.sin(s.heading)],centerHeight=surfaceHeight(s.x,s.y,t,w.waves);lastHullY=centerHeight;
@@ -115,7 +123,7 @@ export function createScene(canvas,{preview=false}={}){
   gl.bindFramebuffer(gl.FRAMEBUFFER,reflectionFrame);gl.viewport(0,0,reflectionWidth,reflectionHeight);gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,shadowTexture);uniforms(solid,s,w,t,reflectionEye,reflectionVP,light);gl.uniform1f(solid.u.uReflectionPass,1);drawMesh(solid,harbor,identity());if(atMatthew)drawMesh(solid,matthewHarbor,identity());if(terrain)drawMesh(solid,terrain,identity());drawHarborCrane(solid,s);harborPeople(solid,s,t);drawFleet(solid,w,t);drawMesh(solid,vessel,model);drawRack(solid,currentBoat,s.deck,stats);drawCrew(solid,currentBoat,w);drawEquipment(solid,currentBoat);fittings(solid,model,s,w,t);drawNets(solid,s,t,w);
   gl.bindFramebuffer(gl.FRAMEBUFFER,null);gl.activeTexture(gl.TEXTURE1);gl.bindTexture(gl.TEXTURE_2D,reflectionTexture);gl.generateMipmap(gl.TEXTURE_2D);gl.activeTexture(gl.TEXTURE0);
   gl.bindFramebuffer(gl.FRAMEBUFFER,null);gl.viewport(0,0,rw,rh);gl.clearColor(.12,.2,.25,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,shadowTexture);
-  uniforms(ocean,s,w,t,eye,viewProjection,light);gl.uniform1i(ocean.u.uReflection,1);matrix(ocean.u.uReflectionVP,reflectionVP);gl.uniform2f(ocean.u.uCenter,Math.floor(s.x/20)*20,Math.floor(s.y/20)*20);gl.bindVertexArray(water.vao);gl.drawArrays(gl.TRIANGLES,0,water.count);
+  uniforms(ocean,s,w,t,eye,viewProjection,light);const slick=s.dieselSlick;gl.uniform4f(ocean.u.uDieselSlick,slick?.x||0,slick?.y||0,slick?.remaining||0,0);gl.uniform1i(ocean.u.uReflection,1);matrix(ocean.u.uReflectionVP,reflectionVP);gl.uniform2f(ocean.u.uCenter,Math.floor(s.x/20)*20,Math.floor(s.y/20)*20);gl.bindVertexArray(water.vao);gl.drawArrays(gl.TRIANGLES,0,water.count);
   uniforms(solid,s,w,t,eye,viewProjection,light);drawMesh(solid,harbor,identity());if(atMatthew)drawMesh(solid,matthewHarbor,identity());if(terrain)drawMesh(solid,terrain,identity());drawHarborCrane(solid,s);harborPeople(solid,s,t);drawFleet(solid,w,t);drawMesh(solid,vessel,model);drawRack(solid,currentBoat,s.deck,stats);drawCrew(solid,currentBoat,w);drawEquipment(solid,currentBoat);fittings(solid,model,s,w,t);drawNets(solid,s,t,w);for(const p of s.pots)if(!(s.deckJob?.kind==='haul'&&s.deckJob.potId===p.id&&deckVisual.progress>(s.deckJob.grapple ? .12 : .2)))drawMesh(solid,buoy,transform(p.x,surfaceHeight(p.x,p.y,t,w.waves),p.y,0,Math.sin(t)*.12,Math.cos(t*.7)*.1));
   if(deckWater.port+deckWater.starboard>.001){uniforms(washProgram,s,w,t,eye,viewProjection,light);gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.depthMask(false);drawMesh(washProgram,washMesh,model);gl.depthMask(true);gl.disable(gl.BLEND);}
   const nextFoamKey=[t,w.waves,s.x,s.y,wake?.time,wake?.points.length].join('/');if(nextFoamKey!==foamKey){const data=buildFoam(wake,s,w,t);foamMesh.count=data.length/11;gl.bindBuffer(gl.ARRAY_BUFFER,foamMesh.buffer);gl.bufferData(gl.ARRAY_BUFFER,data,gl.DYNAMIC_DRAW);foamKey=nextFoamKey;}if(foamMesh.count){uniforms(foam,s,w,t,eye,viewProjection,light);modelMatrices(foam,identity());gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.depthMask(false);gl.bindVertexArray(foamMesh.vao);gl.drawArrays(gl.TRIANGLES,0,foamMesh.count);gl.depthMask(true);gl.disable(gl.BLEND);}
