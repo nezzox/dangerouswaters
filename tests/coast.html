@@ -1,4 +1,4 @@
 <!doctype html><html><meta charset="utf-8"><title>Dangerous Waters · Coast check</title><style>body{margin:0;background:#0d1b22}canvas{display:block;width:100vw;height:100vh}</style><canvas></canvas><script type="module">
-import{createScene}from'../scene.mjs?v=0.18.17';import{createGame,conditions}from'../simulation.mjs?v=0.18.17';
+import{createScene}from'../scene.mjs?v=0.18.18';import{createGame,conditions}from'../simulation.mjs?v=0.18.18';
 const state=createGame();Object.assign(state,{x:92,y:-89,heading:336*Math.PI/180,hour:11,paused:true,weatherOverride:'rough'});const scene=createScene(document.querySelector('canvas'));scene.setZoom(.74);scene.draw(state,conditions(state),0,innerWidth,innerHeight,devicePixelRatio);
 </script></html>

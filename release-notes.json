@@ -1,11 +1,13 @@
 {
-  "version": "0.18.17",
+  "version": "0.18.18",
   "notes": {
     "en": [
-      "Added Time to Waypoint: simulate the voyage to the next planned waypoint, including fuel, time and incidents."
+      "Join friends with a six-character World ID; player names, boats, buoys and leaderboard are shared while each season remains separate.",
+      "Skip to Waypoint now spends fuel without changing the clock; faster ships cover more distance."
     ],
     "sv": [
-      "Lagt till Tid till ruttpunkt: simulera resan till nästa ruttpunkt med bränsle, tid och händelser."
+      "Anslut till vänner med ett sex tecken långt världs-ID. Namn, båtar, bojar och topplista delas medan varje sparfil är separat.",
+      "Hoppa till ruttpunkt drar bränsle utan att ändra klockan. Snabbare båtar färdas längre."
     ]
   }
 }

@@ -73,3 +73,5 @@
 .crab-species-legend{display:flex;flex-wrap:wrap;gap:4px 10px;font:9px monospace;margin:8px 0;line-height:1.5}
 
 .simulation .volume-control{display:inline-flex;align-items:center;gap:5px;white-space:nowrap;font:9px monospace}.volume-control input{width:80px;accent-color:var(--amber)}.volume-control output{min-width:3em}
+
+.leaderboard{position:fixed;right:300px;top:345px;z-index:4;min-width:190px;font:10px monospace}.leaderboard pre{white-space:pre-wrap;font:10px/1.6 monospace;color:#c7d8cf;max-height:180px;overflow:auto}#player-name-dialog input,#join-world-dialog input{display:block;margin:12px 0;padding:10px;background:#132a32;color:#fff;border:1px solid #628078}@media(max-width:1100px){.leaderboard{right:245px}}@media(max-width:760px){.leaderboard{top:270px;right:160px;min-width:120px}}
