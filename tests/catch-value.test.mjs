@@ -6,3 +6,20 @@ test('harbor unloading settles the recorded mixed-location value and empties its
 test('all five regional species use their own price while preserving the voyage premium',async()=>{const {CRAB_SPECIES}=await import('../crab-species.mjs');for(const [species,info] of Object.entries(CRAB_SPECIES)){assert.equal(crabPriceAt({x:0,y:0,crabSpecies:species}),info.usdKg*10);assert(Math.abs(crabPriceAt({x:1620000,y:0,crabSpecies:species})-info.usdKg*50)<1e-8);const s=createGame();addCrabCatch(s,90,{x:1620000,y:0,crabSpecies:species});const value=crabHoldValue(s),copy=restoreSeason(JSON.parse(seasonJSON(s)));assert.equal(crabHoldValue(copy),value);assert(Math.abs(landCrab(copy,90)-value)<1e-8);}assert(CRAB_SPECIES.red.usdKg>CRAB_SPECIES.tanner.usdKg);assert(CRAB_SPECIES.blue.usdKg>CRAB_SPECIES.snow.usdKg);});
 test('regional species and origin prices are shared by player and fleet and survive saved gear',async()=>{const {groundsAt}=await import('../fishing-grounds.mjs'),{captureCrabSpecies}=await import('../catch-value.mjs');for(const g of groundsAt(100)){const pot={id:1,x:g.x,y:g.y,setAt:100,crabSpecies:captureCrabSpecies(g,100)};assert.equal(pot.crabSpecies,g.species);const player=createGame(),fleet={cargo:0};player.pots=[pot];assert.equal(restoreSeason(JSON.parse(seasonJSON(player))).pots[0].crabSpecies,g.species);addCrabCatch(player,40,pot);addCrabCatch(fleet,40,pot);assert.equal(crabHoldValue(player),crabHoldValue(fleet));}assert(Number.isFinite(crabPriceAt({x:0,y:0,crabSpecies:'__proto__'})));});
 test('all species names have Swedish and English translations',async()=>{const {CRAB_SPECIES,crabSpeciesName}=await import('../crab-species.mjs'),{translateText}=await import('../i18n.mjs');for(const [id,s] of Object.entries(CRAB_SPECIES)){assert.equal(crabSpeciesName(id,'sv'),s.sv);assert.equal(translateText(s.en,'sv'),s.sv);assert.equal(translateText(s.en,'en'),s.en);}});
+
+test('market rotates species ranks and individual ground prices at ten-day boundaries',async()=>{
+ const {crabMarketRate,crabGroundPriceFactor}=await import('../catch-value.mjs');
+ const {CRAB_SPECIES}=await import('../crab-species.mjs');
+ const order=hour=>Object.keys(CRAB_SPECIES).sort((a,b)=>crabMarketRate(b,hour)-crabMarketRate(a,hour));
+ assert.deepEqual(order(239.99),order(0));
+ assert.notEqual(order(240)[0],order(0)[0]);
+ assert.notEqual(order(240).at(-1),order(0).at(-1));
+ const values=hour=>['ground-a','ground-b','ground-c'].map(id=>crabGroundPriceFactor(id,hour));
+ assert.deepEqual(values(479),values(240));
+ assert(values(480).every((factor,i)=>factor!==values(240)[i]));
+ const holder={cargo:0};
+ addCrabCatch(holder,10,{x:0,y:0,crabSpecies:'golden'},239);
+ const recorded=crabHoldValue(holder);
+ assert.notEqual(crabMarketRate('golden',240)*10,recorded);
+ assert(Math.abs(landCrab(holder,10)-recorded)<1e-8);
+});
