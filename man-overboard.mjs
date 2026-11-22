@@ -33,3 +33,14 @@ export function stepOverboard(state,dt){
  if(event.phase==='flight'&&event.elapsed>=event.flightSeconds+12)state.overboard=null;
  return true;
 }
+
+
+// Compress the open-sea leg while leaving time for a readable approach on camera.
+export function replacementProgress(event,target){
+ const distance=Math.hypot(target.x-event.x,target.y-event.y);
+ const close=Math.min(1,150/Math.max(1,distance));
+ const approachStart=Math.max(1,event.flightSeconds-9);
+ if(event.elapsed<approachStart)return (1-close)*event.elapsed/approachStart;
+ const approach=Math.min(1,(event.elapsed-approachStart)/(event.flightSeconds-approachStart));
+ return 1-close*(1-approach)**2;
+}
