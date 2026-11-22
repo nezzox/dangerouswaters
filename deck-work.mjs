@@ -1,7 +1,7 @@
-import {rackPositions} from './vessel-style.mjs?v=0.18.49';
-import {crewStations} from './crew-stations.mjs?v=0.18.49';
-import {deckSign} from './vessel-profile.mjs?v=0.18.49';
-import {boatById} from './catalog.mjs?v=0.18.49';
+import {rackPositions} from './vessel-style.mjs?v=0.18.50';
+import {crewStations} from './crew-stations.mjs?v=0.18.50';
+import {deckSign} from './vessel-profile.mjs?v=0.18.50';
+import {boatById} from './catalog.mjs?v=0.18.50';
 const lerp=(a,b,t)=>a+(b-a)*Math.max(0,Math.min(1,t));
 const between=(a,b,t)=>a.map((v,i)=>lerp(v,b[i],t));
 export function deckWorkPose(job,boat=null){if(!job||job.kind==='unload'||job.kind==='undock'||job.kind.startsWith('net'))return null;const p=Math.max(0,Math.min(1,job.elapsed/job.duration)),side=job.layout==='both'&&job.side<0?-1:1,stern=job.layout==='stern',edge=y=>stern?[-13.5,y,0]:[-3.1,y,side*5.6],station=crewStations({hauler:job.layout},{...job,side})[1].target,hand=[station[0],3.1,station[1]];const stored=boat?rackPositions(Math.min(200,(boat.deck||0)+1),boatById(boat.career?.boat)):null,last=stored?.at(-1),slot=last?[last.x,last.y,last.z]:[-4,2.5,0],travelHeight=Math.max(4.7,(stored?.top||0)+1.8,slot[0]>0?7.5:0),lift=[slot[0],travelHeight,slot[2]];let position,tip=0;const grapple=job.kind==='haul'&&job.grapple,q=grapple?Math.max(0,(p-.3)/.7):p;let hook=null,dragBuoy=null;
