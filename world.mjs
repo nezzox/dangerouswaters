@@ -1,6 +1,6 @@
-import {CRAB_GROUND_DATA} from './crab-ground-data.mjs?v=0.18.48';
-import {PORT_PIERS} from './port-data.mjs?v=0.18.48';
-import {COAST_DATA} from './coast-data.mjs?v=0.18.48';
+import {CRAB_GROUND_DATA} from './crab-ground-data.mjs?v=0.18.49';
+import {PORT_PIERS} from './port-data.mjs?v=0.18.49';
+import {COAST_DATA} from './coast-data.mjs?v=0.18.49';
 export const WORLD_VERSION=2;
 export const GEO_ORIGIN={lon:-166.524,lat:53.9034};
 const meters=111319.490793,cos=Math.cos(GEO_ORIGIN.lat*Math.PI/180);

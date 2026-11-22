@@ -3,6 +3,7 @@ export const OVERBOARD_COST=150000;
 
 export function rollOverboard(state,side,random=Math.random){
  if(state.overboard||random()>=1/2500)return false;
+ state.crewLosses=(state.crewLosses||0)+1;
  state.overboard={phase:'fall',elapsed:0,side:side<0?-1:1};
  state.speed=state.throttle=state.desiredKnots=state.rudder=0;
  state.autopilot=state.skipperMission=null;

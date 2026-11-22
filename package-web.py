@@ -10,7 +10,7 @@ version = json.loads((root / 'package.json').read_text())['version']
 release = json.loads((root / 'release-notes.json').read_text())
 assert release['version'] == version, 'Update release-notes.json for the new version'
 (root / 'version.json').write_text(json.dumps(release, ensure_ascii=False) + '\n')
-files = [root / 'version.json', root / 'index.html', root / 'style.css', root / '.nojekyll', root / 'intro.mp4', root / 'new-boat.mp4', root / 'man-overboard.mp4', *sorted(root.glob('*.mjs'))]
+files = [root / 'version.json', root / 'index.html', root / 'style.css', root / '.nojekyll', root / 'intro.mp4', root / 'new-boat.mp4', root / 'man-overboard.mp4', root / 'special-catch.mp4', root / 'another-lost.mp4', root / 'tow.mp4', *sorted(root.glob('*.mjs'))]
 for path in files:
     if path.suffix == '.mp4':
         continue
