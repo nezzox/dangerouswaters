@@ -1,0 +1,21 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {rollOverboard,settleOverboard,dispatchReplacement,stepOverboard} from '../man-overboard.mjs';
+test('rare casualty stops the ship, covers only the shortfall and releases the helm after replacement',()=>{
+ const state={x:1000,y:500,money:50000,speed:3,career:{borrowed:0,debt:0}};
+ assert.equal(rollOverboard(state,1,()=>1/2500),false);
+ assert(rollOverboard(state,-1,()=>0));
+ assert.equal(state.speed,0);
+ stepOverboard(state,5);
+ assert.equal(state.overboard.phase,'film');
+ settleOverboard(state);
+ settleOverboard(state);
+ assert.equal(state.money,0);
+ assert.equal(state.career.borrowed,100000);
+ assert.equal(state.career.debt,110000);
+ dispatchReplacement(state,{x:0,y:0});
+ assert(stepOverboard(state,state.overboard.flightSeconds));
+ assert.equal(state.overboard.phase,'flight');
+ stepOverboard(state,12);
+ assert.equal(state.overboard,null);
+});
