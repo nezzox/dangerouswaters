@@ -1,7 +1,7 @@
-import {TERRAIN_DATA as data} from './terrain-data.mjs?v=0.18.47';
-import {PORT_BUILDINGS,PORT_ROADS,PORT_PIERS} from './port-data.mjs?v=0.18.47';
-import {geoToWorld,WORLD_LAND,isLand,MATTHEW_QUAY} from './world.mjs?v=0.18.47';
-import {geometry} from './geometry.mjs?v=0.18.47';
+import {TERRAIN_DATA as data} from './terrain-data.mjs?v=0.18.48';
+import {PORT_BUILDINGS,PORT_ROADS,PORT_PIERS} from './port-data.mjs?v=0.18.48';
+import {geoToWorld,WORLD_LAND,isLand,MATTHEW_QUAY} from './world.mjs?v=0.18.48';
+import {geometry} from './geometry.mjs?v=0.18.48';
 const bounds=[];for(let i=0;i<data.length;i+=9)bounds.push([Math.min(data[i],data[i+3],data[i+6]),Math.max(data[i],data[i+3],data[i+6]),Math.min(data[i+1],data[i+4],data[i+7]),Math.max(data[i+1],data[i+4],data[i+7])]);
 export function groundHeight(x,y){for(let n=0;n<bounds.length;n++){const b=bounds[n];if(x<b[0]||x>b[1]||y<b[2]||y>b[3])continue;const i=n*9,ax=data[i],ay=data[i+1],bx=data[i+3],by=data[i+4],cx=data[i+6],cy=data[i+7],det=(by-cy)*(ax-cx)+(cx-bx)*(ay-cy);if(Math.abs(det)<.001)continue;const a=((by-cy)*(x-cx)+(cx-bx)*(y-cy))/det,c=((cy-ay)*(x-cx)+(ax-cx)*(y-cy))/det,d=1-a-c;if(a>=-.0001&&c>=-.0001&&d>=-.0001)return a*data[i+2]+c*data[i+5]+d*data[i+8];}return 6;}
 const city=PORT_BUILDINGS.map(b=>({...b,points:b.ring.map(([a,b])=>geoToWorld(a,b))})),roads=PORT_ROADS.map(r=>r.map(([a,b])=>geoToWorld(a,b))),piers=PORT_PIERS.map(r=>r.map(([a,b])=>geoToWorld(a,b)));
@@ -24,23 +24,31 @@ function shoreStone(g,x,y,z,size,seed){
 
 function pileShoreRocks(g,x,y,radius){
  let count=0;
- for(const {outer} of WORLD_LAND)for(let i=1;i<outer.length&&count<680;i++){
+ for(const {outer} of WORLD_LAND)for(let i=1;i<outer.length&&count<1600;i++){
   const a=outer[i-1],b=outer[i],dx=b.x-a.x,dy=b.y-a.y,length=Math.hypot(dx,dy);
-  if(length<5)continue;
+  if(length<1)continue;
   const tx=dx/length,ty=dy/length,offset=(x-a.x)*tx+(y-a.y)*ty;
   const range=Math.min(radius,650);
   if(Math.abs((x-a.x)*ty-(y-a.y)*tx)>range)continue;
-  for(let d=Math.max(2,Math.ceil((offset-range)/5)*5);d<Math.min(length-2,offset+range)&&count<680;d+=5){
+  const startHeight=Math.max(6,groundHeight(a.x,a.y)),endHeight=Math.max(6,groundHeight(b.x,b.y));
+  for(let d=Math.max(1,Math.ceil((offset-range)/3.25)*3.25);d<Math.min(length,offset+range)&&count<1600;d+=3.25){
    const sx=a.x+tx*d,sy=a.y+ty*d;
    if(Math.hypot(sx-x,sy-y)>range)continue;
    // Leave working quay faces and their approaches clear.
    if(Math.hypot(sx-MATTHEW_QUAY.x,sy-MATTHEW_QUAY.y)<260||Math.hypot(sx-47,sy+70)<230)continue;
    const landSide=isLand(sx-ty*4,sy+tx*4)?1:-1;
    const seed=i*113+d+sx*.013+sy*.011;
-   const size=1.2+(Math.sin(seed)*.5+.5)*1.45;
-   shoreStone(g,sx+ty*landSide*.45,.05,sy-tx*landSide*.45,size,seed);
-   shoreStone(g,sx-ty*landSide*.4+tx*1.6,1.25,sy+tx*landSide*.4+ty*1.6,size*.7,seed+1);
-   count+=2;
+   const bankHeight=startHeight+(endHeight-startHeight)*d/length;
+   const height=Math.min(10,bankHeight),rows=Math.ceil(height/1.65);
+   for(let row=0;row<rows&&count<1600;row++){
+    const frac=row/Math.max(1,rows-1);
+    const stagger=(row%2)*1.28+Math.sin(seed+row*2)*.29;
+    const outward=(1-frac)*3.3+.34;
+    const size=1.78+(Math.sin(seed+row*1.87)*.5+.5)*.58;
+    const level=-.3+frac*(height-1.14)+Math.sin(seed+row)*.26;
+    shoreStone(g,sx+tx*stagger+ty*landSide*outward,level,sy+ty*stagger-tx*landSide*outward,size,seed+row*19);
+    count++;
+   }
   }
  }
 }
