@@ -1,5 +1,5 @@
-import {hullWaterGLSL} from './deck-water.mjs?v=0.18.46';
-import {seaHeightGLSL} from './sea-spectrum.mjs?v=0.18.46';
+import {hullWaterGLSL} from './deck-water.mjs?v=0.18.47';
+import {seaHeightGLSL} from './sea-spectrum.mjs?v=0.18.47';
 // Shared atmosphere and ocean functions keep lighting and reflections consistent.
 export const common=`
 precision highp float;precision highp int;
@@ -62,14 +62,18 @@ void main(){if(insideHullLocal(hullLocalPoint(vec3(vWaterLocal.x,vWorld.y,vWater
 {vec2 k=vec2(16.8596806,3.8782949);float rippleFilter=1.-smoothstep(.55,2.5,length(fwidth(vWaterLocal))*17.3);slope+=normalize(k)*cos(dot(vWaterLocal,k)+mod(dot(mod(uCenter,25600.),k),6.2831853)-uDetailTime*13.0273942+8.680+2.3*noise(detail*.67+vec2(8.680,uDetailTime*.03)))*0.0134615*rippleFilter*(.35+uWeather.x*.14)*(.35+.9*noise(detail*.19+k*7.));}
 {vec2 k=vec2(18.9348971,19.3876164);float rippleFilter=1.-smoothstep(.55,2.5,length(fwidth(vWaterLocal))*27.1);slope+=normalize(k)*cos(dot(vWaterLocal,k)+mod(dot(mod(uCenter,25600.),k),6.2831853)-uDetailTime*16.3049379+10.850+2.3*noise(detail*.67+vec2(10.850,uDetailTime*.03)))*0.0116667*rippleFilter*(.35+uWeather.x*.14)*(.35+.9*noise(detail*.19+k*7.));}
 
- vec2 warp=vec2(noise(detail*.17+vec2(uDetailTime*.025,0.)),noise(detail*.17+vec2(37.,uDetailTime*.02)));vec2 microPoint=mat2(.83,-.56,.56,.83)*detail*1.3+warp*2.;float microBase=fbm(microPoint);vec2 grainSlope=vec2(fbm(microPoint+vec2(.12,0.))-microBase,fbm(microPoint+vec2(0.,.12))-microBase)/.12;float grainFilter=1.-smoothstep(.3,1.4,length(fwidth(vWaterLocal*1.3)));slope+=grainSlope*(.12+uWeather.x*.035)*grainFilter;
+ vec2 warp=vec2(noise(detail*.17+vec2(uDetailTime*.025,0.)),noise(detail*.17+vec2(37.,uDetailTime*.02)));vec2 microPoint=mat2(.83,-.56,.56,.83)*detail*1.3+warp*2.;float microBase=fbm(microPoint);vec2 grainSlope=vec2(fbm(microPoint+vec2(.12,0.))-microBase,fbm(microPoint+vec2(0.,.12))-microBase)/.12;float grainFilter=1.-smoothstep(.3,1.4,length(fwidth(vWaterLocal*1.3)));float agitation=smoothstep(.14,.72,field.w+length(field.yz)*.75);
+ slope+=grainSlope*(.10+uWeather.x*.026+agitation*.14)*grainFilter;
  vec3 n=normalize(vec3(-slope.x,1.,-slope.y)),v=normalize(uEye-vWorld),l=sunDir(),halfway=normalize(v+l);float nv=max(.001,dot(n,v)),nl=max(0.,dot(n,l)),fresnel=.0204+.9796*pow(1.-nv,5.);
  vec3 reflected=sky(reflect(-v,n));vec4 clip=uReflectionVP*vec4(vWaterLocal.x,0.,vWaterLocal.y,1.);vec2 uv=clip.xy/clip.w*.5+.5+slope*.007;vec4 objects=textureLod(uReflection,clamp(uv,vec2(.002),vec2(.998)),.7+uWeather.x*.2);float edge=smoothstep(0.,.04,min(min(uv.x,1.-uv.x),min(uv.y,1.-uv.y)));reflected=mix(reflected,objects.rgb/max(vec3(.035),1.-objects.rgb),objects.a*edge);
- vec3 deep=vec3(.003,.018,.026),scatter=vec3(.012,.065,.061)*pow(max(0.,dot(v,-l)),3.)*max(0.,h)*.11;vec3 water=deep*(.5+nl*.5)*(.12+.88*uDaylight)+scatter*uDaylight;
- float rough=.105+uWeather.x*.006,a=rough*rough,nh=max(0.,dot(n,halfway)),den=nh*nh*(a*a-1.)+1.,ggx=a*a/(3.14159*den*den+.00001),spec=ggx*.014*pow(1.-uWeather.w,3.);
+ float trough=smoothstep(-1.15,.65,h);
+ vec3 deep=mix(vec3(.002,.008,.013),vec3(.006,.022,.031),trough);
+ vec3 scatter=vec3(.021,.061,.067)*max(0.,h)*(.04+.13*pow(max(0.,dot(v,-l)),3.));vec3 water=deep*(.5+nl*.5)*(.12+.88*uDaylight)+scatter*uDaylight;
+ float rough=mix(.13,.067,agitation)+uWeather.x*.004,a=rough*rough,nh=max(0.,dot(n,halfway)),den=nh*nh*(a*a-1.)+1.,ggx=a*a/(3.14159*den*den+.00001),spec=ggx*.022*mix(.32,1.,pow(1.-uWeather.w,2.));
  vec3 color=mix(water,reflected,clamp(fresnel,.0204,.95))+vec3(1.,.88,.7)*spec*nl*uDaylight;
  vec2 forward=vec2(cos(uBoat.z),sin(uBoat.z)),delta=p-uBoat.xy;float along=dot(delta,forward),side=abs(dot(delta,vec2(-forward.y,forward.x))),speed=abs(uBoat.w);float bubbles=fbm(detail*1.8-vec2(uDetailTime*.12,0.));float bow=exp(-pow((along-10.8)/2.,2.))*exp(-pow((side-2.)/.9,2.))*clamp(speed/5.,0.,1.);float froth=clamp(wake.x+bow*.3,0.,.6)*smoothstep(.3,.7,bubbles);
- color=mix(color,vec3(.6,.67,.65)*(.1+.9*uDaylight),froth);color*=mix(.72,1.,shadowAt(vShadow,uShadow));color+=waterLamps(vWorld,n,v)+directLamps(vWorld,n,v)*froth*.08;
+ float whitecaps=smoothstep(.64,1.07,h)*smoothstep(.12,.32,field.w)*smoothstep(.46,.7,bubbles)*smoothstep(1.25,4.3,uWeather.x)*.32;
+ color=mix(color,vec3(.64,.71,.70)*(.1+.9*uDaylight),max(froth,whitecaps));color*=mix(.72,1.,shadowAt(vShadow,uShadow));color+=waterLamps(vWorld,n,v)+directLamps(vWorld,n,v)*froth*.08;
  if(uDieselSlick.z>0.){vec2 spill=p-uDieselSlick.xy;float radius=12.+(180.-uDieselSlick.z)*.09,edge=length(spill*vec2(.75,1.2))/radius+noise(spill*.14)*.26;float oil=(1.-smoothstep(.67,1.,edge))*smoothstep(0.,60.,uDieselSlick.z);color=mix(color,vec3(.004,.005,.006),oil*.9);}
  outColor=vec4(finishColor(color,vWorld),1.);}`;
 export const meshVertex=`#version 300 es
@@ -121,7 +125,8 @@ void main(){if(uReflectionPass>.5&&vWorld.y<.04)discard;
  vec3 reflected=sky(reflect(-v,n));vec3 F=f0+(1.-f0)*pow(1.-max(.01,dot(n,v)),5.);c+=reflected*F*(1.-rough*.65)*contact*mix(1.,.08,lowerHull);
  if(glass>.5){float interior=.25+.25*noise(vLocal.xz*5.);c=base*ambient*interior*.2+reflected*(.07+.72*pow(1.-max(0.,dot(n,v)),4.));}
  // Negative surface emission marks matte earth/shore banks; buildings keep their own materials.
- if(vSurface.y< -1.5||(uKind>3.5&&vSurface.y<-.5))c=base*(ambient+vec3(1.1)*max(0.,dot(n,l))*uDaylight*(1.-uWeather.w*.65));
+ if(vSurface.y< -1.5)c*=mix(.48,1.,smoothstep(.0,2.3,vWorld.y));
+ else if(uKind>3.5&&vSurface.y<-.5)c=base*(ambient+vec3(1.1)*max(0.,dot(n,l))*uDaylight*(1.-uWeather.w*.65));
  c+=base*directLamps(vWorld,n,v);c+=vColor*max(0.,vSurface.y)*2.*((vSurface.y>1.1&&uKind<1.5)?uLampUpgrade.y:1.)*((uKind>1.5&&uKind<2.5||uKind>5.5)?max(.12,1.-uDaylight):uLights);
  outColor=vec4(finishColor(c,vWorld),1.);}`;
 export const depthVertex=`#version 300 es
