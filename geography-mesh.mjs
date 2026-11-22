@@ -1,10 +1,50 @@
-import {TERRAIN_DATA as data} from './terrain-data.mjs?v=0.18.51';
-import {PORT_BUILDINGS,PORT_ROADS,PORT_PIERS} from './port-data.mjs?v=0.18.51';
-import {geoToWorld,WORLD_LAND,isLand,MATTHEW_QUAY} from './world.mjs?v=0.18.51';
-import {geometry} from './geometry.mjs?v=0.18.51';
+import {TERRAIN_DATA as data} from './terrain-data.mjs?v=0.18.52';
+import {PORT_BUILDINGS,PORT_ROADS,PORT_PIERS} from './port-data.mjs?v=0.18.52';
+import {geoToWorld,WORLD_LAND,isLand,MATTHEW_QUAY} from './world.mjs?v=0.18.52';
+import {geometry} from './geometry.mjs?v=0.18.52';
 const bounds=[];for(let i=0;i<data.length;i+=9)bounds.push([Math.min(data[i],data[i+3],data[i+6]),Math.max(data[i],data[i+3],data[i+6]),Math.min(data[i+1],data[i+4],data[i+7]),Math.max(data[i+1],data[i+4],data[i+7])]);
 export function groundHeight(x,y){for(let n=0;n<bounds.length;n++){const b=bounds[n];if(x<b[0]||x>b[1]||y<b[2]||y>b[3])continue;const i=n*9,ax=data[i],ay=data[i+1],bx=data[i+3],by=data[i+4],cx=data[i+6],cy=data[i+7],det=(by-cy)*(ax-cx)+(cx-bx)*(ay-cy);if(Math.abs(det)<.001)continue;const a=((by-cy)*(x-cx)+(cx-bx)*(y-cy))/det,c=((cy-ay)*(x-cx)+(ax-cx)*(y-cy))/det,d=1-a-c;if(a>=-.0001&&c>=-.0001&&d>=-.0001)return a*data[i+2]+c*data[i+5]+d*data[i+8];}return 6;}
 const city=PORT_BUILDINGS.map(b=>({...b,points:b.ring.map(([a,b])=>geoToWorld(a,b))})),roads=PORT_ROADS.map(r=>r.map(([a,b])=>geoToWorld(a,b))),piers=PORT_PIERS.map(r=>r.map(([a,b])=>geoToWorld(a,b)));
+const cross=(a,b,c)=>(b.x-a.x)*(c.y-a.y)-(b.y-a.y)*(c.x-a.x);
+export function pierTopTriangles(ring){
+ const points=ring.slice(0,-1).filter((p,i)=>Math.hypot(p.x-ring[i?i-1:ring.length-2].x,p.y-ring[i?i-1:ring.length-2].y)>.001);
+ const origin=points[0];
+ if(points.length<3)return [];
+ const area=points.reduce((total,a,i)=>total+cross(origin,a,points[(i+1)%points.length]),0);
+ if(area>0)points.reverse();
+ const triangles=[];
+ while(points.length>3){
+  let clipped=false;
+  for(let i=0;i<points.length;i++){
+   const a=points[(i+points.length-1)%points.length],b=points[i],c=points[(i+1)%points.length];
+   const turn=cross(a,b,c);
+   if(Math.abs(turn)<1e-6){points.splice(i,1);clipped=true;break;}
+   if(turn>=0||points.some(p=>p!==a&&p!==b&&p!==c&&cross(a,b,p)<=0&&cross(b,c,p)<=0&&cross(c,a,p)<=0))continue;
+   triangles.push([a,b,c]);points.splice(i,1);clipped=true;break;
+  }
+  if(!clipped)return [];
+ }
+ if(points.length===3)triangles.push(points.slice());
+ return triangles;
+}
+function addPier(g,pier){
+ const closed=Math.hypot(pier[0].x-pier.at(-1).x,pier[0].y-pier.at(-1).y)<.1;
+ const at=(p,h)=>[p.x,h,p.y];
+ if(closed){
+  const triangles=pierTopTriangles(pier);
+  if(!triangles.length)return;
+  for(const triangle of triangles)g.tri(...triangle.map(p=>at(p,6)),[.34,.34,.30],.94);
+  for(let i=1;i<pier.length;i++){
+   const a=pier[i-1],b=pier[i];
+   g.quad(at(a,-1),at(b,-1),at(b,6),at(a,6),[.23,.25,.24],.92);
+  }
+  return;
+ }
+ for(let i=1;i<pier.length;i++){
+  const a=pier[i-1],b=pier[i],dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||1,nx=-dy/d*2,ny=dx/d*2;
+  g.quad([a.x+nx,2.1,a.y+ny],[b.x+nx,2.1,b.y+ny],[b.x-nx,2.1,b.y-ny],[a.x-nx,2.1,a.y-ny],[.32,.31,.27],.8);
+ }
+}
 function shoreStone(g,x,y,z,size,seed){
  const rand=n=>{const f=Math.sin(seed*17.31+n*43.73)*43758.5453;return f-Math.floor(f);};
  const angle=rand(0)*Math.PI*2,stretch=.7+rand(1)*.6,shade=.17+rand(2)*.14;
@@ -57,7 +97,9 @@ export function buildGeography(x,y,radius=2200,local=false){const g=geometry();f
  for(const land of WORLD_LAND){for(const ring of [land.outer,...land.holes])for(let i=1;i<ring.length;i++){const a=ring[i-1],b=ring[i];if(Math.min(a.x,b.x)>x+radius||Math.max(a.x,b.x)<x-radius||Math.min(a.y,b.y)>y+radius||Math.max(a.y,b.y)<y-radius)continue;const ah=Math.max(6,groundHeight(a.x,a.y)),bh=Math.max(6,groundHeight(b.x,b.y));g.quad([a.x,-8,a.y],[b.x,-8,b.y],[b.x,bh,b.y],[a.x,ah,a.y],[.25,.27,.24],.98,-1);}}
  for(const building of city){const points=building.points,at=points[0];if(Math.abs(at.x-x)>radius||Math.abs(at.y-y)>radius)continue;const base=Math.max(...points.slice(0,8).map(p=>groundHeight(p.x,p.y))),h=base+building.height;for(let j=1;j<points.length;j++){const a=points[j-1],b=points[j];g.quad([a.x,base,a.y],[a.x,h,a.y],[b.x,h,b.y],[b.x,base,b.y],[.39,.42,.38],.85);}for(let j=2;j<points.length-1;j++)g.tri([at.x,h,at.y],[points[j-1].x,h,points[j-1].y],[points[j].x,h,points[j].y],[.27,.31,.31],.8);}
  for(const road of roads){if(road.every(p=>Math.abs(p.x-x)>radius||Math.abs(p.y-y)>radius))continue;for(let i=1;i<road.length;i++){const a=road[i-1],b=road[i],dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||1,nx=-dy/d*2.6,ny=dx/d*2.6,ah=groundHeight(a.x,a.y)+.14,bh=groundHeight(b.x,b.y)+.14;g.quad([a.x+nx,ah,a.y+ny],[b.x+nx,bh,b.y+ny],[b.x-nx,bh,b.y-ny],[a.x-nx,ah,a.y-ny],[.18,.20,.20],.98);}}
- for(const pier of piers){if(pier.every(p=>Math.abs(p.x-x)>radius||Math.abs(p.y-y)>radius))continue;for(let i=1;i<pier.length;i++){const a=pier[i-1],b=pier[i],dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||1,nx=-dy/d*2,ny=dx/d*2;g.quad([a.x+nx,2.1,a.y+ny],[b.x+nx,2.1,b.y+ny],[b.x-nx,2.1,b.y-ny],[a.x-nx,2.1,a.y-ny],[.32,.31,.27],.8);}}
+ for(const pier of piers){
+  if(!pier.every(p=>Math.abs(p.x-x)>radius||Math.abs(p.y-y)>radius))addPier(g,pier);
+ }
  pileShoreRocks(g,x,y,radius);
  if(local)for(let i=0;i<g.data.length;i+=11){g.data[i]-=x;g.data[i+2]-=y;}
  return g.array();}
