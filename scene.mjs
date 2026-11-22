@@ -1,31 +1,31 @@
-import {replacementProgress} from './man-overboard.mjs?v=0.18.50';
-import {createAntialias} from './antialias.mjs?v=0.18.50';
-import {LIGHTING_PROFILES} from './light-upgrades.mjs?v=0.18.50';
-import {deckFrame,deckSign} from './vessel-profile.mjs?v=0.18.50';
-import {createTerrainLoader} from './terrain-loader.mjs?v=0.18.50';
-import {craneColor} from './crane-style.mjs?v=0.18.50';
-import {rackScale} from './vessel-style.mjs?v=0.18.50';
-import {createRackInstances} from './rack-instances.mjs?v=0.18.50';
-import {lineHaulerMounts,haulerRunning} from './line-hauler.mjs?v=0.18.50';
-import {netWorkPose} from './deck-work.mjs?v=0.18.50';
-import {visibleFleet,fleetColor} from './fleet-visuals.mjs?v=0.18.50';
-import {fleetStats} from './fleet.mjs?v=0.18.50';
-import {buildPortScenery,MATTHEW_FLOODLIGHTS} from './port-scenery.mjs?v=0.18.50';
-import {buildGeography} from './geography-mesh.mjs?v=0.18.50';
-import {createDeckWater,stepDeckWater} from './deck-water.mjs?v=0.18.50';
-import {dockingStage,QUAY,BERTH,PORT_QUAYS,berthsAt,quayPoint} from './harbor.mjs?v=0.18.50';
-import {vesselStats} from './career.mjs?v=0.18.50';
-import {boatById} from './catalog.mjs?v=0.18.50';
-import {createBuoyancy,stepBuoyancy} from './buoyancy.mjs?v=0.18.50';
-import {buildFoam} from './foam.mjs?v=0.18.50';
-import {fenderPose,createFenderMotion,stepFenderMotion,ropePoints} from './fenders.mjs?v=0.18.50';
-import {inverseTransform,multiply,transform,perspective,lookAt,identity,project} from './math3d.mjs?v=0.18.50';
-import {geometry,buildRackPot,buildDeckWash,buildVessel,buildBuoy,buildOceanGrid,buildCrewParts,buildDeckEquipment} from './geometry.mjs?v=0.18.50';
-import {deckWorkPose} from './deck-work.mjs?v=0.18.50';
-import {createCrew,commandCrew,stepCrew,crewPose} from './crew.mjs?v=0.18.50';
-import * as shaders from './scene-shaders.mjs?v=0.18.50';
-export {seaHeight as surfaceHeight} from './sea-spectrum.mjs?v=0.18.50';
-import {seaHeight,seaSettings,directionalSpectrum} from './sea-spectrum.mjs?v=0.18.50';
+import {replacementProgress} from './man-overboard.mjs?v=0.18.51';
+import {createAntialias} from './antialias.mjs?v=0.18.51';
+import {LIGHTING_PROFILES} from './light-upgrades.mjs?v=0.18.51';
+import {deckFrame,deckSign} from './vessel-profile.mjs?v=0.18.51';
+import {createTerrainLoader} from './terrain-loader.mjs?v=0.18.51';
+import {craneColor} from './crane-style.mjs?v=0.18.51';
+import {rackScale} from './vessel-style.mjs?v=0.18.51';
+import {createRackInstances} from './rack-instances.mjs?v=0.18.51';
+import {lineHaulerMounts,haulerRunning} from './line-hauler.mjs?v=0.18.51';
+import {netWorkPose} from './deck-work.mjs?v=0.18.51';
+import {visibleFleet,fleetColor} from './fleet-visuals.mjs?v=0.18.51';
+import {fleetStats} from './fleet.mjs?v=0.18.51';
+import {buildPortScenery,MATTHEW_FLOODLIGHTS} from './port-scenery.mjs?v=0.18.51';
+import {buildGeography} from './geography-mesh.mjs?v=0.18.51';
+import {createDeckWater,stepDeckWater} from './deck-water.mjs?v=0.18.51';
+import {dockingStage,QUAY,BERTH,PORT_QUAYS,berthsAt,quayPoint} from './harbor.mjs?v=0.18.51';
+import {vesselStats} from './career.mjs?v=0.18.51';
+import {boatById} from './catalog.mjs?v=0.18.51';
+import {createBuoyancy,stepBuoyancy} from './buoyancy.mjs?v=0.18.51';
+import {buildFoam} from './foam.mjs?v=0.18.51';
+import {fenderPose,createFenderMotion,stepFenderMotion,ropePoints} from './fenders.mjs?v=0.18.51';
+import {inverseTransform,multiply,transform,perspective,lookAt,identity,project} from './math3d.mjs?v=0.18.51';
+import {geometry,buildRackPot,buildDeckWash,buildVessel,buildBuoy,buildOceanGrid,buildCrewParts,buildDeckEquipment} from './geometry.mjs?v=0.18.51';
+import {deckWorkPose} from './deck-work.mjs?v=0.18.51';
+import {createCrew,commandCrew,stepCrew,crewPose} from './crew.mjs?v=0.18.51';
+import * as shaders from './scene-shaders.mjs?v=0.18.51';
+export {seaHeight as surfaceHeight} from './sea-spectrum.mjs?v=0.18.51';
+import {seaHeight,seaSettings,directionalSpectrum} from './sea-spectrum.mjs?v=0.18.51';
 function ortho(l,r,b,t,n,f){return new Float64Array([2/(r-l),0,0,0,0,2/(t-b),0,0,0,0,-2/(f-n),0,-(r+l)/(r-l),-(t+b)/(t-b),-(f+n)/(f-n),1]);}
 export function createScene(canvas,{preview=false}={}){
  let currentSea={},haulerAngle=0;const surfaceHeight=(x,z,t,waves)=>seaHeight(x,z,t,waves,currentSea);
@@ -119,7 +119,10 @@ export function createScene(canvas,{preview=false}={}){
  tugShape.box(2.77,4.1,-1.58,.22,.16,.17,[.87,.12,.07],.35,1.3);
  tugShape.box(2.77,4.1,1.58,.22,.16,.17,[.15,.88,.27],.35,1.3);
  tugShape.box(-1.2,3.01,0,.26,.21,.35,[.94,.84,.57],.35,1.4);
- const tugMesh=mesh(tugShape.array(),11,6);
+ const tugMesh=mesh(tugShape.array(),11,6),towLineShape=geometry();
+ towLineShape.tube([0,0,0],[0,1,0],.065,[.94,.11,.064],8,.78,.17);
+ const towLineMesh=mesh(towLineShape.array());
+
  const remoteLights=new Float32Array(16);
  const fleetMeshes=new Map();let nearbyFleet=[];
  function prepareFleet(s,w,t,dt){const active=new Set();nearbyFleet=visibleFleet(s).map(v=>{const b=v.boat,stats=fleetStats(s,b),deck=Math.max(0,stats.potCapacity-b.pots.length),key=stats.id+'/'+b.color;active.add(b.id);let entry=fleetMeshes.get(b.id);if(!entry||entry.key!==key){if(entry){destroyMesh(entry.vessel);destroyMesh(entry.buoy);}entry={key,vessel:mesh(buildVessel(0,stats),11,1),buoy:mesh(buildBuoy(fleetColor(b.color))),body:entry?.body||createBuoyancy(surfaceHeight(b.x,b.y,t,w.waves))};fleetMeshes.set(b.id,entry);}const bow=surfaceHeight(b.x+Math.cos(b.heading)*stats.length*.35,b.y+Math.sin(b.heading)*stats.length*.35,t,w.waves),stern=surfaceHeight(b.x-Math.cos(b.heading)*stats.length*.35,b.y-Math.sin(b.heading)*stats.length*.35,t,w.waves);stepBuoyancy(entry.body,{height:surfaceHeight(b.x,b.y,t,w.waves),pitch:Math.atan2(stern-bow,stats.length*.7),roll:Math.sin(t*.65+b.x*.01)*Math.min(.12,w.waves*.02)},s.paused?0:dt);const model=transform(b.x,entry.body.height-.25,b.y,b.heading,entry.body.pitch,entry.body.roll);for(let k=0;k<3;k++){model[k]*=stats.length/24;model[4+k]*=1+(stats.length-24)*.012;model[8+k]*=stats.beam/7.6;}return {...v,entry,model,stats,deck};});for(const [id,entry] of fleetMeshes)if(!active.has(id)){destroyMesh(entry.vessel);destroyMesh(entry.buoy);fleetMeshes.delete(id);}}
@@ -142,19 +145,25 @@ export function createScene(canvas,{preview=false}={}){
  function drawTow(p,s,w,t,model){
   if(s.tow?.phase!=='hook'&&s.tow?.phase!=='travel')return;
   const bow=multiply(model,transform(11,1.9,0));
-  const offset=23,x=bow[12]+Math.cos(s.heading)*offset,y=bow[14]+Math.sin(s.heading)*offset;
+  const offset=23+Math.sin(t*.72)*.85,x=bow[12]+Math.cos(s.heading)*offset,y=bow[14]+Math.sin(s.heading)*offset;
   const height=surfaceHeight(x,y,t,w.waves);
   const tug=transform(x,height,y,s.heading,Math.sin(t*1.4)*.025,Math.cos(t*1.8)*.035);
   drawMesh(p,tugMesh,tug);
   const stern=multiply(tug,transform(-5.5,1.56,0)),start=[stern[12],stern[13],stern[14]];
   const progress=s.tow.phase==='hook'?Math.max(0,Math.min(1,(s.tow.elapsed-.5)/2)):1;
   if(!progress)return;
-  const end=[bow[12],bow[13],bow[14]],arc=s.tow.phase==='hook'&&progress<1?3*Math.sin(Math.PI*progress):-.48;
+  const end=[bow[12],bow[13],bow[14]];
+  const tension=Math.min(1,Math.abs(s.speed)*1.94384/13);
+  const casting=s.tow.phase==='hook'&&progress<1;
+  const sag=casting?-3.8*Math.sin(Math.PI*progress):2.6-1.15*tension+Math.sin(t*1.12)*.35;
+  const dx=end[0]-start[0],dz=end[2]-start[2],length=Math.hypot(dx,dz)||1;
   let previous=start;
-  for(let i=1;i<=8;i++){
-   const u=progress*i/8;
-   const point=start.map((v,k)=>v+(end[k]-v)*u+(k===1?arc*Math.sin(Math.PI*u):0));
-   cable(p,identity(),previous,point,equipment.softRope);previous=point;
+  for(let i=1;i<=18;i++){
+   const u=progress*i/18,envelope=4*u*(1-u);
+   const sway=Math.sin(t*1.8-u*6)*envelope*(.95-.55*tension);
+   const point=[start[0]+dx*u-dz/length*sway,start[1]+(end[1]-start[1])*u-sag*envelope,start[2]+dz*u+dx/length*sway];
+   cable(p,identity(),previous,point,towLineMesh);
+   previous=point;
   }
  }
  function drawReplacement(p,s,t){
