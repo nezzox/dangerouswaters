@@ -17,7 +17,7 @@ import {transitionWeather} from './weather-transition.mjs?v=0.18.57';
 import {ownedUpgrades,createRadioFeed,createLastHaul} from './hud-status.mjs?v=0.18.57';
 import {createIntro} from './intro.mjs?v=0.18.57';
 import {fleetNoticeCount} from './fleet.mjs?v=0.18.57';
-import {redeemDeveloperCode} from './developer-code.mjs?v=0.18.57';
+import {redeemDeveloperCode} from './developer-code.mjs?v=0.18.58';
 import {potSoakStage} from './pot-soak.mjs?v=0.18.57';
 import {createLiveWeather} from './live-weather.mjs?v=0.18.57';
 import {dockingStage,PORT_QUAYS,nearestQuay} from './harbor.mjs?v=0.18.57';
@@ -188,7 +188,7 @@ $('speed-target').addEventListener('pointerup',()=>canvas.focus({preventScroll:t
 for(const b of document.querySelectorAll('[data-weather-mode]'))b.onclick=()=>{setWeatherMode(state,b.dataset.weatherMode);void liveWeather.update(state);save();updateUI();canvas.focus();};
 $('renderer').onclick=()=>{$('code-input').value='';$('code-dialog').returnValue='';keys.clear();$('code-dialog').showModal();$('code-input').focus();};
 $('code-cancel').onclick=()=>$('code-dialog').close('cancel');
-$('code-dialog').addEventListener('close',()=>{if($('code-dialog').returnValue==='redeem'&&redeemDeveloperCode(state,$('code-input').value)){save();updateUI();}canvas.focus();});
+$('code-dialog').addEventListener('close',()=>{if($('code-dialog').returnValue==='redeem'&&redeemDeveloperCode(state,$('code-input').value,getLanguage())){save();updateUI();}canvas.focus();});
 $('speed-target').oninput=e=>{state.desiredKnots=Number(e.target.value);};
 $('rudder-target').oninput=e=>{setRudder(state,Number(e.target.value));updateUI();save();};$('rudder-center').onclick=()=>{centerRudder();updateUI();save();canvas.focus();};
 $('lights').textContent=state.lights===false?'WORK LIGHTS OFF':'WORK LIGHTS ON';$('lights').setAttribute('aria-pressed',String(state.lights!==false));
@@ -331,7 +331,7 @@ function updateUI(){
 function drawChart(){
  const reports=$('ground-reports');
  if(reports.closest('details').open){
-  const language=getLanguage();
+  const language=getLanguage(),stats=vesselStats(state),weather=conditions(state);
   for(const ground of groundsAt(state.hour)){
    let button=reports.querySelector(`[data-ground-id="${ground.id}"]`);
    if(!button){
@@ -349,7 +349,7 @@ function drawChart(){
    const salmon=salmonMarket(ground);
    const crab=groundReport(ground,'crab',Math.max(1,state.career.skills.crab||0),state.hour);
    const fish=groundReport(ground,'salmon',Math.max(1,state.career.skills.salmon||0),state.hour);
-   const fuel=fuelToGround(state,ground,stats,w);
+   const fuel=fuelToGround(state,ground,stats,weather);
    const units=stats.powertrain==='electric'?'kWh':'L';
    const estimate=fuel===null?'':` · ≈${Math.ceil(fuel).toLocaleString(language==='sv'?'sv-SE':'en-US')} ${units} ${language==='sv'?'fågelvägen':'direct'}`;
    const text=`${ground.name} · ${crabSpeciesName(ground.species,language)} ${crab.low}–${crab.high}% · ${money(crabPriceAt({...ground,crabSpecies:ground.species,groundId:ground.id},state.hour))}/kg\n${salmon[language]} ${fish.low}–${fish.high}% · ${money(salmon.price)}/kg${estimate}`;
