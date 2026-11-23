@@ -45,7 +45,8 @@ const DESIGNS=[
  ['Sockeye','Salmon seiner','starboard',true,25,4,1.1,.9],['Frontier','Multi-fishery vessel','both',true,29,6,1,1.3],
  ['Icebound','Ice-strengthened crabber','starboard',false,30,5,.9,1.65],['Swift','Fast long-range seiner','starboard',true,26,4,1.3,1],
  ['Atlas','Factory crabber','both',false,32,7,.95,1.5],['Oceanic','Expedition multi-fishery','both',true,33,8,1.1,1.7],
- ['Classical Guppy','Classic offshore crabber','starboard',false,30,6,1.05,1.5]
+ ['Classical Guppy','Classic offshore crabber','starboard',false,30,6,1.05,1.5],
+ ['Queen Blue','Live crab carrier','starboard',false,32,7,1.0,1.7]
 ];
 export const STARTER={id:'nordvind',name:'Nordvind',type:'Crab fishing vessel',price:180000,length:24,beam:7.6,crew:3,hauler:'starboard',salmon:false,capacity:900,pots:8,tank:500,top:6.2,protection:1,color:0};
 const electricClass=(d,i)=>i>=7&&[5,8,9].includes(d);

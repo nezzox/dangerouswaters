@@ -13,6 +13,7 @@ const offshoreProfiles=[
  [1.48,.83,1.25,.60,[.16,.23,.30],[.58,.59,.48]], // Atlas factory crabber
  [1.30,.61,1.19,.72,[.19,.31,.40],[.64,.41,.24]], // Oceanic
  [1.82,.49,1.18,.46,[.065,.20,.24],[.22,.35,.35]], // Classical Guppy
+ [1.46,.66,1.37,.23,[.045,.24,.69],[.83,.88,.89]], // Queen Blue
 ];
 export function vesselExterior(design={}){
  const family=Number(/^boat-(\d+)-/.exec(design.id||'')?.[1]||0);
@@ -23,5 +24,5 @@ export function vesselExterior(design={}){
   :offshoreProfiles[family-1];
  return {family,bow,stern,bridge,rake,hull,trim,electric};
 }
-export const hullPaint=design=>design?.powertrain==='electric'?[.62,.67,.66]:design?.id?.startsWith('boat-11-')?[.80,.79,.71]:palette[Number(/^boat-(\d+)/.exec(design?.id||'')?.[1]||0)%palette.length];
+export const hullPaint=design=>design?.powertrain==='electric'?[.62,.67,.66]:/^boat-1[12]-/.test(design?.id||'')?[.80,.79,.71]:palette[Number(/^boat-(\d+)/.exec(design?.id||'')?.[1]||0)%palette.length];
 export function deckFrame(matrix,design){if(deckSign(design)>0)return matrix;const out=new Float64Array(matrix);for(let i=0;i<4;i++)out[i]*=-1;return out;}

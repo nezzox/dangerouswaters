@@ -1,10 +1,10 @@
-import {deckSign,hullPaint,vesselExterior} from './vessel-profile.mjs?v=0.18.65';
-import {craneColor} from './crane-style.mjs?v=0.18.65';
-import {crewStations} from './crew-stations.mjs?v=0.18.65';
-import {canStand} from './deck-layout.mjs?v=0.18.65';
-import {lineHaulerMounts} from './line-hauler.mjs?v=0.18.65';
-import {vesselStyle,rackPositions,rackFrames,gantryPlacement} from './vessel-style.mjs?v=0.18.65';
-import {HULL_STATIONS,hullWidthAt} from './fenders.mjs?v=0.18.65';
+import {deckSign,hullPaint,vesselExterior} from './vessel-profile.mjs?v=0.18.66';
+import {craneColor} from './crane-style.mjs?v=0.18.66';
+import {crewStations} from './crew-stations.mjs?v=0.18.66';
+import {canStand} from './deck-layout.mjs?v=0.18.66';
+import {lineHaulerMounts} from './line-hauler.mjs?v=0.18.66';
+import {vesselStyle,rackPositions,rackFrames,gantryPlacement} from './vessel-style.mjs?v=0.18.66';
+import {HULL_STATIONS,hullWidthAt} from './fenders.mjs?v=0.18.66';
 const steel=[.19,.24,.25],paint=[.68,.7,.64],dark=[.045,.08,.1],glass=[.055,.13,.17],brass=[.43,.31,.13],orange=[.72,.29,.065];
 export function geometry(){const data=[];
  function tri(a,b,c,color,rough=.6,emit=0){const u=b.map((x,i)=>x-a[i]),v=c.map((x,i)=>x-a[i]),n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]],len=Math.hypot(...n);if(len<1e-8)return;for(const p of [a,b,c])data.push(...p,...n.map(x=>x/len),...color,rough,emit);}
@@ -37,7 +37,8 @@ function addMarineSearchlight(g,center,side=0){
 function buildOffshoreBridge(g,profile,paint){
  const {box,tube,quad,ellipsoid}=g;
  const {family,electric,trim}=profile;
- const stepped=[6,9,10,11].includes(family)&&!electric,compact=[1,5,8].includes(family);
+ const carrier=family===12;
+ const stepped=[6,9,10,11,12].includes(family)&&!electric,compact=[1,5,8].includes(family);
  // Lower cabin, sill, glazing header and visor have distinct footprints.
  const sill=electric?4.65:stepped?5.25:compact?3.92:4.3;
  const top=sill+1.12*profile.bridge;
@@ -48,9 +49,9 @@ function buildOffshoreBridge(g,profile,paint){
  const skirt=ring(.23,electric?7.18:compact?5.95:6.65,2.62,electric?.95:.43,1.78);
  const base=ring(.23,compact?5.85:6.49,2.62,electric?.94:.43,3.65);
  const lower=ring(stepped?.78:electric?.7:compact?.55:.38,electric?6.45:compact?5.65:6.47,
-  electric?2.88:stepped?2.77:compact?2.30:2.62,electric?1.18:compact?.8:.46,sill);
+  carrier?3.02:electric?2.88:stepped?2.77:compact?2.30:2.62,carrier?1.35:electric?1.18:compact?.8:.46,sill);
  const upper=ring(stepped?.65:compact?1.22:.64,(electric?6.03:compact?4.72:6.28)-.5*(profile.rake-.7),
-  electric?3.02:stepped?2.91:compact?2.17:2.68,electric?1.16:compact?.83:.55,top);
+  carrier?3.18:electric?3.02:stepped?2.91:compact?2.17:2.68,carrier?1.30:electric?1.16:compact?.83:.55,top);
  const roof=ring(upper[0][0]-.23,upper[3][0]+.30,Math.abs(upper[1][2])+.23,electric?1.23:.64,top+.23);
  // The working deck door sits in the aft bulkhead of every bridge.
  for(const row of [skirt,base,lower]){
@@ -163,7 +164,7 @@ export function buildVessel(potCount=8,design={}){const orange=craneColor(design
  const upperWidth=(x,width)=>{
   if(!exterior||design.rampBow)return width;
   const bow=Math.max(0,(x-7.1)/5.1);
-  if(exterior.electric)return width+1.06*bow**1.3;
+  if(exterior.electric||exterior.family===12)return width+1.06*bow**1.3;
   return width*(1+(exterior.bow>.9 ? .38 : .08)*bow);
  };
  const sheer=x=>{
@@ -180,7 +181,17 @@ export function buildVessel(potCount=8,design={}){const orange=craneColor(design
   if(exterior){
    const forward=sheer(x),next=sheer(xx),wet=.21,stripe=.38,ua=upperWidth(x,a)*side,ub=upperWidth(xx,b)*side;
    face([x,.35,a*side],[xx,.35,b*side],[xx,.35+wet,b*side],[x,.35+wet,a*side],exterior.trim,.5);
-   face([x,.35+wet,a*side],[xx,.35+wet,b*side],[xx,1.75+next,ub],[x,1.75+forward,ua],exterior.hull,.48);
+   if(exterior.family===12){
+    const stripeBottom=x=>Math.max(0,1-Math.abs(x-7.9)*1.65);
+    const na=1.42+forward*stripeBottom(x),nb=1.42+next*stripeBottom(xx);
+    const f=(x,y,base,top)=>base+(top-base)*(y-.56)/(1.75+sheer(x)-.56);
+    const point=(x,y,base,top)=>[x,y,f(x,y,base,top)];
+    const al=point(x,na-.12,a*side,ua),ar=point(xx,nb-.12,b*side,ub);
+    const bl=point(x,na,a*side,ua),br=point(xx,nb,b*side,ub);
+    face([x,.56,a*side],[xx,.56,b*side],ar,al,exterior.hull,.48);
+    face(al,ar,br,bl,exterior.trim,.51);
+    face(bl,br,[xx,1.75+next,ub],[x,1.75+forward,ua],exterior.hull,.48);
+   }else face([x,.35+wet,a*side],[xx,.35+wet,b*side],[xx,1.75+next,ub],[x,1.75+forward,ua],exterior.hull,.48);
    face([x,1.75+forward,ua],[xx,1.75+next,ub],[xx,2.15+next,ub],[x,2.15+forward,ua],exterior.trim,.62);
    tube([x,2.2+forward,ua],[xx,2.2+next,ub],.075,exterior.trim,8);
    tube([x,2.2+forward+stripe,ua],[xx,2.2+next+stripe,ub],.045,paint,8);
@@ -192,7 +203,7 @@ export function buildVessel(potCount=8,design={}){const orange=craneColor(design
   tube([x,2.2,a*side],[xx,2.2,b*side],.075,paint);tube([x,3.,a*side],[xx,3.,b*side],.035,paint);
   tube([x,2.15,a*side],[x,3.,a*side],.035,paint);
  }const opening=orientation>0?[-2.8,-1]:[1,2.8],cuts=[x,...opening.filter(v=>v>x&&v<xx),xx];for(let j=0;j<cuts.length-1;j++){const l=cuts[j],r=cuts[j+1],lw=a+(b-a)*(l-x)/(xx-x),rw=a+(b-a)*(r-x)/(xx-x);if(l>=opening[0]&&r<=opening[1]){quad([l,1.7,-lw],[l,1.7,-1.4],[r,1.7,-1.4],[r,1.7,-rw],[.25,.29,.23],.82);quad([l,1.7,.4],[l,1.7,lw],[r,1.7,rw],[r,1.7,.4],[.25,.29,.23],.82);}else quad([l,1.7,-lw],[l,1.7,lw],[r,1.7,rw],[r,1.7,-rw],[.25,.29,.23],.82);}}
- if(exterior?.electric){
+ if(exterior?.electric||exterior?.family===12){
   const x=12.2,width=upperWidth(x,sections.at(-1)[1]),top=2.15+sheer(x);
   quad([x,.56,-.06],[x,top,-width],[x,top,width],[x,.56,.06],exterior.hull,.47);
   tube([x,top,-width],[x,top,width],.075,paint,8);
