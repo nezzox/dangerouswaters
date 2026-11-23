@@ -1,4 +1,4 @@
-import {replacementProgress} from './man-overboard.mjs?v=0.18.69';
+import {replacementProgress} from './man-overboard.mjs?v=0.18.70';
 // Procedural Web Audio: no downloads; all sources share one mute/limiter bus.
 export function ambientMix(state,weather,enabled=true){const near=Math.max(0,1-Math.hypot(state.x-160,state.y-80)/1800),drive=Math.min(1,Math.abs(state.throttle||0)),on=enabled&&!state.paused?1:0;return{engine:on*(.065+drive*.075)*(state.electricDrive?.18:1),wind:on*Math.min(.20,.035+weather.wind*.0035),sea:on*Math.min(.19,.045+weather.waves*.025),rain:on*Math.min(.12,Math.max(0,weather.rain||0)*.10),harbor:on*near*.035,creak:on*Math.min(.045,weather.waves*.007),near};}
 export function createSoundscape(Context=globalThis.AudioContext){const ac=new Context(),master=ac.createGain(),limiter=ac.createDynamicsCompressor();let volume=1;master.gain.value=.8;limiter.threshold.value=-14;limiter.knee.value=18;limiter.ratio.value=5;master.connect(limiter).connect(ac.destination);

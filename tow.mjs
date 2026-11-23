@@ -1,5 +1,5 @@
-import {seaLane} from './navigation.mjs?v=0.18.69';
-import {travelBoost} from './speed-curve.mjs?v=0.18.69';
+import {seaLane} from './navigation.mjs?v=0.18.70';
+import {travelBoost} from './speed-curve.mjs?v=0.18.70';
 
 export const TOW_SPEED=13/1.94384;
 

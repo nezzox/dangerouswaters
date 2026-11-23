@@ -1,5 +1,5 @@
-import {crabAbundance} from './fishing-grounds.mjs?v=0.18.69';
-import {isLand} from './world.mjs?v=0.18.69';
+import {crabAbundance} from './fishing-grounds.mjs?v=0.18.70';
+import {isLand} from './world.mjs?v=0.18.70';
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 // Best habitat fills at 3.6 kg per effective hour; poor habitat is much slower.
 export const POT_CAPACITY=90;

@@ -29,3 +29,5 @@ export const hullPaint=design=>design?.powertrain==='electric'?[.62,.67,.66]:/^b
 export function deckFrame(matrix,design){if(deckSign(design)>0)return matrix;const out=new Float64Array(matrix);for(let i=0;i<4;i++)out[i]*=-1;return out;}
 
 export const workX=(design,x)=>design.forwardWork?-8-x:x;
+
+export const HIGHWATER_SEARCHLIGHT=[6.35,7.42,0];

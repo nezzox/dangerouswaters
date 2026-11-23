@@ -1,11 +1,11 @@
-import {hullWaterGLSL} from './deck-water.mjs?v=0.18.69';
-import {seaHeightGLSL} from './sea-spectrum.mjs?v=0.18.69';
+import {hullWaterGLSL} from './deck-water.mjs?v=0.18.70';
+import {seaHeightGLSL} from './sea-spectrum.mjs?v=0.18.70';
 // Shared atmosphere and ocean functions keep lighting and reflections consistent.
 export const common=`
 precision highp float;precision highp int;
 uniform vec4 uRemoteLights[8];
 uniform vec4 uQuayLights[4];
-uniform float uDeckSign;uniform vec3 uCraneColor;
+uniform float uDeckSign;uniform vec3 uRoofSearchlight;uniform vec3 uCraneColor;
 uniform float uReflectionPass;uniform float uKind;uniform float uDaylight;uniform float uLights;uniform vec4 uLampUpgrade;uniform vec3 uRelativeEye;uniform mat4 uMVP;uniform mat4 uShadowMVP;uniform float uHullY;uniform vec4 uWake[48];uniform vec4 uWakeInfo[48];uniform int uWakeCount;uniform float uWakeTime;
 uniform float uDetailTime;uniform vec3 uSea;uniform float uTime;uniform vec4 uWeather;uniform vec4 uBoat;uniform vec3 uEye;uniform mat4 uVP;uniform mat4 uLightVP;
 float hash(vec2 p){uvec2 i=uvec2(ivec2(p));uint h=i.x*1597334677u^i.y*3812015801u;h=(h^(h>>16))*2246822519u;return float(h^(h>>13))/4294967295.;}
@@ -15,10 +15,10 @@ float fbm(vec2 p){float f=0.,a=.5;for(int i=0;i<4;i++){f+=a*noise(p);p=mat2(.8,-
 vec4 wakeAt(vec2 p){vec4 result=vec4(0.);for(int i=0;i<48;i++){if(i>=uWakeCount)break;float age=uWakeTime-uWakeInfo[i].w;if(age<0.||age>35.)continue;vec2 d=p-uWake[i].xy,f=uWakeInfo[i].xy,r=vec2(-f.y,f.x);float along=dot(d,f),side=dot(d,r),energy=uWakeInfo[i].z;if(abs(along)>20.+age||abs(side)>5.+age*energy*.4)continue;float q=abs(side)-(2.+age*energy*.34),fade=exp(-age*.10)*energy/7.;float ring=exp(-q*q/(.2+age*.035))*exp(-along*along/pow(6.+age*.3,2.));float churn=exp(-dot(d,d)/(8.+age*1.5));result.x=max(result.x,(ring*.32+churn*.18)*fade);float phase=q*2.1-age*1.4;result.yz+=r*sign(side)*(-sin(phase))*ring*fade*.07;result.w+=cos(phase)*ring*fade*.028;}result.x*=smoothstep(.25,.7,fbm(p*1.7+vec2(uDetailTime*.08,0.)));result.w=clamp(result.w,-.07,.07);return result;}
 vec3 shipLocal(vec3 p){vec2 f=vec2(cos(uBoat.z),sin(uBoat.z)),r=vec2(-f.y,f.x),d=p.xz-uBoat.xy;return vec3(dot(d,f),p.y-uHullY,dot(d,r));}
 bool blocked(vec3 o,vec3 p,vec3 lo,vec3 hi){vec3 inv=1./(p-o+vec3(.00001)),a=(lo-o)*inv,b=(hi-o)*inv,mn=min(a,b),mx=max(a,b);return max(max(mn.x,mn.y),max(mn.z,.025))<min(min(mx.x,mx.y),min(mx.z,.98));}
-vec3 lamps(vec3 p,vec3 n,vec3 view,bool volume,bool water){if(uLights<.5||length(p.xz)>160.*uLampUpgrade.z)return vec3(0.);vec3 sum=vec3(0.);for(int i=0;i<5;i++){if(volume&&i>2)break;vec3 o,dir,col;float cone,power;if(i==0){o=vec3(7.,5.3,0.);dir=normalize(vec3(1.,-.2,0.));col=vec3(1.,.83,.62);cone=.91;power=8.;}else if(i<3){float side=i==1?-1.:1.;o=vec3(.0,5.4,side*2.8);dir=normalize(vec3(.3,-.37,side));col=vec3(1.,.87,.68);cone=.79;power=6.;}else{float side=i==3?-1.:1.;o=vec3(-.35,5.4,side*2.8);dir=normalize(vec3(-.6-uLampUpgrade.x*.19,-1.,-side*.25));col=vec3(1.,.77,.49);cone=.55;power=3.8;}cone-=uLampUpgrade.w;power*=volume?sqrt(uLampUpgrade.y):uLampUpgrade.y;if(i==0)dir=normalize(vec3(1.,-.2+uLampUpgrade.x*.015,0.));if(i>2)col=mix(col,vec3(1.,.89,.72),uLampUpgrade.x*.16);float axis=sign(uDeckSign);
+vec3 lamps(vec3 p,vec3 n,vec3 view,bool volume,bool water){if(uLights<.5||length(p.xz)>160.*uLampUpgrade.z)return vec3(0.);vec3 sum=vec3(0.);for(int i=0;i<5;i++){if((volume&&i>2)||(abs(uDeckSign)>1.5&&i>0))break;vec3 o,dir,col;float cone,power;if(i==0){o=vec3(7.,5.3,0.);dir=normalize(vec3(1.,-.2,0.));col=vec3(1.,.83,.62);cone=.91;power=8.;}else if(i<3){float side=i==1?-1.:1.;o=vec3(.0,5.4,side*2.8);dir=normalize(vec3(.3,-.37,side));col=vec3(1.,.87,.68);cone=.79;power=6.;}else{float side=i==3?-1.:1.;o=vec3(-.35,5.4,side*2.8);dir=normalize(vec3(-.6-uLampUpgrade.x*.19,-1.,-side*.25));col=vec3(1.,.77,.49);cone=.55;power=3.8;}cone-=uLampUpgrade.w;power*=volume?sqrt(uLampUpgrade.y):uLampUpgrade.y;if(i==0)dir=normalize(vec3(1.,-.2+uLampUpgrade.x*.015,0.));if(i>2)col=mix(col,vec3(1.,.89,.72),uLampUpgrade.x*.16);float axis=sign(uDeckSign);
  if(abs(uDeckSign)>1.5){
-  if(i==0)axis=-axis;
-  else {o.x-=8.2;dir.x=-dir.x;}
+  o=uRoofSearchlight;
+  dir.x=-dir.x;
  }
  o.x*=axis;dir.x*=axis;vec3 delta=p-o;float dist=length(delta);vec3 toPoint=delta/max(.01,dist);float beam=smoothstep(cone,min(.999,cone+.09),dot(toPoint,dir));if(beam<.001)continue;float range=volume?mix(1.,uLampUpgrade.z,.38):uLampUpgrade.z;float energy=power*beam/(1.+dist*dist*.035/(range*range));if(!volume&&p.y<1.5&&(blocked(o,p,vec3(.25,1.75,-2.6),vec3(6.5,5.8,2.6))||blocked(o,p,vec3(-10.8,1.8,-2.9),vec3(-3.15,5.3,.8))))energy*=.55;if(volume)sum+=col*energy;else{float diffuse=max(.04,dot(n,-toPoint)),spec=pow(max(0.,dot(n,normalize(view-toPoint))),70.);sum+=col*energy*((water?spec*.65+diffuse*(.001+uLampUpgrade.x*.00055):diffuse*.42+spec*.25));}}return sum;}
 vec3 directLamps(vec3 p,vec3 n,vec3 view){vec2 f=vec2(cos(uBoat.z),sin(uBoat.z)),r=vec2(-f.y,f.x);vec3 localN=vec3(dot(n.xz,f),n.y,dot(n.xz,r)),localV=vec3(dot(view.xz,f),view.y,dot(view.xz,r));vec3 lighting=lamps(shipLocal(p),localN,localV,false,false)*(1.-uDaylight*.88);if(p.x<115.&&p.x> -235.)for(int i=0;i<4;i++){vec3 o=vec3(80.,9.,-200.+float(i)*145.),d=o-p;float dist=length(d);lighting+=vec3(1.,.77,.48)*max(0.,dot(n,d/max(.01,dist)))*3./(1.+dist*dist*.09)*(1.-uDaylight*.85);}return lighting;}

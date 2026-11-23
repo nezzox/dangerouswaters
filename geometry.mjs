@@ -1,10 +1,10 @@
-import {deckSign,hullPaint,vesselExterior,workX} from './vessel-profile.mjs?v=0.18.69';
-import {craneColor} from './crane-style.mjs?v=0.18.69';
-import {crewStations} from './crew-stations.mjs?v=0.18.69';
-import {canStand} from './deck-layout.mjs?v=0.18.69';
-import {lineHaulerMounts} from './line-hauler.mjs?v=0.18.69';
-import {vesselStyle,rackPositions,rackFrames,gantryPlacement} from './vessel-style.mjs?v=0.18.69';
-import {HULL_STATIONS,hullWidthAt} from './fenders.mjs?v=0.18.69';
+import {deckSign,hullPaint,vesselExterior,workX,HIGHWATER_SEARCHLIGHT} from './vessel-profile.mjs?v=0.18.70';
+import {craneColor} from './crane-style.mjs?v=0.18.70';
+import {crewStations} from './crew-stations.mjs?v=0.18.70';
+import {canStand} from './deck-layout.mjs?v=0.18.70';
+import {lineHaulerMounts} from './line-hauler.mjs?v=0.18.70';
+import {vesselStyle,rackPositions,rackFrames,gantryPlacement} from './vessel-style.mjs?v=0.18.70';
+import {HULL_STATIONS,hullWidthAt} from './fenders.mjs?v=0.18.70';
 const steel=[.19,.24,.25],paint=[.68,.7,.64],dark=[.045,.08,.1],glass=[.055,.13,.17],brass=[.43,.31,.13],orange=[.72,.29,.065];
 export function geometry(){const data=[];
  function tri(a,b,c,color,rough=.6,emit=0){const u=b.map((x,i)=>x-a[i]),v=c.map((x,i)=>x-a[i]),n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]],len=Math.hypot(...n);if(len<1e-8)return;for(const p of [a,b,c])data.push(...p,...n.map(x=>x/len),...color,rough,emit);}
@@ -126,7 +126,7 @@ function buildOffshoreBridge(g,profile,paint){
   tube([mx,top+.22,0],[mx,h,0],compact?.08:.15,paint,10);
   tube([mx,h-.60,-span],[mx,h-.60,span],.08,trim,8);
   for(const z of [-span,span])tube([mx,h-.62,z],[mx,top+.23,z*.64],.052,steel,8);
-  for(const z of compact?[-.64,.64]:[-1.75,-.66,.66,1.75]){
+  for(const z of family===13?[]:compact?[-.64,.64]:[-1.75,-.66,.66,1.75]){
    box(mx,h-.42,z,.33,.36,.38,steel);
    box(mx+.18,h-.42,z,.05,.28,.30,[.72,.69,.54],.45);
   }
@@ -316,24 +316,16 @@ export function buildVessel(potCount=8,design={}){const orange=craneColor(design
   if(design.forwardWork){
    box(7.65,4.25,side*2.64,.38,.26,.22,steel);
    box(7.65,4.25,side*2.76,.29,.16,.07,navColor,.2,1);
-   tube([-8.18,4.1,side*2.1],[-8.55,5.4,side*2.8],.075,steel,8);
-   box(-8.55,5.4,side*2.8,.4,.25,.24,[1.,.69,.28],.2,1.4);
   }else{
    box(5.4,5.5,side*2.75,.3,.16,.2,navColor,.2,1);
    box(-.3,5.3,side*2.72,.4,.25,.24,[1.,.69,.28],.2,1.4);
   }
  }
- if(exterior){
-  if(design.forwardWork){
-   tube([-7.03,1.72,0],[-7.03,4.86,0],.095,steel,10);
-   box(-7.03,4.86,0,.45,.14,.42,steel);
-   for(const side of [-1,1]){
-    tube([-8.2,4.11,side*1.87],[-8.2,4.96,side*2.61],.095,steel,8);
-    box(-8.2,4.96,side*2.61,.39,.14,.46,steel);
-   }
-  }
-  addMarineSearchlight(g,[design.forwardWork?-7.24:7.24,5.3,0],0,design.forwardWork?-1:1);
-  for(const side of [-1,1])addMarineSearchlight(g,[design.forwardWork?-8.2:0,5.4,side*2.82],side);
+ if(design.forwardWork){
+  addMarineSearchlight(g,HIGHWATER_SEARCHLIGHT,0,-1);
+ }else if(exterior){
+  addMarineSearchlight(g,[7.24,5.3,0]);
+  for(const side of [-1,1])addMarineSearchlight(g,[0,5.4,side*2.82],side);
  }else{
  // Directional searchlight and side floodlight housings.
  tube([6.8,5.3,0],[7.2,5.3,0],.23,steel,10);tube([7.2,5.3,0],[7.23,5.3,0],.19,[.78,.9,1.],10,.05);box(7.24,5.3,0,.03,.3,.3,[.78,.9,1.],.1,2);
