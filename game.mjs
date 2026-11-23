@@ -17,7 +17,7 @@ import {transitionWeather} from './weather-transition.mjs?v=0.18.61';
 import {ownedUpgrades,createRadioFeed,createLastHaul} from './hud-status.mjs?v=0.18.61';
 import {createIntro} from './intro.mjs?v=0.18.61';
 import {fleetNoticeCount} from './fleet.mjs?v=0.18.61';
-import {redeemDeveloperCode} from './developer-code.mjs?v=0.18.61';
+import {redeemDeveloperCode} from './developer-code.mjs?v=0.18.62';
 import {potSoakStage} from './pot-soak.mjs?v=0.18.61';
 import {createLiveWeather} from './live-weather.mjs?v=0.18.61';
 import {dockingStage,PORT_QUAYS,nearestQuay} from './harbor.mjs?v=0.18.61';
@@ -28,7 +28,7 @@ import {clipChartWater} from './chart-water.mjs?v=0.18.61';
 import {groundsAt,groundReport,crabHotspot,groundMotion} from './fishing-grounds.mjs?v=0.18.61';
 import {createSoundscape} from './soundscape.mjs?v=0.18.61';
 import {WORLD_LAND,WORLD_CENTER,WORLD_BOUNDS,PLACES,worldToGeo,clearWater,ST_PAUL_DIESEL} from './world.mjs?v=0.18.61';
-import {getLanguage,setLanguage,translateText,localizeTree} from './i18n.mjs?v=0.18.61';
+import {getLanguage,setLanguage,translateText,localizeTree} from './i18n.mjs?v=0.18.62';
 import {createShop} from './shop.mjs?v=0.18.61';
 import {restoreSeason,seasonJSON} from './saves.mjs?v=0.18.61';
 import {vesselStats,toggleAutomation} from './career.mjs?v=0.18.61';
@@ -189,7 +189,17 @@ $('speed-target').addEventListener('pointerup',()=>canvas.focus({preventScroll:t
 for(const b of document.querySelectorAll('[data-weather-mode]'))b.onclick=()=>{setWeatherMode(state,b.dataset.weatherMode);void liveWeather.update(state);save();updateUI();canvas.focus();};
 $('renderer').onclick=()=>{$('code-input').value='';$('code-dialog').returnValue='';keys.clear();$('code-dialog').showModal();$('code-input').focus();};
 $('code-cancel').onclick=()=>$('code-dialog').close('cancel');
-$('code-dialog').addEventListener('close',()=>{if($('code-dialog').returnValue==='redeem'&&redeemDeveloperCode(state,$('code-input').value,getLanguage())){save();updateUI();}canvas.focus();});
+$('code-dialog').addEventListener('close',()=>{
+ const code=$('code-input').value;
+ if($('code-dialog').returnValue==='redeem'&&redeemDeveloperCode(state,code,getLanguage())){
+  if(code==='Go to harbor'){
+   cancelWaypointSearch();waypointTravel=null;Object.assign(wake,createWake());
+   view.x=state.x;view.y=state.y;followVessel(chartView,state);
+  }
+  save();updateUI();
+ }
+ canvas.focus();
+});
 $('speed-target').oninput=e=>{state.desiredKnots=Number(e.target.value);};
 $('rudder-target').oninput=e=>{setRudder(state,Number(e.target.value));updateUI();save();};$('rudder-center').onclick=()=>{centerRudder();updateUI();save();canvas.focus();};
 $('lights').textContent=state.lights===false?'WORK LIGHTS OFF':'WORK LIGHTS ON';$('lights').setAttribute('aria-pressed',String(state.lights!==false));
@@ -298,7 +308,7 @@ function offerDockRefuel(){
 }
 function updateUI(){
  const towing=!!state.tow;
- for(const element of document.querySelectorAll('header, .left-panel, .right-panel > :not(.chart-panel), footer, .side-instruments, #kofi-support'))element.inert=towing;
+ for(const element of document.querySelectorAll('header, .left-panel, .right-panel > :not(.chart-panel), footer .controls, footer .simulation > :not(#renderer), .side-instruments, #kofi-support'))element.inert=towing;
 
  showQueuedMessage();
  offerDockRefuel();

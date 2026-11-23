@@ -193,6 +193,7 @@ const sv={
  'Steady conditions for the next few hours. Keep watch.':'Stabila förhållanden de närmaste timmarna. Håll utkik.',
  'Manual weather preview. Select Dynamic for seasonal weather.':'Manuell vädervisning. Välj Dynamiskt för säsongsväder.',
  'RADIO & LOGBOOK':'RADIO & LOGGBOK','CHART':'SJÖKORT','HARBOR SERVICES':'HAMNSERVICE','HARBOR SHOP':'HAMNBUTIK','FLEET & FINANCE':'FLOTTA & EKONOMI',
+ 'Arrived outside Dutch Harbor.':'Båten är nu utanför kajen i Dutch Harbor.',
  'CENTER VESSEL':'CENTRERA BÅTEN','CANCEL AP':'AVBRYT AP','SCROLL: ZOOM · DRAG: PAN':'RULLA: ZOOMA · DRA: PANORERA','SCROLL: ZOOM · DRAG: PAN · RIGHT CLICK: AP':'RULLA: ZOOMA · DRA: PANORERA · HÖGERKLICK: AP',
  'FISHING GROUND':'FISKEPLATS','HARBOR':'HAMN','CARGO & FINANCES':'LAST & EKONOMI','KG CATCH':'KG FÅNGST','CRAB / SALMON':'KRABBA / LAX',
  'POTS ON DECK':'TINOR PÅ DÄCK','POTS AT SEA':'TINOR TILL HAVS','BALANCE':'SALDO','DEPTH':'DJUP','M TO HARBOR':'M TILL HAMN','F/V':'F/F',

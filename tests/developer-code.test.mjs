@@ -11,3 +11,18 @@ test('Ge mig grants the chosen positive whole amount in the active currency',()=
  for(const code of ['Ge mig','Ge mig 0','Ge mig -1','Ge mig 1e3','Ge mig 99999999999999999'])assert(!redeemDeveloperCode(s,code));
  assert.equal(s.money-before,750);
 });
+test('Go to harbor ends towing in clear water while preserving resources',async()=>{
+ const {towDestination,vesselOnLand,nearPort}=await import('../simulation.mjs');
+ const s=createGame(),arrival=towDestination();
+ s.career.boat='boat-10-7';
+ Object.assign(s,{x:5000,y:5000,tow:{phase:'travel'},speed:5,fuel:13,hull:20,cargo:50,
+  autopilot:{x:123,y:456},remotePlayers:[{...arrival,boat:'boat-10-7'}]});
+ const balance=s.money;
+ assert(redeemDeveloperCode(s,'Go to harbor'));
+ assert(nearPort(s)&&!vesselOnLand(s));
+ assert(Math.hypot(s.x-arrival.x,s.y-arrival.y)>50);
+ assert.equal(s.tow,null);
+ assert.equal(s.autopilot,null);
+ assert.equal(s.speed,0);
+ assert.deepEqual([s.money,s.fuel,s.hull,s.cargo],[balance,13,20,50]);
+});
