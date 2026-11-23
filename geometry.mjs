@@ -1,10 +1,10 @@
-import {deckSign,hullPaint,vesselExterior,workX,HIGHWATER_SEARCHLIGHT} from './vessel-profile.mjs?v=0.18.70';
-import {craneColor} from './crane-style.mjs?v=0.18.70';
-import {crewStations} from './crew-stations.mjs?v=0.18.70';
-import {canStand} from './deck-layout.mjs?v=0.18.70';
-import {lineHaulerMounts} from './line-hauler.mjs?v=0.18.70';
-import {vesselStyle,rackPositions,rackFrames,gantryPlacement} from './vessel-style.mjs?v=0.18.70';
-import {HULL_STATIONS,hullWidthAt} from './fenders.mjs?v=0.18.70';
+import {deckSign,hullPaint,vesselExterior,workX,HIGHWATER_SEARCHLIGHT} from './vessel-profile.mjs?v=0.18.71';
+import {craneColor} from './crane-style.mjs?v=0.18.71';
+import {crewStations} from './crew-stations.mjs?v=0.18.71';
+import {canStand} from './deck-layout.mjs?v=0.18.71';
+import {lineHaulerMounts} from './line-hauler.mjs?v=0.18.71';
+import {vesselStyle,rackPositions,rackFrames,gantryPlacement} from './vessel-style.mjs?v=0.18.71';
+import {HULL_STATIONS,hullWidthAt} from './fenders.mjs?v=0.18.71';
 const steel=[.19,.24,.25],paint=[.68,.7,.64],dark=[.045,.08,.1],glass=[.055,.13,.17],brass=[.43,.31,.13],orange=[.72,.29,.065];
 export function geometry(){const data=[];
  function tri(a,b,c,color,rough=.6,emit=0){const u=b.map((x,i)=>x-a[i]),v=c.map((x,i)=>x-a[i]),n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]],len=Math.hypot(...n);if(len<1e-8)return;for(const p of [a,b,c])data.push(...p,...n.map(x=>x/len),...color,rough,emit);}
@@ -126,10 +126,6 @@ function buildOffshoreBridge(g,profile,paint){
   tube([mx,top+.22,0],[mx,h,0],compact?.08:.15,paint,10);
   tube([mx,h-.60,-span],[mx,h-.60,span],.08,trim,8);
   for(const z of [-span,span])tube([mx,h-.62,z],[mx,top+.23,z*.64],.052,steel,8);
-  for(const z of family===13?[]:compact?[-.64,.64]:[-1.75,-.66,.66,1.75]){
-   box(mx,h-.42,z,.33,.36,.38,steel);
-   box(mx+.18,h-.42,z,.05,.28,.30,[.72,.69,.54],.45);
-  }
   if(family===11){
    for(const [y,half] of [[h-.18,1.23],[h-.94,.84],[h-1.68,.58]]){
     tube([mx,y,-half],[mx,y,half],.042,steel,8);
@@ -311,28 +307,20 @@ export function buildVessel(potCount=8,design={}){const orange=craneColor(design
  }
  // Wire cages remain open so the deck and cage shadows can be seen through them.
  for(const [i,{x,z,y,scale}] of rackPositions(potCount,design).entries())addRackPot(g,x,y,z,i,scale);
- for(const side of [-1,1]){
-  const navColor=side<0?[.6,.015,.005]:[.015,.5,.13];
-  if(design.forwardWork){
-   box(7.65,4.25,side*2.64,.38,.26,.22,steel);
-   box(7.65,4.25,side*2.76,.29,.16,.07,navColor,.2,1);
-  }else{
-   box(5.4,5.5,side*2.75,.3,.16,.2,navColor,.2,1);
-   box(-.3,5.3,side*2.72,.4,.25,.24,[1.,.69,.28],.2,1.4);
-  }
- }
  if(design.forwardWork){
   addMarineSearchlight(g,HIGHWATER_SEARCHLIGHT,0,-1);
- }else if(exterior){
+ }else{
+  if(!exterior){
+   tube([6.26,4.9,0],[7.03,4.86,0],.096,steel,8);
+   box(7.03,4.86,0,.45,.14,.42,steel);
+   for(const side of [-1,1]){
+    tube([.48,4.75,side*2.35],[0,4.96,side*2.61],.095,steel,8);
+    box(0,4.96,side*2.61,.51,.14,.5,steel);
+   }
+  }
   addMarineSearchlight(g,[7.24,5.3,0]);
   for(const side of [-1,1])addMarineSearchlight(g,[0,5.4,side*2.82],side);
- }else{
- // Directional searchlight and side floodlight housings.
- tube([6.8,5.3,0],[7.2,5.3,0],.23,steel,10);tube([7.2,5.3,0],[7.23,5.3,0],.19,[.78,.9,1.],10,.05);box(7.24,5.3,0,.03,.3,.3,[.78,.9,1.],.1,2);
- for(const side of [-1,1])box(0,5.4,side*2.82,.42,.3,.1,[.78,.9,1.],.1,1.5);
  }
- // Survival equipment establishes scale without external models.
- for(const side of [-1,1])for(let i=0;i<16;i++){const a=i*Math.PI/8,b=(i+1)*Math.PI/8;tube([6.+Math.cos(a)*.48,3.4+Math.sin(a)*.48,side*2.76],[6.+Math.cos(b)*.48,3.4+Math.sin(b)*.48,side*2.76],.11,i%4===0?paint:orange,6);}
  // Rubber fenders, window seals and wipers, mooring cleats, hoses and fittings.
  for(const side of [-1,1]){
   for(const x of [-10.7,8.5]){const z=orientation>0?2.45:Math.min(2.45,hullWidthAt(orientation*x,design)-.35);tube([x,1.85,side*z],[x,2.1,side*z],.09,steel,12);tube([x-.32,2.1,side*z],[x+.32,2.1,side*z],.07,steel,12);}

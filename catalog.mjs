@@ -1,7 +1,7 @@
 // Most disciplines/systems have five ranks; intelligent automation is a separate single purchase.
 export const SKILL_SYSTEMS=[
- ['autoDeploy','Automatic pot setting','Automation',4500,'Automatically set pots after clearing the buoy range ring'],
- ['autoHaul','Automatic pot retrieval','Automation',6500,'Unlock auto haul; higher ranks reduce minimum soak by 0.2 h'],
+ ['autoDeploy','Automatic pot setting','Automation',4500,'Rank I unlocks Auto Set. Ranks II–V use the same selected buoy spacing of 80, 160 or 220 m.'],
+ ['autoHaul','Automatic pot retrieval','Automation',6500,'Rank I unlocks Auto Haul with a 2-hour minimum soak. Each further rank reduces the minimum by 12 in-game minutes, to 1 h 12 min at Rank V.'],
  ['work','Deck teamwork','Crew',3500,'All deck operations 8% faster per rank'],
  ['deploy','Pot rigging','Crew',2800,'Setting pots 10% faster per rank'],
  ['haul','Hauler handling','Crew',4000,'Hauling pots 9% faster per rank'],
