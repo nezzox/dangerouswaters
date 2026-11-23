@@ -1,4 +1,4 @@
-import {crabGroundAt} from './fishing-grounds.mjs?v=0.18.56';
+import {crabGroundAt} from './fishing-grounds.mjs?v=0.18.57';
 
 // In-game prices in SEK per kg, balanced around the previous 42 kr/kg base.
 const species=[

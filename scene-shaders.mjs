@@ -1,9 +1,9 @@
-import {hullWaterGLSL} from './deck-water.mjs?v=0.18.56';
-import {seaHeightGLSL} from './sea-spectrum.mjs?v=0.18.56';
+import {hullWaterGLSL} from './deck-water.mjs?v=0.18.57';
+import {seaHeightGLSL} from './sea-spectrum.mjs?v=0.18.57';
 // Shared atmosphere and ocean functions keep lighting and reflections consistent.
 export const common=`
 precision highp float;precision highp int;
-uniform vec4 uRemoteLights[4];
+uniform vec4 uRemoteLights[8];
 uniform vec4 uQuayLights[4];
 uniform float uDeckSign;uniform vec3 uCraneColor;
 uniform float uReflectionPass;uniform float uKind;uniform float uDaylight;uniform float uLights;uniform vec4 uLampUpgrade;uniform vec3 uRelativeEye;uniform mat4 uMVP;uniform mat4 uShadowMVP;uniform float uHullY;uniform vec4 uWake[48];uniform vec4 uWakeInfo[48];uniform int uWakeCount;uniform float uWakeTime;
@@ -18,15 +18,27 @@ bool blocked(vec3 o,vec3 p,vec3 lo,vec3 hi){vec3 inv=1./(p-o+vec3(.00001)),a=(lo
 vec3 lamps(vec3 p,vec3 n,vec3 view,bool volume,bool water){if(uLights<.5||length(p.xz)>160.*uLampUpgrade.z)return vec3(0.);vec3 sum=vec3(0.);for(int i=0;i<5;i++){if(volume&&i>2)break;vec3 o,dir,col;float cone,power;if(i==0){o=vec3(7.,5.3,0.);dir=normalize(vec3(1.,-.2,0.));col=vec3(.7,.86,1.);cone=.91;power=8.;}else if(i<3){float side=i==1?-1.:1.;o=vec3(.0,5.4,side*2.8);dir=normalize(vec3(.3,-.37,side));col=vec3(.72,.87,1.);cone=.79;power=6.;}else{float side=i==3?-1.:1.;o=vec3(-.35,5.4,side*2.8);dir=normalize(vec3(-.6,-1.,-side*.25));col=vec3(1.,.77,.49);cone=.55;power=3.8;}cone-=uLampUpgrade.w;power*=uLampUpgrade.y;if(i>2)col=mix(col,vec3(.92,.96,1.),uLampUpgrade.x*.16);o.x*=uDeckSign;dir.x*=uDeckSign;vec3 delta=p-o;float dist=length(delta);vec3 toPoint=delta/max(.01,dist);float beam=smoothstep(cone,min(.999,cone+.09),dot(toPoint,dir));if(beam<.001)continue;float energy=power*beam/(1.+dist*dist*.035/(uLampUpgrade.z*uLampUpgrade.z));if(!volume&&p.y<1.5&&(blocked(o,p,vec3(.25,1.75,-2.6),vec3(6.5,5.8,2.6))||blocked(o,p,vec3(-10.8,1.8,-2.9),vec3(-3.15,5.3,.8))))energy*=.55;if(volume)sum+=col*energy;else{float diffuse=max(.04,dot(n,-toPoint)),spec=pow(max(0.,dot(n,normalize(view-toPoint))),70.);sum+=col*energy*((water?spec*.65+diffuse*.001:diffuse*.42+spec*.25));}}return sum;}
 vec3 directLamps(vec3 p,vec3 n,vec3 view){vec2 f=vec2(cos(uBoat.z),sin(uBoat.z)),r=vec2(-f.y,f.x);vec3 localN=vec3(dot(n.xz,f),n.y,dot(n.xz,r)),localV=vec3(dot(view.xz,f),view.y,dot(view.xz,r));vec3 lighting=lamps(shipLocal(p),localN,localV,false,false)*(1.-uDaylight*.88);if(p.x<115.&&p.x> -235.)for(int i=0;i<4;i++){vec3 o=vec3(80.,9.,-200.+float(i)*145.),d=o-p;float dist=length(d);lighting+=vec3(1.,.77,.48)*max(0.,dot(n,d/max(.01,dist)))*3./(1.+dist*dist*.09)*(1.-uDaylight*.85);}return lighting;}
 vec3 waterLamps(vec3 p,vec3 n,vec3 view){vec2 f=vec2(cos(uBoat.z),sin(uBoat.z)),r=vec2(-f.y,f.x);return lamps(shipLocal(p),vec3(dot(n.xz,f),n.y,dot(n.xz,r)),vec3(dot(view.xz,f),view.y,dot(view.xz,r)),false,true)*(1.-uDaylight*.995);}
-vec3 remoteBeams(vec3 p){float energy=0.;for(int i=0;i<4;i++){
- vec4 lamp=uRemoteLights[i];if(lamp.w<=0.)continue;
- vec2 f=vec2(cos(lamp.z),sin(lamp.z)),d=p.xz-lamp.xy-f*8.;
- float dist=length(d),along=dot(d,f);
- float cone=smoothstep(.88,.99,along/max(.1,dist));
- float side=abs(dot(d,vec2(-f.y,f.x)));
- float deck=exp(-dist*.12),beam=cone*smoothstep(0.,7.,along)*(1.-smoothstep(12.,105.,dist));
- energy+=deck*.08+beam*(.09+uWeather.y*.16)*exp(-side*.04);
- }return vec3(.66,.84,1.)*energy*(1.-smoothstep(.08,.65,uDaylight));}
+vec3 remoteBeams(vec3 p){
+ float night=1.-smoothstep(.08,.65,uDaylight);
+ if(night<=0.)return vec3(0.);
+ vec3 viewRay=p-uEye;
+ float energy=0.;
+ for(int i=0;i<4;i++){
+  vec4 lamp=uRemoteLights[i*2];if(lamp.w==0.)continue;
+  vec3 axis=normalize(uRemoteLights[i*2+1].xyz),offset=uEye-lamp.xyz;
+  // Closest approach of the visible camera ray to the finite beam axis.
+  vec3 across=viewRay-axis*dot(viewRay,axis);
+  vec3 originAcross=offset-axis*dot(offset,axis);
+  float t=clamp(-dot(originAcross,across)/max(.001,dot(across,across)),0.,1.);
+  vec3 samplePoint=offset+viewRay*t;
+  float along=dot(samplePoint,axis);
+  float radius=.28+max(0.,along)*.20;
+  float profile=1.-smoothstep(0.,radius,length(samplePoint-axis*along));
+  float fade=smoothstep(0.,1.8,along)*(1.-smoothstep(15.,46.,along));
+  energy+=profile*fade;
+ }
+ return vec3(.68,.84,1.)*energy*night*(.009+uWeather.y*.055+uWeather.z*.012);
+}
 vec3 quayLighting(vec3 p){
  float amount=0.;
  for(int i=0;i<4;i++){
