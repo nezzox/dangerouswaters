@@ -1,28 +1,29 @@
-import {moveTow,roundTowRoute} from './tow.mjs?v=0.18.53';
-import {rollOverboard,stepOverboard} from './man-overboard.mjs?v=0.18.53';
-import {ST_PAUL_DIESEL} from './world.mjs?v=0.18.53';
-import {travelBoost} from './speed-curve.mjs?v=0.18.53';
-import {crabSpeciesName} from './crab-species.mjs?v=0.18.53';
-import {landCrab,addCrabCatch,captureCrabSpecies} from './catch-value.mjs?v=0.18.53';
-import {intelligentSetSignal} from './sonar-signal.mjs?v=0.18.53';
-import {nextPotNumber} from './pot-numbers.mjs?v=0.18.53';
-import {deckSign} from './vessel-profile.mjs?v=0.18.53';
-import {solarCharge,electricBurn,energyPrice} from './energy.mjs?v=0.18.53';
-import {potDropLocal} from './crane-style.mjs?v=0.18.53';
-import {resolveFleetContact} from './vessel-collision.mjs?v=0.18.53';
-import {potCatchAt} from './pot-soak.mjs?v=0.18.53';
-import {fuelBurnRate} from './fuel-economy.mjs?v=0.18.53';
-import {prepareRareCatch,awardRareCatch,rareValue,rareById} from './rare-catch.mjs?v=0.18.53';
-import {SEA_WEAR_SCALE} from './balance.mjs?v=0.18.53';
-import {crabAbundance,salmonAbundance} from './fishing-grounds.mjs?v=0.18.53';
-export {groundsAt} from './fishing-grounds.mjs?v=0.18.53';
-import {WORLD_VERSION,WORLD_BOUNDS,FISHING_GROUNDS,isLand,inWorld,clearWater} from './world.mjs?v=0.18.53';
-import {planSeaRoute,seaLane} from './navigation.mjs?v=0.18.53';
-import {tickFleet} from './fleet.mjs?v=0.18.53';
-import {ensureCareer,vesselStats,settleLanding} from './career.mjs?v=0.18.53';
-import {tickIncidents,blocksDeck} from './incidents.mjs?v=0.18.53';
-import {QUAY,BERTH,nearestQuay,chooseBerth,quayPoint,buildDockRoute,dockRouteDuration,dockingPose,vesselIntersectsHarbor,castOffPosition,buildCastOffRoute} from './harbor.mjs?v=0.18.53';
-export {BERTH} from './harbor.mjs?v=0.18.53';
+import {addSalmonCatch,salmonHoldRate} from './salmon-market.mjs?v=0.18.54';
+import {moveTow,roundTowRoute} from './tow.mjs?v=0.18.54';
+import {rollOverboard,stepOverboard} from './man-overboard.mjs?v=0.18.54';
+import {ST_PAUL_DIESEL} from './world.mjs?v=0.18.54';
+import {travelBoost} from './speed-curve.mjs?v=0.18.54';
+import {crabSpeciesName} from './crab-species.mjs?v=0.18.54';
+import {landCrab,addCrabCatch,captureCrabSpecies} from './catch-value.mjs?v=0.18.54';
+import {intelligentSetSignal} from './sonar-signal.mjs?v=0.18.54';
+import {nextPotNumber} from './pot-numbers.mjs?v=0.18.54';
+import {deckSign} from './vessel-profile.mjs?v=0.18.54';
+import {solarCharge,electricBurn,energyPrice} from './energy.mjs?v=0.18.54';
+import {potDropLocal} from './crane-style.mjs?v=0.18.54';
+import {resolveFleetContact} from './vessel-collision.mjs?v=0.18.54';
+import {potCatchAt} from './pot-soak.mjs?v=0.18.54';
+import {fuelBurnRate} from './fuel-economy.mjs?v=0.18.54';
+import {prepareRareCatch,awardRareCatch,rareValue,rareById} from './rare-catch.mjs?v=0.18.54';
+import {SEA_WEAR_SCALE} from './balance.mjs?v=0.18.54';
+import {crabAbundance,salmonAbundance} from './fishing-grounds.mjs?v=0.18.54';
+export {groundsAt} from './fishing-grounds.mjs?v=0.18.54';
+import {WORLD_VERSION,WORLD_BOUNDS,FISHING_GROUNDS,isLand,inWorld,clearWater} from './world.mjs?v=0.18.54';
+import {planSeaRoute,seaLane} from './navigation.mjs?v=0.18.54';
+import {tickFleet} from './fleet.mjs?v=0.18.54';
+import {ensureCareer,vesselStats,settleLanding} from './career.mjs?v=0.18.54';
+import {tickIncidents,blocksDeck} from './incidents.mjs?v=0.18.54';
+import {QUAY,BERTH,nearestQuay,chooseBerth,quayPoint,buildDockRoute,dockRouteDuration,dockingPose,vesselIntersectsHarbor,castOffPosition,buildCastOffRoute} from './harbor.mjs?v=0.18.54';
+export {BERTH} from './harbor.mjs?v=0.18.54';
 export const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 export const PORT={x:BERTH.x,y:BERTH.y};
 export const DECK_LIMIT_KNOTS=5;
@@ -108,7 +109,7 @@ function stepSimulation(s,dt,overboardRandom){
  if(s.paused)return;
  dt=clamp(dt,0,1);if(s.dieselSlick){s.dieselSlick.remaining-=dt;if(s.dieselSlick.remaining<=0)s.dieselSlick=null;}s.autoSetSlowing=false;s.autoHaulSlowing=false;s.hour+=dt/45;const stats=vesselStats(s);s.fuel=Math.min(stats.tank,s.fuel+solarCharge(stats,s.hour,conditions(s),dt));tickIncidents(s,dt,stats,conditions(s));if(s.career)tickFleet(s,dt,conditions(s));
  if(s.deckJob?.kind==='undock'){const j=s.deckJob;j.route??=buildCastOffRoute({x:j.x,y:j.y,heading:j.startHeading},{x:j.targetX,y:j.targetY,heading:j.targetHeading});j.elapsed=Math.min(j.duration,j.elapsed+dt);Object.assign(s,dockingPose(j.route,j.elapsed));s.throttle=0;s.rudder=0;if(j.elapsed>=j.duration){s.deckJob=null;s.speed=0;notify(s,'Clear of the quay. Manual helm or autopilot ready.');}return;}
- if(s.deckJob?.kind==='unload'){const j=s.deckJob;if(j.reservationPending){s.speed=0;return;}const others=[...(s.career?.fleet||[]),...(s.remotePlayers||[])];if(j.berth&&others.some(o=>Math.hypot(o.x-j.berth.x,o.y-j.berth.y)<25)){s.deckJob=null;s.speed=0;notify(s,'Berth occupied. Docking stopped; choose another berth.');return;}if(!j.route){j.route=buildDockRoute({x:j.x,y:j.y,heading:j.startHeading,career:s.career},j.berth||BERTH);j.approach=Math.max(.01,dockRouteDuration(j.route));j.duration=j.approach+clamp(j.unloadSeconds??22,1,120);}j.elapsed+=dt;Object.assign(s,dockingPose(j.route,Math.min(j.elapsed,j.approach)));s.throttle=0;s.desiredKnots=0;s.rudder=0;s.autopilot=null;if(j.elapsed>=j.duration){const kg=Math.min(j.cargoKg,s.cargo);const crabRevenue=landCrab(s,kg);const fish=Math.min(j.salmonKg||0,s.salmon||0);s.salmon-=fish;const bonus=rareValue(s),receipt=settleLanding(s,(crabRevenue+fish*42)*stats.priceBonus+bonus);s.rareHold={};s.totalLanded=(Number.isFinite(s.totalLanded)?s.totalLanded:s.landed||0)+kg+fish;s.landed+=kg+fish;s.totalEarned=(s.totalEarned||0)+receipt.net;s.deckJob=null;s.speed=0;s.moored={x:s.x,y:s.y,heading:s.heading};notify(s,kg||fish||bonus?`${kg} kg crab + ${fish} kg salmon landed.${bonus?` Special catch bonus ${bonus.toLocaleString('en-US')} kr.`:''} Net +${Math.round(receipt.net).toLocaleString('en-US')} kr${receipt.repaid?`; loan repaid ${Math.round(receipt.repaid)} kr`:''}.`:'Secured alongside. Hold empty. Ready for service.');}return;}
+ if(s.deckJob?.kind==='unload'){const j=s.deckJob;if(j.reservationPending){s.speed=0;return;}const others=[...(s.career?.fleet||[]),...(s.remotePlayers||[])];if(j.berth&&others.some(o=>Math.hypot(o.x-j.berth.x,o.y-j.berth.y)<25)){s.deckJob=null;s.speed=0;notify(s,'Berth occupied. Docking stopped; choose another berth.');return;}if(!j.route){j.route=buildDockRoute({x:j.x,y:j.y,heading:j.startHeading,career:s.career},j.berth||BERTH);j.approach=Math.max(.01,dockRouteDuration(j.route));j.duration=j.approach+clamp(j.unloadSeconds??22,1,120);}j.elapsed+=dt;Object.assign(s,dockingPose(j.route,Math.min(j.elapsed,j.approach)));s.throttle=0;s.desiredKnots=0;s.rudder=0;s.autopilot=null;if(j.elapsed>=j.duration){const kg=Math.min(j.cargoKg,s.cargo);const crabRevenue=landCrab(s,kg);const fish=Math.min(j.salmonKg||0,s.salmon||0);s.salmon-=fish;const bonus=rareValue(s),receipt=settleLanding(s,(crabRevenue+fish*salmonHoldRate(s))*stats.priceBonus+bonus);s.rareHold={};s.totalLanded=(Number.isFinite(s.totalLanded)?s.totalLanded:s.landed||0)+kg+fish;s.landed+=kg+fish;s.totalEarned=(s.totalEarned||0)+receipt.net;s.deckJob=null;s.speed=0;s.moored={x:s.x,y:s.y,heading:s.heading};notify(s,kg||fish||bonus?`${kg} kg crab + ${fish} kg salmon landed.${bonus?` Special catch bonus ${bonus.toLocaleString('en-US')} kr.`:''} Net +${Math.round(receipt.net).toLocaleString('en-US')} kr${receipt.repaid?`; loan repaid ${Math.round(receipt.repaid)} kr`:''}.`:'Secured alongside. Hold empty. Ready for service.');}return;}
  if(s.moored){if(Math.abs(s.desiredKnots||0)>.01||s.autopilot){if(!undock(s)){s.desiredKnots=0;}return;}else{Object.assign(s,s.moored);s.speed=0;s.throttle=0;s.rudder=0;return;}}
  advancePickupAll(s);
  if(s.skipperMission?.kind==='home'&&s.skipperMission.stage==='berth'&&!s.deckJob&&nearPort(s)&&Math.abs(s.speed)<1){s.skipperMission=null;dock(s);return;}
@@ -136,7 +137,7 @@ function stepSimulation(s,dt,overboardRandom){
  if(s.deckJob&&!blocksDeck(s)&&!(s.incident?.system==='net'&&s.deckJob.kind.startsWith('net'))){const j=s.deckJob;j.elapsed+=dt*(s.incident?.system==='crew'?.5:1);if(j.kind==='deploy'&&!j.released&&j.elapsed>=j.duration*.9)j.released={...releasePoint(s),at:s.hour};if(j.elapsed>=j.duration){
  if(j.kind==='deploy'){if(j.intelligent&&s.career.intelligentAutoSet)s.intelligentSetRunout=300;const drop=j.released||{...releasePoint(s),at:s.hour};s.pots.push({id:nextPotNumber(s.pots),x:drop.x,y:drop.y,setAt:drop.at,crabSpecies:captureCrabSpecies(drop,drop.at)});s.nextPot=nextPotNumber(s.pots);notify(s,'Pot deployed. Clear the range ring before setting another.');}
  else if(j.kind==='netSet'){s.nets.push({id:s.nextPot++,x:j.x,y:j.y,setAt:s.hour});notify(s,'Salmon net set. Let it soak, then return within 120 meters.');}
- else if(j.kind==='netHaul'){const net=s.nets.find(n=>n.id===j.netId);if(net){const kg=Math.min(j.catchKg,Math.max(0,stats.capacity-s.cargo-s.salmon));s.salmon+=kg;s.lastHaul={kg,species:'salmon'};s.nets=s.nets.filter(n=>n.id!==j.netId);notify(s,`${kg} kg salmon sorted into the hold.`);revealRare(s,j.rareId,'salmon');}}
+ else if(j.kind==='netHaul'){const net=s.nets.find(n=>n.id===j.netId);if(net){const kg=Math.min(j.catchKg,Math.max(0,stats.capacity-s.cargo-s.salmon));addSalmonCatch(s,kg,net,s.hour);s.lastHaul={kg,species:'salmon'};s.nets=s.nets.filter(n=>n.id!==j.netId);notify(s,`${kg} kg salmon sorted into the hold.`);revealRare(s,j.rareId,'salmon');}}
  else {const p=s.pots.find(p=>p.id===j.potId);if(p){const kg=Math.min(j.catchKg,Math.max(0,stats.capacity-s.cargo-(s.salmon||0)));addCrabCatch(s,kg,p,s.hour);s.lastHaul={kg,species:'crab',crabSpecies:captureCrabSpecies(p)};s.deck++;s.pots=s.pots.filter(p=>p.id!==j.potId);s.nextPot=nextPotNumber(s.pots);notify(s,`Pot ${j.potId} emptied. ${kg} kg of crab sorted into the hold.${s.lastHaul.crabSpecies?` ${crabSpeciesName(s.lastHaul.crabSpecies)}.`:''}`);revealRare(s,j.rareId,'crab');}}s.deckJob=null;if((j.kind==='deploy'||j.kind==='haul')&&rollOverboard(s,j.side,overboardRandom))return;}}
  const previous={x:s.x,y:s.y,heading:s.heading,career:s.career};
  s.heading+=s.rudder*stats.steer*dt*(.07+Math.abs(s.speed)*.024)*(s.speed<0?-1:1);

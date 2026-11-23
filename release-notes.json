@@ -1,1 +1,1 @@
-{"version": "0.18.53", "notes": {"en": ["Multiplayer now uses Firebase Spark with direct peer-to-peer boat updates and a Firebase fallback."], "sv": ["Multiplayer använder nu Firebase Spark med direkt båtsynk mellan spelare och Firebase som reserv."]}}
+{"version": "0.18.54", "notes": {"en": ["Fishing Intelligence has compact, clickable grounds and shows salmon percentages, species and prices."], "sv": ["Fishing Intelligence har kompakta, klickbara fiskeområden och visar laxprognos, arter och priser."]}}
