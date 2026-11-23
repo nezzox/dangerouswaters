@@ -1,3 +1,20 @@
 import {test} from 'node:test';import assert from 'node:assert/strict';import {createGame,setAutopilot} from '../simulation.mjs';import {startWaypointTravel,advanceWaypointTravel} from '../time-to-waypoint.mjs';
 test('time travel follows autopilot, spends fuel and stops at the next waypoint',()=>{const s=createGame();Object.assign(s,{x:1200,y:500,heading:0,paused:false,weatherOverride:'calm',desiredKnots:6});s.career.nextIncident=1e9;assert(setAutopilot(s,2000,500));assert(setAutopilot(s,2600,500,true));const start=s.hour,fuel=s.fuel,travel=startWaypointTravel(s);assert(travel);let result;for(let i=0;i<100&&!result?.done;i++)result=advanceWaypointTravel(s,travel,100);assert.equal(result.reason,'arrived');assert.equal(s.hour,start);assert(s.fuel<fuel);assert(Math.hypot(s.x-2000,s.y-500)<30);assert(s.autopilot);assert.equal(s.autopilot.waypoints.length,1);});
 test('time travel refuses absent route, pauses and active incidents',()=>{const s=createGame();assert.equal(startWaypointTravel(s),null);Object.assign(s,{paused:false,x:1200,y:500,heading:0,desiredKnots:6});assert(setAutopilot(s,2000,500));s.incident={system:'engine',remaining:50};assert.equal(startWaypointTravel(s),null);s.incident=null;const travel=startWaypointTravel(s);s.fuel=0;assert.equal(advanceWaypointTravel(s,travel).reason,'interrupted');});
+test('skipping a Return and Dock route spends fuel and hands off to normal docking',async()=>{
+ const {skipperCommand,step}=await import('../simulation.mjs');
+ const s=createGame();
+ Object.assign(s,{x:1200,y:500,paused:false,weatherOverride:'calm'});
+ s.career.skills.steer=1;
+ s.career.nextIncident=1e9;
+ assert(skipperCommand(s,'home'));
+ const fuel=s.fuel,hour=s.hour;
+ const travel=startWaypointTravel(s);
+ assert(travel);
+ assert.equal(advanceWaypointTravel(s,travel).reason,'arrived');
+ assert(s.fuel<fuel);
+ assert.equal(s.hour,hour);
+ assert.equal(s.skipperMission.stage,'berth');
+ step(s,.1);
+ assert.equal(s.deckJob?.kind,'unload');
+});

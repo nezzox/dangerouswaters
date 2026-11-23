@@ -1,6 +1,6 @@
 import {replacementProgress} from './man-overboard.mjs?v=0.18.61';
 import {createAntialias} from './antialias.mjs?v=0.18.61';
-import {LIGHTING_PROFILES} from './light-upgrades.mjs?v=0.18.61';
+import {LIGHTING_PROFILES} from './light-upgrades.mjs?v=0.18.63';
 import {deckFrame,deckSign} from './vessel-profile.mjs?v=0.18.61';
 import {createTerrainLoader} from './terrain-loader.mjs?v=0.18.61';
 import {craneColor} from './crane-style.mjs?v=0.18.61';
@@ -23,7 +23,7 @@ import {inverseTransform,multiply,transform,perspective,lookAt,identity,project}
 import {geometry,buildRackPot,buildDeckWash,buildVessel,buildBuoy,buildOceanGrid,buildCrewParts,buildDeckEquipment} from './geometry.mjs?v=0.18.61';
 import {deckWorkPose} from './deck-work.mjs?v=0.18.61';
 import {createCrew,commandCrew,stepCrew,crewPose} from './crew.mjs?v=0.18.61';
-import * as shaders from './scene-shaders.mjs?v=0.18.61';
+import * as shaders from './scene-shaders.mjs?v=0.18.63';
 export {seaHeight as surfaceHeight} from './sea-spectrum.mjs?v=0.18.61';
 import {seaHeight,seaSettings,directionalSpectrum} from './sea-spectrum.mjs?v=0.18.61';
 function ortho(l,r,b,t,n,f){return new Float64Array([2/(r-l),0,0,0,0,2/(t-b),0,0,0,0,-2/(f-n),0,-(r+l)/(r-l),-(t+b)/(t-b),-(f+n)/(f-n),1]);}
