@@ -9,3 +9,20 @@ test('legacy saves migrate without losing money, pots or upgrades',()=>{const s=
 test('large vessels, negative balances, nets, loans, repairs and captain requests survive save migration',()=>{const s=createGame();s.money=BOATS.at(-1).price+1e7;buyBoat(s,BOATS.at(-1).id,'captain');s.nets=[{id:2,x:1200,y:600,setAt:5}];s.money=-100;s.fuel=vesselStats(s).tank;takeLoan(s,1000);triggerIncident(s,INCIDENTS[0].id);s.career.fleet[0].request={cost:1000,fuel:10,repair:1,bait:745,status:'pending'};const t=restoreSeason(JSON.parse(seasonJSON(s)));assert(t);assert.equal(t.career.boat,s.career.boat);assert.equal(t.fuel,s.fuel);assert.equal(t.career.debt,1100);assert.equal(t.incident.id,s.incident.id);assert.equal(t.nets.length,1);assert.equal(t.career.fleet[0].request.cost,1000);});
 test('mixed landing pays both fisheries and repays debt exactly once across resume',()=>{let s=createGame();s.paused=false;s.cargo=100;s.salmon=200;takeLoan(s,10000);dock(s);s=restoreSeason(JSON.parse(seasonJSON(s)));s.paused=false;const balance=s.money;for(let i=0,n=Math.ceil(s.deckJob.duration)+2;i<n;i++)step(s,1);const received=s.money-balance;assert.equal(received,(100*65+200*42)*.85);assert.equal(s.cargo,0);assert.equal(s.salmon,0);const paid=s.money;for(let i=0;i<200;i++)step(s,1);assert.equal(s.money,paid);});
 test('invalid imports are rejected without accepting nonfinite or malformed core state',()=>{assert.equal(restoreSeason({version:1}),null);const s=createGame();s.fuel=Infinity;assert.equal(restoreSeason(s),null);});
+test('the vessel refit refunds full hull and installed upgrades once without losing vessels or gear',async()=>{
+ const {PARTS}=await import('../catalog.mjs');
+ const s=createGame();
+ const first=BOATS[1],fleet=BOATS[11];
+ s.career.boat=first.id;s.career.parts={sonar:2};
+ s.career.fleet=[{id:'fleet-test',boat:fleet.id,x:1000,y:500,fuel:50,hull:100,parts:{tank:1},phase:'deploy',pots:[]}];
+ s.pots=[{id:1,x:1400,y:600,setAt:1}];
+ const old=JSON.parse(seasonJSON(s));delete old.vesselModelVersion;
+ const upgraded=restoreSeason(old),parts=PARTS.filter(x=>x.key==='sonar'&&x.rank<=2||x.key==='tank'&&x.rank===1);
+ assert.equal(upgraded.money,s.money+first.price+fleet.price+parts.reduce((sum,p)=>sum+p.price,0));
+ assert.equal(upgraded.career.boat,first.id);
+ assert.deepEqual(upgraded.career.parts,{sonar:2});
+ assert.equal(upgraded.career.fleet[0].boat,fleet.id);
+ assert.equal(upgraded.pots.length,1);
+ assert.equal(restoreSeason(JSON.parse(seasonJSON(upgraded))).money,upgraded.money);
+ assert.equal(restoreSeason(JSON.parse(seasonJSON(s))).money,s.money);
+});

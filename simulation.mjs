@@ -1,29 +1,29 @@
-import {addSalmonCatch,salmonHoldRate} from './salmon-market.mjs?v=0.18.61';
-import {moveTow,roundTowRoute} from './tow.mjs?v=0.18.61';
-import {rollOverboard,stepOverboard} from './man-overboard.mjs?v=0.18.61';
-import {ST_PAUL_DIESEL} from './world.mjs?v=0.18.61';
-import {travelBoost} from './speed-curve.mjs?v=0.18.61';
-import {crabSpeciesName} from './crab-species.mjs?v=0.18.61';
-import {landCrab,addCrabCatch,captureCrabSpecies} from './catch-value.mjs?v=0.18.61';
-import {intelligentSetSignal} from './sonar-signal.mjs?v=0.18.61';
-import {nextPotNumber} from './pot-numbers.mjs?v=0.18.61';
-import {deckSign} from './vessel-profile.mjs?v=0.18.61';
-import {solarCharge,electricBurn,energyPrice} from './energy.mjs?v=0.18.61';
-import {potDropLocal} from './crane-style.mjs?v=0.18.61';
-import {resolveFleetContact} from './vessel-collision.mjs?v=0.18.61';
-import {potCatchAt} from './pot-soak.mjs?v=0.18.61';
-import {fuelBurnRate} from './fuel-economy.mjs?v=0.18.61';
-import {prepareRareCatch,awardRareCatch,rareValue,rareById} from './rare-catch.mjs?v=0.18.61';
-import {SEA_WEAR_SCALE} from './balance.mjs?v=0.18.61';
-import {crabAbundance,salmonAbundance} from './fishing-grounds.mjs?v=0.18.61';
-export {groundsAt} from './fishing-grounds.mjs?v=0.18.61';
-import {WORLD_VERSION,WORLD_BOUNDS,FISHING_GROUNDS,isLand,inWorld,clearWater} from './world.mjs?v=0.18.61';
-import {planSeaRoute,seaLane} from './navigation.mjs?v=0.18.61';
-import {tickFleet} from './fleet.mjs?v=0.18.61';
-import {ensureCareer,vesselStats,settleLanding} from './career.mjs?v=0.18.61';
-import {tickIncidents,blocksDeck} from './incidents.mjs?v=0.18.61';
-import {QUAY,BERTH,nearestQuay,chooseBerth,quayPoint,buildDockRoute,dockRouteDuration,dockingPose,vesselIntersectsHarbor,castOffPosition,buildCastOffRoute} from './harbor.mjs?v=0.18.61';
-export {BERTH} from './harbor.mjs?v=0.18.61';
+import {addSalmonCatch,salmonHoldRate} from './salmon-market.mjs?v=0.18.65';
+import {moveTow,roundTowRoute} from './tow.mjs?v=0.18.65';
+import {rollOverboard,stepOverboard} from './man-overboard.mjs?v=0.18.65';
+import {ST_PAUL_DIESEL} from './world.mjs?v=0.18.65';
+import {travelBoost} from './speed-curve.mjs?v=0.18.65';
+import {crabSpeciesName} from './crab-species.mjs?v=0.18.65';
+import {landCrab,addCrabCatch,captureCrabSpecies} from './catch-value.mjs?v=0.18.65';
+import {intelligentSetSignal} from './sonar-signal.mjs?v=0.18.65';
+import {nextPotNumber} from './pot-numbers.mjs?v=0.18.65';
+import {deckSign} from './vessel-profile.mjs?v=0.18.65';
+import {solarCharge,electricBurn,energyPrice} from './energy.mjs?v=0.18.65';
+import {potDropLocal} from './crane-style.mjs?v=0.18.65';
+import {resolveFleetContact} from './vessel-collision.mjs?v=0.18.65';
+import {potCatchAt} from './pot-soak.mjs?v=0.18.65';
+import {fuelBurnRate} from './fuel-economy.mjs?v=0.18.65';
+import {prepareRareCatch,awardRareCatch,rareValue,rareById} from './rare-catch.mjs?v=0.18.65';
+import {SEA_WEAR_SCALE} from './balance.mjs?v=0.18.65';
+import {crabAbundance,salmonAbundance} from './fishing-grounds.mjs?v=0.18.65';
+export {groundsAt} from './fishing-grounds.mjs?v=0.18.65';
+import {WORLD_VERSION,WORLD_BOUNDS,FISHING_GROUNDS,isLand,inWorld,clearWater} from './world.mjs?v=0.18.65';
+import {planSeaRoute,seaLane} from './navigation.mjs?v=0.18.65';
+import {tickFleet} from './fleet.mjs?v=0.18.65';
+import {ensureCareer,vesselStats,settleLanding} from './career.mjs?v=0.18.65';
+import {tickIncidents,blocksDeck} from './incidents.mjs?v=0.18.65';
+import {QUAY,BERTH,nearestQuay,chooseBerth,quayPoint,buildDockRoute,dockRouteDuration,dockingPose,vesselIntersectsHarbor,castOffPosition,buildCastOffRoute} from './harbor.mjs?v=0.18.65';
+export {BERTH} from './harbor.mjs?v=0.18.65';
 export const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 export const PORT={x:BERTH.x,y:BERTH.y};
 export const DECK_LIMIT_KNOTS=5;
@@ -31,7 +31,7 @@ export const potSpeedLimit=s=>s.career?.skills?.maxSpeedHauling?13:s.career?.ski
 const canWorkPots=s=>Math.abs(s.speed)*1.94384 <= potSpeedLimit(s)-(s.career?.skills?.maxSpeedHauling?0:1e-6);
 export const grounds=FISHING_GROUNDS;
 export const distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
-export function createGame(){return ensureCareer({version:1,energySchema:1,worldVersion:WORLD_VERSION,x:180,y:100,heading:-Math.PI/2,speed:0,throttle:0,rudder:0,hour:6.4,money:48000,fuel:500,hull:100,cargo:0,capacity:900,deck:8,pots:[],nextPot:1,engine:0,hold:0,gear:0,paused:true,desiredKnots:0,intelligentSetRunout:0,deckJob:null,autopilot:null,lights:true,moored:null,weatherOverride:null,weatherMode:'live',message:'Welcome aboard F/V Nordvind.',log:[],landed:0});}
+export function createGame(){return ensureCareer({version:1,vesselModelVersion:1,energySchema:1,worldVersion:WORLD_VERSION,x:180,y:100,heading:-Math.PI/2,speed:0,throttle:0,rudder:0,hour:6.4,money:48000,fuel:500,hull:100,cargo:0,capacity:900,deck:8,pots:[],nextPot:1,engine:0,hold:0,gear:0,paused:true,desiredKnots:0,intelligentSetRunout:0,deckJob:null,autopilot:null,lights:true,moored:null,weatherOverride:null,weatherMode:'live',message:'Welcome aboard F/V Nordvind.',log:[],landed:0});}
 function crewActivity(s,kind){s.activity={id:(s.activity?.id||0)+1,kind};}
 export const POT_RANGE=80;
 export function potBearing(s,p){const dx=p.x-s.x,dy=p.y-s.y;return {along:dx*Math.cos(s.heading)+dy*Math.sin(s.heading),starboard:-dx*Math.sin(s.heading)+dy*Math.cos(s.heading)};}

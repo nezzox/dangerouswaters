@@ -1,7 +1,7 @@
-import {MATTHEW_QUAY} from './world.mjs?v=0.18.61';
-import {ensureRareState,rareCount} from './rare-catch.mjs?v=0.18.61';
-import {INCIDENT_INTERVAL_SCALE,INCIDENT_SCHEDULE_VERSION} from './balance.mjs?v=0.18.61';
-import {SKILLS,PARTS,BOATS,SKILL_SYSTEMS,PART_SYSTEMS,boatById} from './catalog.mjs?v=0.18.61';
+import {MATTHEW_QUAY} from './world.mjs?v=0.18.65';
+import {ensureRareState,rareCount} from './rare-catch.mjs?v=0.18.65';
+import {INCIDENT_INTERVAL_SCALE,INCIDENT_SCHEDULE_VERSION} from './balance.mjs?v=0.18.65';
+import {SKILLS,PARTS,BOATS,SKILL_SYSTEMS,PART_SYSTEMS,boatById} from './catalog.mjs?v=0.18.65';
 const finite=(n,f=0)=>Number.isFinite(n)?n:f,clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 export const inHarbor=s=>Math.hypot(s.x-160,s.y-80)<230||Math.hypot(s.x-MATTHEW_QUAY.x,s.y-MATTHEW_QUAY.y)<230;
 export const shopReady=s=>inHarbor(s)&&Math.abs(s.speed)<1&&!s.deckJob&&!s.incident;
@@ -23,7 +23,13 @@ export function vesselStats(s){
 const result=(ok,message)=>({ok,message});
 export function buyItem(s,category,id){ensureCareer(s);const item=(category==='skills'?SKILLS:category==='parts'?PARTS:[]).find(x=>x.id===id);if(!item)return result(false,'Unknown item.');if(!shopReady(s))return result(false,'Stop in harbor and finish all work before purchasing.');const owned=category==='skills'?s.career.skills:s.career.parts,current=owned[item.key]||0;if(current!==item.rank-1)return result(false,current>=item.rank?'Already owned.':'Purchase the previous rank first.');if(item.key==='intelligentAutoSet'&&!s.career.skills.autoDeploy)return result(false,'Purchase Auto Set I first.');if(item.key==='nets'&&!vesselStats(s).salmon)return result(false,'A salmon-capable hull is required.');if(s.money<item.price)return result(false,'Insufficient funds.');s.money-=item.price;owned[item.key]=item.rank;s.capacity=vesselStats(s).capacity;if(category==='parts'&&item.key==='racks')s.deck+=4;return result(true,`${item.name} acquired.`);}
 export function toggleAutomation(s,key){ensureCareer(s);if(!['autoDeploy','autoHaul','intelligentAutoSet'].includes(key)||!s.career.skills[key])return result(false,'Purchase this skill in the harbor shop first.');if(key==='intelligentAutoSet'&&!s.career[key]&&!s.career.parts.sonar)return result(false,'Install a sonar before enabling Intelligent Auto Set.');s.career[key]=!s.career[key];if(key==='intelligentAutoSet'||key==='autoDeploy'&&s.career[key])s.intelligentSetRunout=0;if(key==='intelligentAutoSet'&&s.career[key])s.career.autoDeploy=false;if(key==='autoDeploy'&&s.career[key])s.career.intelligentAutoSet=false;return result(true,`${key==='intelligentAutoSet'?'Intelligent Auto Set':key==='autoDeploy'?'Auto set':'Auto haul'} ${s.career[key]?'enabled':'disabled'}.`);}
-export function tradeValue(s){const c=s.career||{};return Math.round((boatById(c.boat).price+PARTS.filter(p=>p.rank<=(c.parts?.[p.key]||0)).reduce((n,p)=>n+p.price,0)+18000*(s.engine||0)+12000*(s.hold||0)+8000*(s.gear||0))*.65);}
+export function installedVesselValue(vessel){
+ return boatById(vessel.boat).price+PARTS.filter(p=>p.rank<=(vessel.parts?.[p.key]||0)).reduce((total,p)=>total+p.price,0)
+  +18000*(vessel.engine||0)+12000*(vessel.hold||0)+8000*(vessel.gear||0);
+}
+export function tradeValue(s){
+ return Math.round(installedVesselValue({...s.career,engine:s.engine,hold:s.hold,gear:s.gear})*.65);
+}
 export function buyBoat(s,id,disposition){ensureCareer(s);const b=BOATS.find(x=>x.id===id);if(!b||!['sell','captain'].includes(disposition))return result(false,'Choose trade-in or hire a captain.');if(!shopReady(s)||s.cargo||s.salmon||rareCount(s)||s.pots.length||s.nets.length)return result(false,'Unload all catch and retrieve all fishing gear before changing vessels.');if(b.id===s.career.boat)return result(false,'This is your current vessel.');const value=disposition==='sell'?tradeValue(s):0,cost=b.price-value+(disposition==='captain'?25000:0);if(s.money<cost)return result(false,'Insufficient funds for this exchange.');if(disposition==='captain'&&s.career.fleet.length>=100)return result(false,'Your fleet already has 100 vessels.');if(disposition==='captain'){const n=s.career.nextFleet++,old=boatById(s.career.boat);s.career.fleet.push({id:`fleet-${n}`,boat:old.id,name:old.name,parts:{...s.career.parts},engine:s.engine,hold:s.hold,gear:s.gear,capacity:s.capacity,x:270,y:40+(n%3)*20,heading:0,fuel:s.fuel,hull:s.hull,phase:'outbound',timer:0,pots:[],cargo:0,salmon:0,expenses:0,earnings:0,trips:0,color:['#70c9df','#cda0ed','#ea859d','#91c97a'][n%4],request:null,fishing:old.salmon?s.career.fishing:'crab'});}
  if(s.career.firstBoatReward==='ready')s.career.firstBoatReward='pending';s.money-=cost;s.moored=null;s.career.boat=b.id;s.career.parts={};s.career.autoDeploy=false;s.career.autoHaul=false;s.career.intelligentAutoSet=false;s.intelligentSetRunout=0;s.career.fishing='crab';s.engine=0;s.hold=0;s.gear=0;s.capacity=b.capacity;s.deck=b.pots;s.fuel=b.tank;s.hull=100;s.desiredKnots=0;s.speed=0;s.autopilot=null;s.x=180;s.y=80;return result(true,`${b.name} commissioned. ${disposition==='captain'?'Your previous vessel has a hired captain.':'Previous vessel traded in.'}`);
 }

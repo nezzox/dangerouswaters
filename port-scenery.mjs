@@ -1,7 +1,7 @@
-import {QUAY,quayPoint,berthsAt} from './harbor.mjs?v=0.18.61';
-import {geometry} from './geometry.mjs?v=0.18.61';
-import {WORLD_LAND,isLand} from './world.mjs?v=0.18.61';
-import {groundHeight} from './geography-mesh.mjs?v=0.18.61';
+import {QUAY,quayPoint,berthsAt} from './harbor.mjs?v=0.18.65';
+import {geometry} from './geometry.mjs?v=0.18.65';
+import {WORLD_LAND,isLand,SERVICE_APRON} from './world.mjs?v=0.18.65';
+import {groundHeight} from './geography-mesh.mjs?v=0.18.65';
 const asphalt=[.16,.18,.18],concrete=[.36,.37,.34],steel=[.29,.33,.33],dark=[.07,.09,.085];
 export const MATTHEW_FLOODLIGHTS=[-215,-122,-37,61];
 function buildMatthewDetails(g,quay){
@@ -114,9 +114,10 @@ export function buildPortScenery(selected=QUAY,local=false){const g=geometry();l
  // The service crane is part of this quay, with its foundation on the apron.
  for(const quay of [selected]){
  const point=(u,v)=>quayPoint(u,v,quay);
- if(quay!==QUAY){
-  buildMatthewDetails(g,quay);
-  const corners=[point(-228,0),point(-228,40),point(78,40),point(78,0)];
+ if(quay!==QUAY)buildMatthewDetails(g,quay);
+ {
+  const {start,end,depth}=SERVICE_APRON;
+  const corners=[point(start,0),point(start,depth),point(end,depth),point(end,0)];
   const vertex=(i,h)=>[corners[i].x,h,corners[i].y];
   g.quad(...[0,1,2,3].map(i=>vertex(i,quay.deck)),concrete);
   for(let i=0;i<4;i++){const j=(i+1)%4;g.quad(vertex(i,-2),vertex(j,-2),vertex(j,quay.deck),vertex(i,quay.deck),concrete);}

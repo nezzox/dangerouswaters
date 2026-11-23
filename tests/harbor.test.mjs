@@ -23,3 +23,19 @@ test('six harbor berths choose a free clear location and survive saving',async()
 test('berth reservations prevent another vessel selecting an incoming berth',async()=>{const {chooseBerth,BERTHS}=await import('../harbor.mjs');const s=createGame();const berth=chooseBerth(s,[{x:1000,y:1000,boat:'nordvind',berth:BERTHS[0]}]);assert.notDeepEqual(berth,BERTHS[0]);});
 test('get unstuck finds safe water without changing cargo or money',async()=>{const {getUnstuck}=await import('../simulation.mjs'),{vesselIntersectsHarbor}=await import('../harbor.mjs');const s=createGame();Object.assign(s,BERTH,{moored:{...BERTH},cargo:20,money:12345});s.remotePlayers=[{id:'remote-test',boat:'nordvind',...BERTH,parts:{},pots:[]}];assert.equal(getUnstuck(s),true);assert(!vesselIntersectsHarbor(s));assert(Math.hypot(s.x-BERTH.x,s.y-BERTH.y)>15);assert.equal(s.cargo,20);assert.equal(s.money,12345);assert.equal(s.moored,null);});
 test('loading a docking job resumes toward its reserved berth',async()=>{const {BERTHS}=await import('../harbor.mjs'),{restoreSeason,seasonJSON}=await import('../saves.mjs');let s=createGame();s.paused=false;s.cargo=10;s.remotePlayers=[{...BERTHS[0],id:'remote-a',boat:'nordvind',parts:{},pots:[]}];dock(s);assert(s.deckJob);assert.notDeepEqual(s.deckJob.berth,BERTHS[0]);const berth=s.deckJob.berth;s.remotePlayers=[];s=restoreSeason(JSON.parse(seasonJSON(s)));s.paused=false;for(let i=0;i<1000&&s.deckJob;i++)step(s,1);assert(!s.deckJob);assert(Math.hypot(s.x-berth.x,s.y-berth.y)<1);});
+test('both enlarged service quays can fit six of the largest vessels alongside',async()=>{
+ const {PORT_QUAYS,berthsAt,chooseBerth,vesselIntersectsHarbor}=await import('../harbor.mjs');
+ const {BOATS}=await import('../catalog.mjs');
+ const largest=BOATS.reduce((a,b)=>b.length>a.length?b:a);
+ for(const quay of PORT_QUAYS){
+  const s=createGame();Object.assign(s,quay);s.career.boat=largest.id;
+  const occupied=[];
+  for(const berth of berthsAt(quay)){
+   assert(!vesselIntersectsHarbor({...s,...berth}));
+   const free=chooseBerth(s,occupied);
+   assert(free);
+   occupied.push({...free,boat:largest.id});
+  }
+  assert.equal(chooseBerth(s,occupied),null);
+ }
+});

@@ -1,14 +1,29 @@
-import {boatById} from './catalog.mjs?v=0.18.61';
-import {isLand,MATTHEW_QUAY} from './world.mjs?v=0.18.61';
-import {planSeaRoute} from './navigation.mjs?v=0.18.61';
+import {boatById} from './catalog.mjs?v=0.18.65';
+import {isLand,MATTHEW_QUAY,DUTCH_QUAY} from './world.mjs?v=0.18.65';
+import {planSeaRoute} from './navigation.mjs?v=0.18.65';
 // Shared frame on the new geographic quay. Positive inland points onto its apron.
-export const QUAY={x:47.3186402115,y:-70.0756194544,tx:-.811539539913,ty:.584297505692,deck:6.8};
-QUAY.heading=Math.atan2(QUAY.ty,QUAY.tx);
+export const QUAY=DUTCH_QUAY;
 export function quayPoint(along=0,inland=0,quay=QUAY){return{x:quay.x+quay.tx*along-quay.ty*inland,y:quay.y+quay.ty*along+quay.tx*inland};}
-export const BERTH={...quayPoint(0,-6),heading:QUAY.heading};
-export const BERTHS=[0,50,-50,-100,-150,-200].map(along=>({...quayPoint(along,-6),heading:QUAY.heading}));
+const berthOffsets=[0,68,-68,-136,-204,-272];
+const quayBerths=quay=>berthOffsets.map(along=>({...quayPoint(along,-12,quay),heading:quay.heading}));
+export const BERTHS=quayBerths(QUAY);
+export const BERTH=BERTHS[0];
 export const PORT_QUAYS=[QUAY,MATTHEW_QUAY];
-export const berthsAt=quay=>quay===QUAY?BERTHS:[0,50,-50,-100,-150,-200].map(along=>({...quayPoint(along,-7,quay),heading:quay.heading}));
+const matthewBerths=quayBerths(MATTHEW_QUAY);
+export const berthsAt=quay=>quay===QUAY?BERTHS:matthewBerths;
+export function restoreBerth(saved){
+ for(const quay of PORT_QUAYS){
+  const berths=berthsAt(quay);
+  const match=berths.find(b=>Math.hypot(saved.x-b.x,saved.y-b.y)<.1);
+  if(match)return match;
+  const old=[0,50,-50,-100,-150,-200].findIndex(along=>{
+   const p=quayPoint(along,quay===QUAY?-6:-7,quay);
+   return Math.hypot(saved.x-p.x,saved.y-p.y)<.1;
+  });
+  if(old>=0)return berths[old];
+ }
+ return null;
+}
 export function nearestQuay(s){return Math.hypot(s.x-QUAY.x,s.y-QUAY.y)<Math.hypot(s.x-MATTHEW_QUAY.x,s.y-MATTHEW_QUAY.y)?QUAY:MATTHEW_QUAY;}
 export function chooseBerth(s,boats=[]){return berthsAt(nearestQuay(s)).find(b=>!vesselIntersectsHarbor({...s,...b})&&boats.every(o=>Math.hypot(o.x-b.x,o.y-b.y)>Math.max(45,(boatById(s.career?.boat).length+boatById(o.boat).length)*.6)&&(!o.berth||Math.hypot(o.berth.x-b.x,o.berth.y-b.y)>40)))||null;}
 const angle=a=>Math.atan2(Math.sin(a),Math.cos(a));
@@ -17,7 +32,7 @@ export function vesselIntersectsHarbor(s){const boat=boatById(s.career?.boat),c=
 export function buildDockRoute(s,berth=BERTH){const legs=[];let at={x:s.x,y:s.y,heading:s.heading};const add=(x,y,h,label)=>{const d=Math.hypot(x-at.x,y-at.y),turn=angle(h-at.heading);if(d<.01&&Math.abs(turn)<.01)return;const to={x,y,heading:at.heading+turn},duration=Math.max(1.5*d/1.7,Math.abs(turn)/.23,1);legs.push({from:{...at},to,duration,label});at=to;};
  const quay=nearestQuay(berth);
  const localU=(s.x-berth.x)*quay.tx+(s.y-berth.y)*quay.ty,localN=(s.x-quay.x)*quay.ty-(s.y-quay.y)*quay.tx;
- if(Math.abs(localU)<1&&localN>=5.9&&Math.abs(angle(s.heading-berth.heading))<.03){add(berth.x,berth.y,berth.heading,'Closing alongside the quay');return legs;}
+ if(Math.abs(localU)<1&&localN>=11.9&&Math.abs(angle(s.heading-berth.heading))<.03){add(berth.x,berth.y,berth.heading,'Closing alongside the quay');return legs;}
  // Move sideways away from shore before turning, as a pilot-assisted maneuver.
  const escape=Math.max(0,70-localN);if(escape>0)add(at.x+quay.ty*escape,at.y-quay.tx*escape,at.heading,'Clearing the quay');
  const along=(berth.x-quay.x)*quay.tx+(berth.y-quay.y)*quay.ty,staging=quayPoint(along,-75,quay),route=planSeaRoute(at,staging);

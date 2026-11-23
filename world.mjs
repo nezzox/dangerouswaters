@@ -1,6 +1,6 @@
-import {CRAB_GROUND_DATA} from './crab-ground-data.mjs?v=0.18.61';
-import {PORT_PIERS} from './port-data.mjs?v=0.18.61';
-import {COAST_DATA} from './coast-data.mjs?v=0.18.61';
+import {CRAB_GROUND_DATA} from './crab-ground-data.mjs?v=0.18.65';
+import {PORT_PIERS} from './port-data.mjs?v=0.18.65';
+import {COAST_DATA} from './coast-data.mjs?v=0.18.65';
 export const WORLD_VERSION=2;
 export const GEO_ORIGIN={lon:-166.524,lat:53.9034};
 const meters=111319.490793,cos=Math.cos(GEO_ORIGIN.lat*Math.PI/180);
@@ -44,8 +44,14 @@ const matthewA=geoToWorld(-172.783315,60.41234),matthewB=geoToWorld(-173.004221,
 const matthewLength=Math.hypot(matthewB.x-matthewA.x,matthewB.y-matthewA.y);
 const tx=(matthewB.x-matthewA.x)/matthewLength,ty=(matthewB.y-matthewA.y)/matthewLength;
 export const MATTHEW_QUAY={name:'St Matthew Harbor',x:(matthewA.x+matthewB.x)/2+ty*32,y:(matthewA.y+matthewB.y)/2-tx*32,tx,ty,deck:6.8,heading:Math.atan2(ty,tx)};
-function matthewPier(x,y){const q=MATTHEW_QUAY,dx=x-q.x,dy=y-q.y,u=dx*q.tx+dy*q.ty,v=-dx*q.ty+dy*q.tx;return u>=-228&&u<=78&&v>=0&&v<=40;}
-export function isLand(x,y){if(matthewPier(x,y)||coastalLand(x,y))return true;for(const pier of pierShapes){if(x<pier.left||x>pier.right||y<pier.top||y>pier.bottom)continue;const p=pier.points,closed=Math.hypot(p[0].x-p.at(-1).x,p[0].y-p.at(-1).y)<.1;if(closed&&pointInRing(x,y,p))return true;for(let i=1;i<p.length;i++){const a=p[i-1],b=p[i],dx=b.x-a.x,dy=b.y-a.y,t=Math.max(0,Math.min(1,((x-a.x)*dx+(y-a.y)*dy)/(dx*dx+dy*dy||1)));if(Math.hypot(x-a.x-t*dx,y-a.y-t*dy)<3)return true;}}return false;}
+export const DUTCH_QUAY={x:47.3186402115,y:-70.0756194544,tx:-.811539539913,ty:.584297505692,deck:6.8};
+DUTCH_QUAY.heading=Math.atan2(DUTCH_QUAY.ty,DUTCH_QUAY.tx);
+export const SERVICE_APRON={start:-303,end:96,depth:40};
+function serviceApron(x,y,q){
+ const dx=x-q.x,dy=y-q.y,u=dx*q.tx+dy*q.ty,v=-dx*q.ty+dy*q.tx;
+ return u>=SERVICE_APRON.start&&u<=SERVICE_APRON.end&&v>=0&&v<=SERVICE_APRON.depth;
+}
+export function isLand(x,y){if(serviceApron(x,y,MATTHEW_QUAY)||serviceApron(x,y,DUTCH_QUAY)||coastalLand(x,y))return true;for(const pier of pierShapes){if(x<pier.left||x>pier.right||y<pier.top||y>pier.bottom)continue;const p=pier.points,closed=Math.hypot(p[0].x-p.at(-1).x,p[0].y-p.at(-1).y)<.1;if(closed&&pointInRing(x,y,p))return true;for(let i=1;i<p.length;i++){const a=p[i-1],b=p[i],dx=b.x-a.x,dy=b.y-a.y,t=Math.max(0,Math.min(1,((x-a.x)*dx+(y-a.y)*dy)/(dx*dx+dy*dy||1)));if(Math.hypot(x-a.x-t*dx,y-a.y-t*dy)<3)return true;}}return false;}
 export const inWorld=(x,y)=>Number.isFinite(x)&&Number.isFinite(y)&&x>=nw.x&&x<=se.x&&y>=nw.y&&y<=se.y;
 export function clearWater(x,y,radius=28){return !isLand(x,y)&&[0,1,2,3,4,5,6,7].every(i=>!isLand(x+Math.cos(i*Math.PI/4)*radius,y+Math.sin(i*Math.PI/4)*radius));}
 export function nearestWater(x,y){if(clearWater(x,y))return {x,y};for(let r=35;r<=3500;r+=35)for(let i=0;i<24;i++){const a=i*Math.PI/12,nx=x+Math.cos(a)*r,ny=y+Math.sin(a)*r;if(clearWater(nx,ny))return {x:nx,y:ny};}return {x:180,y:100};}
