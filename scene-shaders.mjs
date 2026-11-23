@@ -1,5 +1,5 @@
-import {hullWaterGLSL} from './deck-water.mjs?v=0.18.68';
-import {seaHeightGLSL} from './sea-spectrum.mjs?v=0.18.68';
+import {hullWaterGLSL} from './deck-water.mjs?v=0.18.69';
+import {seaHeightGLSL} from './sea-spectrum.mjs?v=0.18.69';
 // Shared atmosphere and ocean functions keep lighting and reflections consistent.
 export const common=`
 precision highp float;precision highp int;
@@ -109,7 +109,11 @@ void main(){if(uReflectionPass>.5&&vWorld.y<.04)discard;
  vec2 uv=localN.y>.65?vLocal.xz:localN.x>.65?vLocal.zy:vLocal.xy;
  float grain=filteredGrain(uv*48.),macro=fbm(uv*.7),vertical=1.-abs(n.y),painted=step(.34,vColor.r),glass=1.-step(.145,vSurface.x),detail=step(.5,uKind)*(1.-glass);
  float rust=0.,seam=0.,height=0.;vec3 base=pow(vColor,vec3(2.2));float rough=clamp(vSurface.x,.08,.98);float lowerHull=(uKind>.5&&uKind<1.5&&vLocal.y<1.65)?1.:0.;if(lowerHull>.5)rough=max(rough,.84);if(uKind>4.5&&distance(vColor,vec3(.72,.29,.065))<.03)base=pow(uCraneColor,vec3(2.2));
- if(vSurface.y< -1.5){base=pow(vColor,vec3(2.2))*(.82+.28*noise(vWorld.xz*8.));rough=.98;height=(grain-.5)*.001;
+ if(vSurface.y< -2.5){
+  float damp=(1.-smoothstep(.3,2.8,vWorld.y))*vertical;
+  base*=.90+.19*macro+.07*grain-.14*damp;
+  rough=.97;height=(grain-.5)*.001;
+ }else if(vSurface.y< -1.5){base=pow(vColor,vec3(2.2))*(.82+.28*noise(vWorld.xz*8.));rough=.98;height=(grain-.5)*.001;
  }else if(uKind>.5&&uKind<1.5){
   float drip=noise(vec2(uv.x*5.8,uv.y*.42))*noise(vec2(uv.x*18.,uv.y*.15)),salt=smoothstep(.53,.8,fbm(uv*vec2(1.8,5.)));
   rust=smoothstep(.41,.67,drip+macro*.25)*painted*vertical*.58;

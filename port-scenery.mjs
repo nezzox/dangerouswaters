@@ -1,7 +1,7 @@
-import {QUAY,quayPoint,berthsAt} from './harbor.mjs?v=0.18.68';
-import {geometry} from './geometry.mjs?v=0.18.68';
-import {WORLD_LAND,isLand,SERVICE_APRON} from './world.mjs?v=0.18.68';
-import {groundHeight} from './geography-mesh.mjs?v=0.18.68';
+import {QUAY,quayPoint,berthsAt} from './harbor.mjs?v=0.18.69';
+import {geometry} from './geometry.mjs?v=0.18.69';
+import {WORLD_LAND,isLand,SERVICE_APRON} from './world.mjs?v=0.18.69';
+import {groundHeight} from './geography-mesh.mjs?v=0.18.69';
 const asphalt=[.16,.18,.18],concrete=[.36,.37,.34],steel=[.29,.33,.33],dark=[.07,.09,.085];
 export const MATTHEW_FLOODLIGHTS=[-215,-122,-37,61];
 function buildMatthewDetails(g,quay){
@@ -116,11 +116,22 @@ export function buildPortScenery(selected=QUAY,local=false){const g=geometry();l
  const point=(u,v)=>quayPoint(u,v,quay);
  if(quay!==QUAY)buildMatthewDetails(g,quay);
  {
-  const {start,end,depth}=SERVICE_APRON;
-  const corners=[point(start,0),point(start,depth),point(end,depth),point(end,0)];
-  const vertex=(i,h)=>[corners[i].x,h,corners[i].y];
-  g.quad(...[0,1,2,3].map(i=>vertex(i,quay.deck)),concrete);
-  for(let i=0;i<4;i++){const j=(i+1)%4;g.quad(vertex(i,-2),vertex(j,-2),vertex(j,quay.deck),vertex(i,quay.deck),concrete);}
+  const {start,end,depth}=SERVICE_APRON,top=quay.deck;
+  const at=(u,v,h)=>{const p=point(u,v);return [p.x,h,p.y];};
+  const deck=(u0,u1,v0,v1,h,color)=>g.quad(at(u0,v0,h),at(u0,v1,h),at(u1,v1,h),at(u1,v0,h),color,.94,-3);
+  const wall=(u0,u1,low,high,color)=>g.quad(at(u1,0,low),at(u0,0,low),at(u0,0,high),at(u1,0,high),color,.95,-3);
+  deck(start,end,0,3,top,[.43,.43,.39]);
+  deck(start,end,3,depth,top,[.29,.31,.30]);
+  for(let u=start;u<end;u+=8){
+   const next=Math.min(end,u+8),tone=(Math.floor((u-start)/8)%3)*.014;
+   wall(u,next,-2,2.05,[.17+tone,.20+tone,.17+tone]);
+   wall(u,next,2.05,top-.48,[.30+tone,.31+tone,.28+tone]);
+   wall(u,next,top-.48,top,[.41,.41,.36]);
+   g.tube(at(u,-.01,.55),at(u,-.01,top-.48),.036,[.19,.20,.18],5,.95,-3);
+   deck(u+.04,Math.min(u+2.4,next),3.75,3.89,top+.018,[.60,.48,.22]);
+  }
+  for(const u of [start,end])g.quad(at(u,0,-2),at(u,depth,-2),at(u,depth,top),at(u,0,top),concrete,.95,-3);
+  g.quad(at(start,depth,-2),at(end,depth,-2),at(end,depth,top),at(start,depth,top),concrete,.95,-3);
  }
  for(const berth of berthsAt(quay)){const along=(berth.x-quay.x)*quay.tx+(berth.y-quay.y)*quay.ty,mast=point(along,8),bin=point(along-14,21),base=quay.deck;
  if(quay===QUAY){

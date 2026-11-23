@@ -1,10 +1,10 @@
-import {deckSign,hullPaint,vesselExterior,workX} from './vessel-profile.mjs?v=0.18.68';
-import {craneColor} from './crane-style.mjs?v=0.18.68';
-import {crewStations} from './crew-stations.mjs?v=0.18.68';
-import {canStand} from './deck-layout.mjs?v=0.18.68';
-import {lineHaulerMounts} from './line-hauler.mjs?v=0.18.68';
-import {vesselStyle,rackPositions,rackFrames,gantryPlacement} from './vessel-style.mjs?v=0.18.68';
-import {HULL_STATIONS,hullWidthAt} from './fenders.mjs?v=0.18.68';
+import {deckSign,hullPaint,vesselExterior,workX} from './vessel-profile.mjs?v=0.18.69';
+import {craneColor} from './crane-style.mjs?v=0.18.69';
+import {crewStations} from './crew-stations.mjs?v=0.18.69';
+import {canStand} from './deck-layout.mjs?v=0.18.69';
+import {lineHaulerMounts} from './line-hauler.mjs?v=0.18.69';
+import {vesselStyle,rackPositions,rackFrames,gantryPlacement} from './vessel-style.mjs?v=0.18.69';
+import {HULL_STATIONS,hullWidthAt} from './fenders.mjs?v=0.18.69';
 const steel=[.19,.24,.25],paint=[.68,.7,.64],dark=[.045,.08,.1],glass=[.055,.13,.17],brass=[.43,.31,.13],orange=[.72,.29,.065];
 export function geometry(){const data=[];
  function tri(a,b,c,color,rough=.6,emit=0){const u=b.map((x,i)=>x-a[i]),v=c.map((x,i)=>x-a[i]),n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]],len=Math.hypot(...n);if(len<1e-8)return;for(const p of [a,b,c])data.push(...p,...n.map(x=>x/len),...color,rough,emit);}
@@ -143,6 +143,7 @@ function buildOffshoreBridge(g,profile,paint){
   }
   for(const [x,z] of [[4.1,-1.65],[4.45,1.58]])tube([x,top+.23,z],[x,top+2.18,z],.023,steel,6);
  }
+ if(family===13)return;
  // Carry the lamp bases on steel brackets bolted into the deckhouse.
  const frontBase=[7.03,4.86,0];
  const frontWall=[base[3][0]-.14,4.20,0];
@@ -310,7 +311,18 @@ export function buildVessel(potCount=8,design={}){const orange=craneColor(design
  }
  // Wire cages remain open so the deck and cage shadows can be seen through them.
  for(const [i,{x,z,y,scale}] of rackPositions(potCount,design).entries())addRackPot(g,x,y,z,i,scale);
- for(const side of [-1,1]){box(5.4,5.5,side*2.75,.3,.16,.2,side<0?[.6,.015,.005]:[.015,.5,.13],.2,1);box(-.3,5.3,side*2.72,.4,.25,.24,[1.,.69,.28],.2,1.4);}
+ for(const side of [-1,1]){
+  const navColor=side<0?[.6,.015,.005]:[.015,.5,.13];
+  if(design.forwardWork){
+   box(7.65,4.25,side*2.64,.38,.26,.22,steel);
+   box(7.65,4.25,side*2.76,.29,.16,.07,navColor,.2,1);
+   tube([-8.18,4.1,side*2.1],[-8.55,5.4,side*2.8],.075,steel,8);
+   box(-8.55,5.4,side*2.8,.4,.25,.24,[1.,.69,.28],.2,1.4);
+  }else{
+   box(5.4,5.5,side*2.75,.3,.16,.2,navColor,.2,1);
+   box(-.3,5.3,side*2.72,.4,.25,.24,[1.,.69,.28],.2,1.4);
+  }
+ }
  if(exterior){
   if(design.forwardWork){
    tube([-7.03,1.72,0],[-7.03,4.86,0],.095,steel,10);
@@ -343,20 +355,20 @@ export function buildVessel(potCount=8,design={}){const orange=craneColor(design
  // Aft cabin doorway: black recess, raised frame and a separately animated door leaf.
  if(design.forwardWork){
   // After bulkhead of the enclosed forecastle, with a clear door recess.
-  for(const [z,width] of [[-.88,3.96],[2.55,.70]]){
+  for(const [z,width] of [[-.715,3.63],[2.37,.32]]){
    box(-8.15,2.90,z,.30,2.35,width,paint);
   }
-  box(-8.07,4.03,0,.19,.26,5.74,exterior.trim);
+  box(-8.07,4.03,0,.19,.26,5.06,exterior.trim);
   box(-9.67,2.84,1.65,.14,2.04,1.04,dark,.84);
   box(-8.03,3.97,1.65,.14,.15,1.29,paint);
   for(const z of [1.07,2.23])box(-8.03,2.83,z,.13,2.20,.09,paint);
   box(-7.97,1.79,1.65,.53,.12,1.24,steel);
   const roof=(x,w,y)=>[[x,y,-w],[x,y,w]];
-  const rear=roof(-8,2.87,4.16),front=roof(-10.48,1.52,3.74);
+  const rear=roof(-8,2.53,4.16),front=roof(-10.48,1.19,3.74);
   quad(rear[0],rear[1],front[1],front[0],exterior.trim,.55);
   for(const side of [0,1]){
    const a=rear[side],b=front[side];
-   quad(a,b,[b[0],1.77,b[2]],[a[0],1.77,a[2]],paint,.58);
+   quad(a,b,[b[0],2.18,b[2]*.87],[a[0],1.77,a[2]*.97],paint,.58);
   }
  }else{
   if(exterior){
