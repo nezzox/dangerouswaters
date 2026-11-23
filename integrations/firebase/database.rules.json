@@ -1,0 +1,65 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "worlds": {
+      "$world": {
+        ".validate": "$world.matches(/^[A-Z0-9]{6}$/)",
+        "host": {
+          ".read": "auth != null",
+          ".write": "auth != null && !data.exists() && newData.val() === auth.uid"
+        },
+        "members": {
+          ".read": "auth != null && root.child('worlds').child($world).child('host').exists()",
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && root.child('worlds').child($world).child('host').exists()",
+            ".validate": "newData.hasChildren(['name','boat','x','y','heading'])",
+            "name": {".validate": "newData.isString() && newData.val().length <= 24"},
+            "boat": {".validate": "newData.isString() && newData.val().matches(/^(nordvind|boat-[0-9]{1,2}-[0-9]{1,2})$/)"},
+            "x": {".validate": "newData.isNumber()"},
+            "y": {".validate": "newData.isNumber()"},
+            "heading": {".validate": "newData.isNumber()"},
+            "hour": {".validate": "newData.isNumber()"},
+            "landed": {".validate": "newData.isNumber()"},
+            "earned": {".validate": "newData.isNumber()"},
+            "isHost": {".validate": "newData.val() === (root.child('worlds').child($world).child('host').val() === auth.uid)"},
+            "lights": {".validate": "newData.isBoolean()"},
+            "berth": {".validate": "newData.child('x').isNumber() && newData.child('y').isNumber()"},
+            "pots": {"$id": {".validate": "$id.matches(/^[0-9]{1,7}$/) && newData.child('0').isNumber() && newData.child('1').isNumber()"}},
+            "fleet": {"$id": {".validate": "newData.child('id').val() === $id && newData.child('name').isString() && newData.child('boat').isString() && newData.child('x').isNumber() && newData.child('y').isNumber() && newData.child('heading').isNumber()"}},
+            "$other": {".validate": false}
+          }
+        },
+        "positions": {
+          ".read": "auth != null && root.child('worlds').child($world).child('host').exists()",
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && (!newData.exists() || root.child('worlds').child($world).child('members').child($uid).exists())",
+            "boat": {".validate": "newData.child('0').isNumber() && newData.child('1').isNumber() && newData.child('2').isNumber()"},
+            "fleet": {"$id": {".validate": "newData.child('0').isNumber() && newData.child('1').isNumber() && newData.child('2').isNumber()"}},
+            "$other": {".validate": false}
+          }
+        },
+        "berths": {
+          ".read": "auth != null && root.child('worlds').child($world).child('host').exists()",
+          "$berth": {
+            ".write": "auth != null && ((!newData.exists() && data.val() === auth.uid) || (newData.val() === auth.uid && (!data.exists() || data.val() === auth.uid) && root.child('worlds').child($world).child('members').child(auth.uid).exists()))"
+          }
+        },
+        "signals": {
+          "$target": {
+            ".read": "auth != null && auth.uid === $target",
+            "$sender": {
+              "$message": {
+                ".write": "auth != null && ((!newData.exists() && auth.uid === $target) || (auth.uid === $sender && root.child('worlds').child($world).child('members').child($sender).exists() && root.child('worlds').child($world).child('members').child($target).exists()))",
+                "description": {".validate": "(newData.child('type').val() === 'offer' || newData.child('type').val() === 'answer') && newData.child('sdp').isString() && newData.child('sdp').val().length <= 16000"},
+                "candidate": {".validate": "newData.child('candidate').isString() && newData.child('candidate').val().length <= 2048"},
+                "$other": {".validate": false}
+              }
+            }
+          }
+        },
+        "$other": {".validate": false}
+      }
+    }
+  }
+}

@@ -1,5 +1,5 @@
-import {hullWaterGLSL} from './deck-water.mjs?v=0.18.52';
-import {seaHeightGLSL} from './sea-spectrum.mjs?v=0.18.52';
+import {hullWaterGLSL} from './deck-water.mjs?v=0.18.53';
+import {seaHeightGLSL} from './sea-spectrum.mjs?v=0.18.53';
 // Shared atmosphere and ocean functions keep lighting and reflections consistent.
 export const common=`
 precision highp float;precision highp int;

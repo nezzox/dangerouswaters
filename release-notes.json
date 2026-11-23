@@ -1,1 +1,1 @@
-{"version": "0.18.52", "notes": {"en": ["Closed pier outlines at Dutch Harbor now render as solid piers."], "sv": ["Slutna kajkonturer i Dutch Harbor ritas nu som solida kajer."]}}
+{"version": "0.18.53", "notes": {"en": ["Multiplayer now uses Firebase Spark with direct peer-to-peer boat updates and a Firebase fallback."], "sv": ["Multiplayer använder nu Firebase Spark med direkt båtsynk mellan spelare och Firebase som reserv."]}}

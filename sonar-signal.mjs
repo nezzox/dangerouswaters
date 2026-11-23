@@ -1,4 +1,4 @@
-import {crabAbundance,salmonAbundance} from './fishing-grounds.mjs?v=0.18.52';
+import {crabAbundance,salmonAbundance} from './fishing-grounds.mjs?v=0.18.53';
 // Gameplay interpretation of a sounder, not a physical model of species identification.
 export const SONAR_GRADES=[
  {radius:60,samples:12,error:30,interval:2,name:'Basic'},

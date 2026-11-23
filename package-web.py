@@ -23,6 +23,7 @@ with zipfile.ZipFile(output, 'w', compression=zipfile.ZIP_DEFLATED) as archive:
         archive.write(path, path.name)
     archive.write(root / 'docs' / 'hosting.md', 'HOSTING.md')
     archive.write(root / 'docs' / 'geography.md', 'GEOGRAPHY.md')
+    archive.write(root / "integrations/firebase/SDK-LICENSE", "FIREBASE-SDK-LICENSE")
 with zipfile.ZipFile(output) as archive:
     assert archive.testzip() is None
     assert all('/' not in name for name in archive.namelist())
