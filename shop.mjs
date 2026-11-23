@@ -1,9 +1,9 @@
-import {RARE_CATCHES,rareValue,rareCount} from './rare-catch.mjs?v=0.18.73';
-import {boatPreview} from './boat-preview.mjs?v=0.18.73';
-import {translateText,localizeTree,toInternalMoney} from './i18n.mjs?v=0.18.73';
-import {SKILLS,PARTS,BOATS} from './catalog.mjs?v=0.18.73';
-import {buyItem,buyBoat,vesselStats,tradeValue,inHarbor,shopReady,takeLoan,creditLimit} from './career.mjs?v=0.18.73';
-import {answerCaptain,answerFleetUpgrade,toggleFleetService,sellFleetVessel,fleetSaleValue,fleetStats,readFleetMessages} from './fleet.mjs?v=0.18.73';
+import {RARE_CATCHES,rareValue,rareCount} from './rare-catch.mjs?v=0.18.74';
+import {boatPreview} from './boat-preview.mjs?v=0.18.74';
+import {translateText,localizeTree,toInternalMoney} from './i18n.mjs?v=0.18.74';
+import {SKILLS,PARTS,BOATS} from './catalog.mjs?v=0.18.74';
+import {buyItem,buyBoat,vesselStats,tradeValue,inHarbor,shopReady,takeLoan,creditLimit} from './career.mjs?v=0.18.74';
+import {answerCaptain,answerFleetUpgrade,toggleFleetService,sellFleetVessel,fleetSaleValue,fleetStats,readFleetMessages} from './fleet.mjs?v=0.18.74';
 const kr=n=>`${Math.round(n).toLocaleString('en-US')} kr`;
 const node=(tag,text,className)=>{const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(className)el.className=className;return el;};
 export function createShop(getState,onChange){

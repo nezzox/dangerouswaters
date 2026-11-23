@@ -1,6 +1,6 @@
-import {crewStations} from './crew-stations.mjs?v=0.18.73';
-import {hullWidthAt} from './fenders.mjs?v=0.18.73';
-import {deckSign,workX} from './vessel-profile.mjs?v=0.18.73';
+import {crewStations} from './crew-stations.mjs?v=0.18.74';
+import {hullWidthAt} from './fenders.mjs?v=0.18.74';
+import {deckSign,workX} from './vessel-profile.mjs?v=0.18.74';
 export function vesselStyle(design={}){const family=Number(/^boat-(\d+)-/.exec(design.id||'')?.[1]||0);return {family,netLane:!!design.salmon,gantry:[2,3,4,6,9,10].includes(family),exhausts:[2,7,9,10].includes(family)?2:1,upperBridge:[6,9,10].includes(family),bowShield:family===7,radarArch:[1,3,5,8].includes(family)};}
 export function potRackPosition(i,design={}){return design.salmon?{x:-10+Math.floor(i/4)*2,z:1.7,y:2.4+(i%4)*1.25}:{x:-10+Math.floor(i/6)*2,z:-2.05+(i%2)*2.05,y:2.4+Math.floor((i%6)/2)*1.25};}
 

@@ -1,5 +1,5 @@
 import {firebaseConfig} from './multiplayer-firebase-config.mjs';
-import {positionInterval,vesselPosition,potChanges} from './multiplayer-pacing.mjs';
+import {positionInterval,vesselPosition,potChanges} from './multiplayer-pacing.mjs?v=0.18.74';
 
 let firebase;
 function connectFirebase(){
@@ -14,8 +14,8 @@ function connectFirebase(){
  })().catch(error=>{firebase=null;throw error;});
 }
 
-const unpack=(packed,boat)=>Array.isArray(packed)&&packed.length===3&&packed.every(Number.isFinite)?
- {...boat,x:packed[0],y:packed[1],heading:packed[2]}:boat;
+const unpack=(packed,boat,sentAt)=>Array.isArray(packed)&&packed.length===3&&packed.every(Number.isFinite)?
+ {...boat,x:packed[0],y:packed[1],heading:packed[2],positionSample:packed,sentAt}:boat;
 const decodePots=entries=>Object.entries(entries||{}).flatMap(([id,p])=>
  Array.isArray(p)&&p.every(Number.isFinite)?[{id:Number(id),x:p[0],y:p[1]}]:[]);
 
@@ -45,7 +45,7 @@ export function createFirebaseMultiplayer(presence){
    const link=r.links.get(id),direct=link?.received&&performance.now()-link.received.at<2300?link.received.data:null;
    const positions=direct||r.positions[id]||{};
    return unpack(positions.boat,{...member,id,transport:direct?"p2p":"firebase",pots:decodePots(member.pots),
-    fleet:Object.entries(member.fleet||{}).map(([key,b])=>unpack(positions.fleet?.[key],{...b,pots:decodePots(b.pots)}))});
+    fleet:Object.entries(member.fleet||{}).map(([key,b])=>unpack(positions.fleet?.[key],{...b,transport:direct?"p2p":"firebase",pots:decodePots(b.pots)},direct?.sentAt))},direct?.sentAt);
   });
  }
  function openLink(r,id){
@@ -61,7 +61,12 @@ export function createFirebaseMultiplayer(presence){
    link.channel=channel;
    channel.onmessage=event=>{
     if(typeof event.data!=='string'||event.data.length>16000)return;
-    try{const data=JSON.parse(event.data);if(!data.boat)return;link.received={at:performance.now(),data};refresh(r);}catch{}
+    try{
+     const data=JSON.parse(event.data),previous=link.received?.data.sentAt;
+     if(!data.boat||Number.isFinite(previous)&&Number.isFinite(data.sentAt)&&data.sentAt<=previous)return;
+     link.received={at:performance.now(),data};
+     refresh(r);
+    }catch{}
    };
   };
   pc.onicecandidate=event=>{if(event.candidate)void send({candidate:event.candidate.toJSON()});};
@@ -151,7 +156,9 @@ export function createFirebaseMultiplayer(presence){
    await sdk.set(mine,metadata({...presence(state),isHost:r.isHost}));
    if(room!==r)return false;
    r.stops.push(sdk.onValue(ref('members'),snap=>{r.members=snap.val()||{};syncLinks(r);refresh(r);}),
-    sdk.onValue(ref('positions'),snap=>{r.positions=snap.val()||{};refresh(r);}),
+    sdk.onChildAdded(ref('positions'),snap=>{r.positions[snap.key]=snap.val();refresh(r);}),
+    sdk.onChildChanged(ref('positions'),snap=>{r.positions[snap.key]=snap.val();refresh(r);}),
+    sdk.onChildRemoved(ref('positions'),snap=>{delete r.positions[snap.key];refresh(r);}),
     sdk.onValue(sdk.ref(sdk.database,'.info/connected'),snap=>{
      if(room!==r)return;
      if(!snap.val()){
@@ -180,13 +187,13 @@ export function createFirebaseMultiplayer(presence){
  function updateRoom(r,state,now){
   const p={...presence(state),isHost:r.isHost},previous=r.previous;
   const packet={boat:vesselPosition(p),fleet:Object.fromEntries(p.fleet.map(b=>[b.id,vesselPosition(b)]))};
-  let fallback=false;
+  let fallback=false,directPacket;
   for(const peer of peers){
    const link=r.links.get(peer.id);
    const near=Math.hypot(p.x-peer.x,p.y-peer.y);
    if(link?.channel?.readyState!=='open'){fallback=true;continue;}
    if(now-link.last<positionInterval(near)||link.channel.bufferedAmount>16000)continue;
-   try{link.channel.send(JSON.stringify(packet));link.last=now;}catch{fallback=true;}
+   try{link.channel.send(directPacket??=JSON.stringify({...packet,sentAt:performance.timeOrigin+now}));link.last=now;}catch{fallback=true;}
   }
   if(fallback&&now-r.lastFallback>=600){
    r.lastFallback=now;
