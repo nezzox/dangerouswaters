@@ -14,6 +14,7 @@ const offshoreProfiles=[
  [1.30,.61,1.19,.72,[.19,.31,.40],[.64,.41,.24]], // Oceanic
  [1.82,.49,1.18,.46,[.065,.20,.24],[.22,.35,.35]], // Classical Guppy
  [1.46,.66,1.37,.23,[.045,.24,.69],[.83,.88,.89]], // Queen Blue
+ [2.12,1.85,1.32,.58,[.25,.32,.32],[.70,.40,.22]], // Highwater
 ];
 export function vesselExterior(design={}){
  const family=Number(/^boat-(\d+)-/.exec(design.id||'')?.[1]||0);

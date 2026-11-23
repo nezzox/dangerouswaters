@@ -1,6 +1,6 @@
-import {crewStations} from './crew-stations.mjs?v=0.18.66';
-import {hullWidthAt} from './fenders.mjs?v=0.18.66';
-import {deckSign} from './vessel-profile.mjs?v=0.18.66';
+import {crewStations} from './crew-stations.mjs?v=0.18.67';
+import {hullWidthAt} from './fenders.mjs?v=0.18.67';
+import {deckSign} from './vessel-profile.mjs?v=0.18.67';
 export function vesselStyle(design={}){const family=Number(/^boat-(\d+)-/.exec(design.id||'')?.[1]||0);return {family,netLane:!!design.salmon,gantry:[2,3,4,6,9,10].includes(family),exhausts:[2,7,9,10].includes(family)?2:1,upperBridge:[6,9,10].includes(family),bowShield:family===7,radarArch:[1,3,5,8].includes(family)};}
 export function potRackPosition(i,design={}){return design.salmon?{x:-10+Math.floor(i/4)*2,z:1.7,y:2.4+(i%4)*1.25}:{x:-10+Math.floor(i/6)*2,z:-2.05+(i%2)*2.05,y:2.4+Math.floor((i%6)/2)*1.25};}
 
@@ -28,9 +28,16 @@ function rackColumns(design){const key=layoutKey(design);if(columnCache.has(key)
  const fits=p=>{const box=potBounds(p),width=Math.min(hullWidthAt(box.min[0]*deckSign(design),design),hullWidthAt(box.max[0]*deckSign(design),design));return !stations.some(({target:[x,z]})=>x>box.min[0]-.32&&x<box.max[0]+.32&&z>box.min[2]-.32&&z<box.max[2]+.32)&&Math.max(Math.abs(box.min[2]),Math.abs(box.max[2]))<width-.12&&!obstacles.some(b=>boxesOverlap(box,b));};
  const add=(x,z,raised=false)=>{const p={x,z,y:1.78+(.62+(raised?2.15:0))*sy,scale,raised};const footprint={...p,y:1.78+.62*sy};if(!fits(p)||!fits(footprint)||columns.some(c=>boxesOverlap(potBounds(c),potBounds(p))))return;columns.push(p);};
  // Close-spaced rows leave shoulder-width lanes; the central row uses supported walk-under racks.
- for(let x=-10;x<=-.8;x+=2.4*sx)for(const z of [-2.4,0,2.4])add(x,z,Math.abs(z)<.5);
+ if(design.forwardWork){
+  for(let x=.5;x<=4.65;x+=2.1*sx)for(const z of [-2.42,-.1,2.57]){
+   if(x<1.8&&z>0)continue;
+   add(x,z);
+  }
+ }else{
+  for(let x=-10;x<=-.8;x+=2.4*sx)for(const z of [-2.4,0,2.4])add(x,z,Math.abs(z)<.5);
+ }
  // Short forecastle racks leave the windlass and central mooring passage unobstructed.
- if(design.powertrain!=='electric'){
+ if(design.powertrain!=='electric'&&!design.forwardWork){
   for(let x=6.9+.89*sx;x<=9.1;x+=1.9*sx)for(const z of [-1.25,1.25])if((design.id&&design.id!=='nordvind')||z<0)add(x,z);
  }
  const data={columns,scale,fits};columnCache.set(key,data);return data;}

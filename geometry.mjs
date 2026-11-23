@@ -1,10 +1,10 @@
-import {deckSign,hullPaint,vesselExterior} from './vessel-profile.mjs?v=0.18.66';
-import {craneColor} from './crane-style.mjs?v=0.18.66';
-import {crewStations} from './crew-stations.mjs?v=0.18.66';
-import {canStand} from './deck-layout.mjs?v=0.18.66';
-import {lineHaulerMounts} from './line-hauler.mjs?v=0.18.66';
-import {vesselStyle,rackPositions,rackFrames,gantryPlacement} from './vessel-style.mjs?v=0.18.66';
-import {HULL_STATIONS,hullWidthAt} from './fenders.mjs?v=0.18.66';
+import {deckSign,hullPaint,vesselExterior} from './vessel-profile.mjs?v=0.18.67';
+import {craneColor} from './crane-style.mjs?v=0.18.67';
+import {crewStations} from './crew-stations.mjs?v=0.18.67';
+import {canStand} from './deck-layout.mjs?v=0.18.67';
+import {lineHaulerMounts} from './line-hauler.mjs?v=0.18.67';
+import {vesselStyle,rackPositions,rackFrames,gantryPlacement} from './vessel-style.mjs?v=0.18.67';
+import {HULL_STATIONS,hullWidthAt} from './fenders.mjs?v=0.18.67';
 const steel=[.19,.24,.25],paint=[.68,.7,.64],dark=[.045,.08,.1],glass=[.055,.13,.17],brass=[.43,.31,.13],orange=[.72,.29,.065];
 export function geometry(){const data=[];
  function tri(a,b,c,color,rough=.6,emit=0){const u=b.map((x,i)=>x-a[i]),v=c.map((x,i)=>x-a[i]),n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]],len=Math.hypot(...n);if(len<1e-8)return;for(const p of [a,b,c])data.push(...p,...n.map(x=>x/len),...color,rough,emit);}
@@ -16,9 +16,9 @@ export function geometry(){const data=[];
  function ellipsoid(x,y,z,rx,ry,rz,col=paint,rough=.6){const start=data.length,point=(a,b)=>[x+rx*Math.sin(a)*Math.cos(b),y+ry*Math.cos(a),z+rz*Math.sin(a)*Math.sin(b)];for(let i=0;i<10;i++)for(let j=0;j<16;j++){const a=i*Math.PI/10,b=j*Math.PI/8,c=(i+1)*Math.PI/10,d=(j+1)*Math.PI/8;if(i>0)tri(point(a,b),point(a,d),point(c,b),col,rough);if(i<9)tri(point(a,d),point(c,d),point(c,b),col,rough);}for(let k=start;k<data.length;k+=11){const n=[(data[k]-x)/(rx*rx),(data[k+1]-y)/(ry*ry),(data[k+2]-z)/(rz*rz)],l=Math.hypot(...n);for(let q=0;q<3;q++)data[k+3+q]=n[q]/l;}}
  return {data,tri,quad,box,tube,ellipsoid,roundedBox,array:()=>new Float32Array(data)};
 }
-function addMarineSearchlight(g,center,side=0){
+function addMarineSearchlight(g,center,side=0,forward=1){
  const {box,tube}=g,body=[.46,.48,.45],rim=[.22,.25,.25],lens=[.57,.45,.26];
- const point=(a,b,c)=>side?[center[0]+c,center[1]+b,center[2]+side*a]:[center[0]+a,center[1]+b,center[2]+c];
+ const point=(a,b,c)=>side?[center[0]+c,center[1]+b,center[2]+side*a]:[center[0]+a*forward,center[1]+b,center[2]+c];
  tube(point(-.42,0,0),point(-.09,0,0),.30,body,16,.56);
  tube(point(-.105,0,0),point(.005,0,0),.328,rim,20,.48);
  tube(point(.004,0,0),point(.019,0,0),.276,dark,20,.18);
@@ -38,7 +38,7 @@ function buildOffshoreBridge(g,profile,paint){
  const {box,tube,quad,ellipsoid}=g;
  const {family,electric,trim}=profile;
  const carrier=family===12;
- const stepped=[6,9,10,11,12].includes(family)&&!electric,compact=[1,5,8].includes(family);
+ const stepped=[6,9,10,11,12,13].includes(family)&&!electric,compact=[1,5,8].includes(family);
  // Lower cabin, sill, glazing header and visor have distinct footprints.
  const sill=electric?4.65:stepped?5.25:compact?3.92:4.3;
  const top=sill+1.12*profile.bridge;
@@ -62,7 +62,7 @@ function buildOffshoreBridge(g,profile,paint){
  for(const [a,b,color] of [[skirt,base,paint],[base,lower,paint],[lower,upper,paint],[upper,roof,trim]]){
   for(let i=0;i<a.length;i++){
    const j=(i+1)%a.length;
-   if(i!==7||(a!==skirt&&a!==base)){
+   if(family===13||i!==7||(a!==skirt&&a!==base)){
     quad(a[i],b[i],b[j],a[j],color,.49);
     continue;
    }
@@ -192,6 +192,10 @@ export function buildVessel(potCount=8,design={}){const orange=craneColor(design
     face(al,ar,br,bl,exterior.trim,.51);
     face(bl,br,[xx,1.75+next,ub],[x,1.75+forward,ua],exterior.hull,.48);
    }else face([x,.35+wet,a*side],[xx,.35+wet,b*side],[xx,1.75+next,ub],[x,1.75+forward,ua],exterior.hull,.48);
+   if(design.forwardWork&&x>-8&&xx<6.7){
+    tube([x,1.82,ua],[xx,1.82,ub],.065,exterior.trim,8);
+    continue;
+   }
    face([x,1.75+forward,ua],[xx,1.75+next,ub],[xx,2.15+next,ub],[x,2.15+forward,ua],exterior.trim,.62);
    tube([x,2.2+forward,ua],[xx,2.2+next,ub],.075,exterior.trim,8);
    tube([x,2.2+forward+stripe,ua],[xx,2.2+next+stripe,ub],.045,paint,8);
@@ -250,7 +254,18 @@ export function buildVessel(potCount=8,design={}){const orange=craneColor(design
   let start=-11;if(!fits(start)){let lo=start,hi=1;for(let i=0;i<24;i++){const mid=(lo+hi)/2;if(fits(mid))hi=mid;else lo=mid;}start=hi;}
   box((start+1)/2,1.73,z,1-start,.025,.022,[.13,.17,.14],.9);
  }
- if(exterior)buildOffshoreBridge(g,exterior,paint);
+ if(exterior){
+  const bridgeStart=g.data.length;
+  buildOffshoreBridge(g,exterior,paint);
+  if(design.forwardWork){
+   for(let i=bridgeStart;i<g.data.length;i+=11){
+    g.data[i]=10.9-g.data[i]*.79;
+    g.data[i+3]/=-.79;
+    const normal=Math.hypot(g.data[i+3],g.data[i+4],g.data[i+5]);
+    for(let j=3;j<6;j++)g.data[i+j]/=normal;
+   }
+  }
+ }
  else{
  // Sloping bridge glazing, rounded lower cabin and overhanging roof.
  roundedBox(3.4,2.8,0,6.3,2.1,5.25,design.powertrain==='electric'?.5:.22,paint,.48);
@@ -297,7 +312,15 @@ export function buildVessel(potCount=8,design={}){const orange=craneColor(design
  for(const [i,{x,z,y,scale}] of rackPositions(potCount,design).entries())addRackPot(g,x,y,z,i,scale);
  for(const side of [-1,1]){box(5.4,5.5,side*2.75,.3,.16,.2,side<0?[.6,.015,.005]:[.015,.5,.13],.2,1);box(-.3,5.3,side*2.72,.4,.25,.24,[1.,.69,.28],.2,1.4);}
  if(exterior){
-  addMarineSearchlight(g,[7.24,5.3,0]);
+  if(design.forwardWork){
+   tube([-7.03,1.72,0],[-7.03,4.86,0],.095,steel,10);
+   box(-7.03,4.86,0,.45,.14,.42,steel);
+   for(const side of [-1,1]){
+    tube([0,4.15,side*1.65],[0,4.96,side*2.61],.095,steel,8);
+    if(side<0)tube([0,1.75,-2.61],[0,4.96,-2.61],.08,steel,8);
+   }
+  }
+  addMarineSearchlight(g,[design.forwardWork?-7.24:7.24,5.3,0],0,design.forwardWork?-1:1);
   for(const side of [-1,1])addMarineSearchlight(g,[0,5.4,side*2.82],side);
  }else{
  // Directional searchlight and side floodlight housings.
@@ -318,6 +341,11 @@ export function buildVessel(potCount=8,design={}){const orange=craneColor(design
  for(let y=2.3;y<5.7;y+=.3){tube([.05,y,-2.86],[.05,y, -3.18],.025,steel,8);}tube([.05,2,-2.86],[.05,5.9,-2.86],.035,steel,10);tube([.05,2,-3.18],[.05,5.9,-3.18],.035,steel,10);
  }
  // Aft cabin doorway: black recess, raised frame and a separately animated door leaf.
+ if(design.forwardWork){
+  // Companionway leading down to the passage beneath the pot deck.
+  box(.94,2.94,1.65,1.35,2.45,1.43,paint);
+  box(.87,4.19,1.65,1.60,.18,1.66,exterior.trim);
+ }
  if(exterior){
   box(.43,2.85,1.05,.74,2.16,.14,paint);
   box(.43,2.85,2.25,.74,2.16,.14,paint);
@@ -329,7 +357,9 @@ for(const z of [1.07,2.23])box(.06,2.85,z,.12,2.2,.08,paint);box(.06,3.97,1.65,.
  const glyphs={N:[[0,0,0,1],[0,1,.6,0],[.6,0,.6,1]],O:[[0,0,0,1],[0,1,.6,1],[.6,1,.6,0],[.6,0,0,0]],R:[[0,0,0,1],[0,1,.6,1],[.6,1,.6,.5],[.6,.5,0,.5],[0,.5,.6,0]],D:[[0,0,0,1],[0,1,.5,.85],[.5,.85,.5,.15],[.5,.15,0,0]],V:[[0,1,.3,0],[.3,0,.6,1]],I:[[.3,0,.3,1]]};
  Object.assign(glyphs,{A:[[0,0,.3,1],[.3,1,.6,0],[.15,.45,.45,.45]],B:[[0,0,0,1],[0,1,.6,.8],[.6,.8,0,.5],[0,.5,.6,.25],[.6,.25,0,0]],C:[[.6,1,0,1],[0,1,0,0],[0,0,.6,0]],E:[[0,0,0,1],[0,1,.6,1],[0,.5,.5,.5],[0,0,.6,0]],F:[[0,0,0,1],[0,1,.6,1],[0,.5,.5,.5]],G:[[.6,1,0,1],[0,1,0,0],[0,0,.6,0],[.6,0,.6,.5],[.6,.5,.3,.5]],H:[[0,0,0,1],[.6,0,.6,1],[0,.5,.6,.5]],J:[[.6,1,.6,0],[.6,0,0,0],[0,0,0,.3]],K:[[0,0,0,1],[0,.5,.6,1],[0,.5,.6,0]],L:[[0,1,0,0],[0,0,.6,0]],M:[[0,0,0,1],[0,1,.3,.5],[.3,.5,.6,1],[.6,1,.6,0]],P:[[0,0,0,1],[0,1,.6,1],[.6,1,.6,.5],[.6,.5,0,.5]],Q:[[0,0,0,1],[0,1,.6,1],[.6,1,.6,0],[.6,0,0,0],[.3,.3,.7,-.1]],S:[[.6,1,0,1],[0,1,0,.5],[0,.5,.6,.5],[.6,.5,.6,0],[.6,0,0,0]],T:[[0,1,.6,1],[.3,1,.3,0]],U:[[0,1,0,0],[0,0,.6,0],[.6,0,.6,1]],W:[[0,1,.15,0],[.15,0,.3,.5],[.3,.5,.45,0],[.45,0,.6,1]],X:[[0,0,.6,1],[0,1,.6,0]],Y:[[0,1,.3,.5],[.6,1,.3,.5],[.3,.5,.3,0]],Z:[[0,1,.6,1],[.6,1,0,0],[0,0,.6,0]]});
  const segments=[[0,1,.6,1],[.6,1,.6,.5],[.6,.5,.6,0],[0,0,.6,0],[0,.5,0,0],[0,1,0,.5],[0,.5,.6,.5]];for(const [i,mask] of ['1111110','0110000','1101101','1111001','0110011','1011011','1011111','1110000','1111111','1111011'].entries())glyphs[i]=segments.filter((_,k)=>mask[k]==='1');
+ const letteringStart=g.data.length;
  for(const side of [-1,1])for(const [i,char] of [...(design.name?.toUpperCase()||'NORDVIND')].entries())for(const [a,b,c,d] of glyphs[char]||[])tube([(side>0?(orientation>0?1:5.25)+orientation*(i*(4.25/Math.max(8,design.name?.length||8))+a*.45):(orientation>0?5.25:1)-orientation*(i*(design.id&&design.id!=='nordvind'?4.25/Math.max(8,design.name?.length||8):.56)+a*.55)),3.15+b*.5,side*2.686],[(side>0?(orientation>0?1:5.25)+orientation*(i*(4.25/Math.max(8,design.name?.length||8))+c*.45):(orientation>0?5.25:1)-orientation*(i*(design.id&&design.id!=='nordvind'?4.25/Math.max(8,design.name?.length||8):.56)+c*.55)),3.15+d*.5,side*2.686],.022,design.powertrain==='electric'?[.65,.76,.72]:dark,4,.45,design.powertrain==='electric'?1.4:0);
+ if(design.forwardWork)for(let i=letteringStart;i<g.data.length;i+=11)g.data[i]+=5.25;
  // Recessed hold hatch and sorting chute, with an actual opening in the deck mesh.
  box(-1.9,.55,-.5,1.8,.08,1.8,[.008,.014,.014],1);for(const x of [-2.85,-.95])box(x,1.35,-.5,.13,1.1,2.05,steel);for(const z of [-1.45,.45])box(-1.9,1.35,z,2.,1.1,.13,steel);for(const x of [-2.87,-.93])box(x,1.87,-.5,.16,.25,2.15,[.43,.45,.37]);for(const z of [-1.48,.48])box(-1.9,1.87,z,2.1,.25,.16,[.43,.45,.37]);
  box(-1.5,2.2,-2.3,.9,.9,.8,[.29,.3,.27]);tube([-1.5,2.65,-2.8],[-1.5,2.65,-1.8],.26,steel,12);
