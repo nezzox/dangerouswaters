@@ -1,4 +1,6 @@
-import {test} from 'node:test';import assert from 'node:assert/strict';import {createGame,step} from '../simulation.mjs';
+import {test} from 'node:test';import assert from 'node:assert/strict';import {createGame,step as simulateStep} from '../simulation.mjs';
+// Keep man-overboard rolls out of the automation scenarios.
+const step=(state,dt)=>simulateStep(state,dt,()=>.5);
 const cruise=()=>{const s=createGame();Object.assign(s,{x:1000,y:500,heading:0,speed:6,desiredKnots:12,paused:false,weatherOverride:'calm'});s.career.autoDeploy=true;s.career.skills.autoDeploy=1;s.career.nextIncident=1e9;return s;};
 test('Auto Set brakes from cruise, deploys below five knots and preserves the selected cruise target',()=>{const s=cruise();let working=false;for(let i=0;i<600;i++){step(s,.1);if(s.deckJob?.kind==='deploy'){working=true;assert(s.speed*1.94384<5);}assert.equal(s.desiredKnots,12);}assert(working);assert(s.pots.length>0);assert(s.autoSetSlowing);assert(s.speed*1.94384<4.6);s.career.autoDeploy=false;for(let i=0;i<400;i++)step(s,.1);assert(!s.autoSetSlowing);assert(s.speed*1.94384>8);});
 test('Intelligent Auto Set keeps cruise speed while searching a weak signal',()=>{const s=cruise();Object.assign(s.career,{autoDeploy:false,intelligentAutoSet:true,skills:{autoDeploy:1,intelligentAutoSet:1},parts:{sonar:5}});for(let i=0;i<250;i++)step(s,.1);assert(!s.autoSetSlowing);assert(s.speed*1.94384>5);assert.equal(s.pots.length,0);});
