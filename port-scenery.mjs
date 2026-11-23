@@ -1,7 +1,7 @@
-import {QUAY,quayPoint,berthsAt} from './harbor.mjs?v=0.18.55';
-import {geometry} from './geometry.mjs?v=0.18.55';
-import {WORLD_LAND,isLand} from './world.mjs?v=0.18.55';
-import {groundHeight} from './geography-mesh.mjs?v=0.18.55';
+import {QUAY,quayPoint,berthsAt} from './harbor.mjs?v=0.18.56';
+import {geometry} from './geometry.mjs?v=0.18.56';
+import {WORLD_LAND,isLand} from './world.mjs?v=0.18.56';
+import {groundHeight} from './geography-mesh.mjs?v=0.18.56';
 const asphalt=[.16,.18,.18],concrete=[.36,.37,.34],steel=[.29,.33,.33],dark=[.07,.09,.085];
 export const MATTHEW_FLOODLIGHTS=[-215,-122,-37,61];
 function buildMatthewDetails(g,quay){
@@ -36,6 +36,40 @@ function buildMatthewDetails(g,quay){
   block(u,4.32,1.5,.14,9.7,10.3,[1.,.73,.25],.55);
  }
 }
+const craneSteel=[.15,.19,.19],craneMachinery=[.60,.28,.12];
+function buildPortalCrane(g,at,base){
+ const [x,,z]=at(0,0,0);
+ g.box(x,base+.35,z,6,.7,6,concrete);
+ for(const side of [-1,1]){
+  for(const end of [-1,1]){
+   g.tube(at(side*2.6,end*2.6,base+.5),at(side*1.6,end*1.6,22.5),.21,craneSteel,4);
+  }
+  for(let h=base+1;h<21;h+=4){
+   const lower=2.6-(h-base)/22,upper=lower-.18;
+   g.tube(at(side*lower,-lower,h),at(side*upper,upper,h+4),.11,craneSteel,4);
+   g.tube(at(side*lower,lower,h),at(side*upper,-upper,h+4),.11,craneSteel,4);
+   g.tube(at(-lower,side*lower,h),at(upper,side*upper,h+4),.11,craneSteel,4);
+  }
+ }
+ g.box(x,21.7,z,5.6,.38,5.6,craneSteel);
+ g.box(x,22.8,z,3.8,2.1,3.2,craneMachinery);
+ g.box(x,23.3,z,2.5,1.2,2.4,craneSteel);
+ for(let h=base+1;h<21.5;h+=.55)g.tube(at(-.48,2.25,h),at(.48,2.25,h),.047,steel,4);
+}
+export function buildPortBoom(){
+ const g=geometry();
+ for(const z of [-.5,.5]){
+  g.tube([0,-.35,z],[3,1.1,z*.25],.11,craneSteel,4);
+  g.tube([0,2.5,z],[3,1.1,z*.25],.11,craneSteel,4);
+  for(let i=0;i<4;i++){
+   const a=i/4,b=(i+1)/4;
+   g.tube([a*3,2.5-1.4*a,z*(1-.75*a)],[b*3,-.35+1.45*b,z*(1-.75*b)],.065,craneSteel,4);
+  }
+ }
+ g.box(.32,.25,0,.45,.8,1.4,craneMachinery);
+ g.tube([3,1.1,-.25],[3,1.1,.25],.24,steel,10);
+ return g.array();
+}
 // A small break spot and a striped windsock give the Dutch Harbor waterfront some character.
 function buildDutchBreakSpot(g){
  const coffee=quayPoint(-75,19),deck=QUAY.deck;
@@ -59,8 +93,8 @@ export function buildPortScenery(selected=QUAY,local=false){const g=geometry();l
  for(let i=1;i<land.outer.length;i++){const a=land.outer[i-1],b=land.outer[i],dx=b.x-a.x,dy=b.y-a.y,length=Math.hypot(dx,dy);if(length<8)continue;
  const tx=dx/length,ty=dy/length,mx=(a.x+b.x)/2,my=(a.y+b.y)/2;let nx=-ty,ny=tx;
  if(!isLand(mx+nx*8,my+ny*8)){nx=-nx;ny=-ny;}if(!isLand(mx+nx*15,my+ny*15))continue;
- const count=Math.ceil(length/65);for(let j=0;j<count;j++){const t=(j+.5)/count,x=a.x+dx*t,y=a.y+dy*t;if(x< -1150||x>900||y< -1350||y>500)continue;
- const span=Math.min(65,length/count),base=Math.max(6,groundHeight(x+nx*50,y+ny*50)+.18),seed=++index;
+ const count=Math.ceil(length/65);for(let j=0;j<count;j++){const t=(j+.5)/count,x=a.x+dx*t,y=a.y+dy*t;if(x< -1150||x>900||y< -1350||y>500||nx>-.08||ny>.65)continue;
+ const span=Math.min(65,length/count),base=Math.min(11,Math.max(6.25,groundHeight(x+nx*12,y+ny*12)+.18)),seed=++index;
  const p=(u,v,h=base)=>[x+tx*u+nx*v,h,y+ty*u+ny*v];
  const slab=(u,v,w,d,h,col,rough=.85)=>{const q=[p(u-w/2,v-d/2),p(u+w/2,v-d/2),p(u+w/2,v+d/2),p(u-w/2,v+d/2)];g.quad(q[0],q[3],q[2],q[1],col,rough,h<.2?-2:0);if(h)for(let k=0;k<4;k++){const a=q[k],b=q[(k+1)%4];g.quad(a,b,[b[0],b[1]+h,b[2]],[a[0],a[1]+h,a[2]],col,rough);}if(h)g.quad(...[q[0],q[3],q[2],q[1]].map(a=>[a[0],a[1]+h,a[2]]),col,rough,h<.2?-2:0);};
  // Reclaimed apron, quayside edge, and the road along the foot of the hill.
@@ -88,10 +122,14 @@ export function buildPortScenery(selected=QUAY,local=false){const g=geometry();l
   for(let i=0;i<4;i++){const j=(i+1)%4;g.quad(vertex(i,-2),vertex(j,-2),vertex(j,quay.deck),vertex(i,quay.deck),concrete);}
  }
  for(const berth of berthsAt(quay)){const along=(berth.x-quay.x)*quay.tx+(berth.y-quay.y)*quay.ty,mast=point(along,8),bin=point(along-14,21),base=quay.deck;
+ if(quay===QUAY){
+  buildPortalCrane(g,(u,v,h)=>{const p=point(along+u,8+v);return [p.x,h,p.y];},base);
+ }else{
  g.box(mast.x,base+.3,mast.y,5,.6,5,concrete,.95);
  for(const u of [-1.7,1.7])for(const v of [-1.7,1.7]){const a=point(along+u,8+v),b=point(along+u*.4,8+v*.4);g.tube([a.x,base+.6,a.y],[b.x,23,b.y],.18,[.64,.28,.10],8);}
  for(let h=base+1;h<22;h+=2){const a=point(along-1,7),b=point(along+1,9);g.tube([a.x,h,a.y],[b.x,h+2,b.y],.08,steel,6);}
  g.box(mast.x,22,mast.y,3,3,3,[.64,.28,.10]);g.box(mast.x,23.7,mast.y,3.5,.3,3.5,steel);
+ }
  g.box(bin.x,base+1,bin.y,5,2,4,steel);g.box(bin.x,base+2.05,bin.y,4.5,.15,3.5,dark);}
  }
  if(selected===QUAY)buildDutchBreakSpot(g);

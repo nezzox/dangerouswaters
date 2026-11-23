@@ -1,9 +1,10 @@
-import {TERRAIN_DATA as data} from './terrain-data.mjs?v=0.18.55';
-import {PORT_BUILDINGS,PORT_ROADS,PORT_PIERS} from './port-data.mjs?v=0.18.55';
-import {geoToWorld,WORLD_LAND,isLand,MATTHEW_QUAY} from './world.mjs?v=0.18.55';
-import {geometry} from './geometry.mjs?v=0.18.55';
+import {harborElevation} from './harbor-elevation.mjs?v=0.18.56';
+import {TERRAIN_DATA as data} from './terrain-data.mjs?v=0.18.56';
+import {PORT_BUILDINGS,PORT_ROADS,PORT_PIERS} from './port-data.mjs?v=0.18.56';
+import {geoToWorld,WORLD_LAND,isLand,MATTHEW_QUAY} from './world.mjs?v=0.18.56';
+import {geometry} from './geometry.mjs?v=0.18.56';
 const bounds=[];for(let i=0;i<data.length;i+=9)bounds.push([Math.min(data[i],data[i+3],data[i+6]),Math.max(data[i],data[i+3],data[i+6]),Math.min(data[i+1],data[i+4],data[i+7]),Math.max(data[i+1],data[i+4],data[i+7])]);
-export function groundHeight(x,y){for(let n=0;n<bounds.length;n++){const b=bounds[n];if(x<b[0]||x>b[1]||y<b[2]||y>b[3])continue;const i=n*9,ax=data[i],ay=data[i+1],bx=data[i+3],by=data[i+4],cx=data[i+6],cy=data[i+7],det=(by-cy)*(ax-cx)+(cx-bx)*(ay-cy);if(Math.abs(det)<.001)continue;const a=((by-cy)*(x-cx)+(cx-bx)*(y-cy))/det,c=((cy-ay)*(x-cx)+(ax-cx)*(y-cy))/det,d=1-a-c;if(a>=-.0001&&c>=-.0001&&d>=-.0001)return a*data[i+2]+c*data[i+5]+d*data[i+8];}return 6;}
+export function groundHeight(x,y){for(let n=0;n<bounds.length;n++){const b=bounds[n];if(x<b[0]||x>b[1]||y<b[2]||y>b[3])continue;const i=n*9,ax=data[i],ay=data[i+1],bx=data[i+3],by=data[i+4],cx=data[i+6],cy=data[i+7],det=(by-cy)*(ax-cx)+(cx-bx)*(ay-cy);if(Math.abs(det)<.001)continue;const a=((by-cy)*(x-cx)+(cx-bx)*(y-cy))/det,c=((cy-ay)*(x-cx)+(ax-cx)*(y-cy))/det,d=1-a-c;if(a>=-.0001&&c>=-.0001&&d>=-.0001)return harborElevation(x,y,a*data[i+2]+c*data[i+5]+d*data[i+8]);}return 6;}
 const city=PORT_BUILDINGS.map(b=>({...b,points:b.ring.map(([a,b])=>geoToWorld(a,b))})),roads=PORT_ROADS.map(r=>r.map(([a,b])=>geoToWorld(a,b))),piers=PORT_PIERS.map(r=>r.map(([a,b])=>geoToWorld(a,b)));
 const cross=(a,b,c)=>(b.x-a.x)*(c.y-a.y)-(b.y-a.y)*(c.x-a.x);
 export function pierTopTriangles(ring){
@@ -92,7 +93,23 @@ function pileShoreRocks(g,x,y,radius){
   }
  }
 }
-export function buildGeography(x,y,radius=2200,local=false){const g=geometry();for(let n=0;n<bounds.length;n++){const b=bounds[n];if(b[0]>x+radius||b[1]<x-radius||b[2]>y+radius||b[3]<y-radius)continue;const i=n*9,points=[0,3,6].map(j=>[data[i+j],data[i+j+2],data[i+j+1]]),height=(points[0][1]+points[1][1]+points[2][1])/3,color=height>650?[.51,.52,.48]:height>250?[.23,.29,.24]:[.19,.28,.20];g.tri(points[0],points[2],points[1],color,.97,-1);}
+function terrainFace(g,triangle){
+ const raised=triangle.map(([x,h,y])=>[x,harborElevation(x,y,h),y]);
+ const height=raised.reduce((sum,p)=>sum+p[1],0)/3;
+ const color=height>450?[.35,.36,.33]:height>210?[.24,.27,.23]:[.19,.26,.18];
+ g.tri(raised[0],raised[2],raised[1],color,.97,-1);
+}
+function subdivideTerrain(g,points,level){
+ if(!level){terrainFace(g,points);return;}
+ const [a,b,c]=points,mid=(p,q)=>p.map((v,i)=>(v+q[i])/2);
+ const ab=mid(a,b),bc=mid(b,c),ca=mid(c,a);
+ for(const tri of [[a,ab,ca],[ab,b,bc],[ca,bc,c],[ab,bc,ca]])subdivideTerrain(g,tri,level-1);
+}
+export function buildGeography(x,y,radius=2200,local=false){if(Math.hypot(x,y)<2400)radius=Math.max(radius,3700);const g=geometry();for(let n=0;n<bounds.length;n++){const b=bounds[n];if(b[0]>x+radius||b[1]<x-radius||b[2]>y+radius||b[3]<y-radius)continue;const i=n*9,points=[0,3,6].map(j=>[data[i+j],data[i+j+2],data[i+j+1]]);
+ const inHarborRegion=b[0]>-3650&&b[1]<2900&&b[2]>-7700&&b[3]<4900;
+ const edge=Math.max(b[1]-b[0],b[3]-b[2]);
+ subdivideTerrain(g,points,inHarborRegion&&edge<225?2:0);
+ }
  // Give the shoreline a solid bank instead of a floating paper-thin surface.
  for(const land of WORLD_LAND){for(const ring of [land.outer,...land.holes])for(let i=1;i<ring.length;i++){const a=ring[i-1],b=ring[i];if(Math.min(a.x,b.x)>x+radius||Math.max(a.x,b.x)<x-radius||Math.min(a.y,b.y)>y+radius||Math.max(a.y,b.y)<y-radius)continue;const ah=Math.max(6,groundHeight(a.x,a.y)),bh=Math.max(6,groundHeight(b.x,b.y));g.quad([a.x,-8,a.y],[b.x,-8,b.y],[b.x,bh,b.y],[a.x,ah,a.y],[.25,.27,.24],.98,-1);}}
  for(const building of city){const points=building.points,at=points[0];if(Math.abs(at.x-x)>radius||Math.abs(at.y-y)>radius)continue;const base=Math.max(...points.slice(0,8).map(p=>groundHeight(p.x,p.y))),h=base+building.height;for(let j=1;j<points.length;j++){const a=points[j-1],b=points[j];g.quad([a.x,base,a.y],[a.x,h,a.y],[b.x,h,b.y],[b.x,base,b.y],[.39,.42,.38],.85);}for(let j=2;j<points.length-1;j++)g.tri([at.x,h,at.y],[points[j-1].x,h,points[j-1].y],[points[j].x,h,points[j].y],[.27,.31,.31],.8);}
