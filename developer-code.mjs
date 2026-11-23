@@ -1,5 +1,5 @@
-import {getUnstuck,notify,towDestination} from './simulation.mjs?v=0.18.72';
-import {QUAY} from './harbor.mjs?v=0.18.72';
+import {getUnstuck,notify,towDestination} from './simulation.mjs?v=0.18.73';
+import {QUAY} from './harbor.mjs?v=0.18.73';
 
 function goToHarbor(s){
  if(s.overboard)return false;

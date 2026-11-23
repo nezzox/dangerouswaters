@@ -11,3 +11,19 @@ test('Intelligent Auto Set brakes at a strong signal and keeps working speed ins
 test('intelligent deployment holds working speed for 300 traveled meters, then resumes cruise',async()=>{const {groundsAt,crabHotspot}=await import('../fishing-grounds.mjs');const s=cruise(),g=crabHotspot(groundsAt(s.hour)[0],5,s.hour);Object.assign(s,{x:g.x,y:g.y});Object.assign(s.career,{autoDeploy:false,intelligentAutoSet:true,skills:{autoDeploy:1,intelligentAutoSet:1},parts:{sonar:5}});for(let i=0;i<600&&!s.pots.length;i++)step(s,.1);assert.equal(s.pots.length,1);assert(s.intelligentSetRunout>299);s.career.parts.sonar=0;s.deck=0;const remaining=s.intelligentSetRunout;s.paused=true;step(s,1);assert.equal(s.intelligentSetRunout,remaining);s.paused=false;let traveled=0;for(let i=0;i<3000&&s.intelligentSetRunout>0;i++){const before={x:s.x,y:s.y};step(s,.1);traveled+=Math.hypot(s.x-before.x,s.y-before.y);assert(s.speed*1.94384<5);assert.equal(s.desiredKnots,12);}assert(traveled>=299&&traveled<301);for(let i=0;i<300;i++)step(s,.1);assert(s.speed*1.94384>8);});
 
 test('a subsequent intelligent deployment restarts the runout and switching it off clears it',async()=>{const {groundsAt,crabHotspot}=await import('../fishing-grounds.mjs');const {toggleAutomation}=await import('../career.mjs');const s=cruise(),g=crabHotspot(groundsAt(s.hour)[0],5,s.hour);Object.assign(s,{x:g.x,y:g.y});Object.assign(s.career,{autoDeploy:false,intelligentAutoSet:true,skills:{autoDeploy:1,intelligentAutoSet:1},parts:{sonar:5}});let sawCountdown=false;for(let i=0;i<1800&&s.pots.length<2;i++){step(s,.1);sawCountdown||=s.intelligentSetRunout>0&&s.intelligentSetRunout<280;}assert.equal(s.pots.length,2);assert(sawCountdown);assert(s.intelligentSetRunout>299);assert(toggleAutomation(s,'intelligentAutoSet').ok);assert.equal(s.intelligentSetRunout,0);for(let i=0;i<300;i++)step(s,.1);assert(s.speed*1.94384>8);});
+
+test('higher Auto Set ranks shorten the automatic cycle and preserve manual setting time',async()=>{
+ const {createGame,handlePot,tickAutomation}=await import('../simulation.mjs');
+ const duration=(rank,automatic)=>{
+  const s=createGame();
+  Object.assign(s,{x:1000,y:500,speed:1});
+  s.career.skills.autoDeploy=rank;
+  s.career.autoDeploy=true;
+  if(automatic)tickAutomation(s);
+  else handlePot(s);
+  return s.deckJob.duration;
+ };
+ assert.equal(duration(1,true),14);
+ assert.equal(duration(5,true),10);
+ assert.equal(duration(5,false),14);
+});

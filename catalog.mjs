@@ -1,6 +1,6 @@
 // Most disciplines/systems have five ranks; intelligent automation is a separate single purchase.
 export const SKILL_SYSTEMS=[
- ['autoDeploy','Automatic pot setting','Automation',4500,'Rank I unlocks Auto Set. Ranks II–V use the same selected buoy spacing of 80, 160 or 220 m.'],
+ ['autoDeploy','Automatic pot setting','Automation',4500,'Rank I unlocks Auto Set. Each additional rank adds 10% to the automatic setting rate, up to +40% at Rank V.'],
  ['autoHaul','Automatic pot retrieval','Automation',6500,'Rank I unlocks Auto Haul with a 2-hour minimum soak. Each further rank reduces the minimum by 12 in-game minutes, to 1 h 12 min at Rank V.'],
  ['work','Deck teamwork','Crew',3500,'All deck operations 8% faster per rank'],
  ['deploy','Pot rigging','Crew',2800,'Setting pots 10% faster per rank'],
@@ -11,7 +11,7 @@ export const SKILL_SYSTEMS=[
  ['crab','Crab grounds knowledge','Fishing',5500,'Unlock crab ground potential forecasts; higher ranks narrow uncertainty and add 6% yield per rank; rank IV shows migration direction; rank V reveals dense crab cores on the chart'],
  ['salmon','Salmon reading','Fishing',6500,'Unlock salmon ground potential forecasts; higher ranks narrow uncertainty and add 8% yield per rank'],
  ['price','Market negotiation','Business',8000,'Catch prices +2.5% per rank'],
- ['bait','Bait preparation','Fishing',3000,'Bait cost reduced by 6% per rank'],
+ ['bait','Bait preparation','Fishing',3000,'Better bait increases the crab pot fill rate by 5% per rank, up to +25%. The bonus is applied when the pot is set.'],
  ['hull','Heavy weather seamanship','Safety',5500,'Wave damage reduced by 4% per rank'],
  ['risk','Preventive maintenance','Safety',7500,'Incident frequency reduced by 5% per rank'],
  ['steer','Skipper navigation','Navigation',20000,'Rank I: full-speed return and dock; rank II: approach oldest own pot. Rudder response +7% per rank'],

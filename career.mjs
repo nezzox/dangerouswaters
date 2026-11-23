@@ -1,7 +1,7 @@
-import {MATTHEW_QUAY} from './world.mjs?v=0.18.72';
-import {ensureRareState,rareCount} from './rare-catch.mjs?v=0.18.72';
-import {INCIDENT_INTERVAL_SCALE,INCIDENT_SCHEDULE_VERSION} from './balance.mjs?v=0.18.72';
-import {SKILLS,PARTS,BOATS,SKILL_SYSTEMS,PART_SYSTEMS,boatById} from './catalog.mjs?v=0.18.72';
+import {MATTHEW_QUAY} from './world.mjs?v=0.18.73';
+import {ensureRareState,rareCount} from './rare-catch.mjs?v=0.18.73';
+import {INCIDENT_INTERVAL_SCALE,INCIDENT_SCHEDULE_VERSION} from './balance.mjs?v=0.18.73';
+import {SKILLS,PARTS,BOATS,SKILL_SYSTEMS,PART_SYSTEMS,boatById} from './catalog.mjs?v=0.18.73';
 const finite=(n,f=0)=>Number.isFinite(n)?n:f,clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 export const inHarbor=s=>Math.hypot(s.x-160,s.y-80)<230||Math.hypot(s.x-MATTHEW_QUAY.x,s.y-MATTHEW_QUAY.y)<230;
 export const shopReady=s=>inHarbor(s)&&Math.abs(s.speed)<1&&!s.deckJob&&!s.incident;
@@ -15,7 +15,8 @@ export function vesselStats(s){
  top:b.top+(s.engine||0)*1.1+part('engine')*.45,work:1+v('work')*.08+part('crane')*.1+Math.max(0,crew-3)*.035,
  deploy:1+v('deploy')*.1+part('lights')*.05,haul:1+v('haul')*.09+v('sort')*.07+part('winch')*.1,repair:1+v('repair')*.15+part('pumps')*.1,
  fuelUse:Math.max(.35,1-v('fuel')*.04-part('propeller')*.05),crabYield:1+v('crab')*.06+part('sonar')*.05,salmonYield:1+v('salmon')*.08+part('nets')*.08,
- priceBonus:1+v('price')*.025+part('chiller')*.02,baitCost:Math.round(150*Math.max(.3,1-v('bait')*.06-part('freezer')*.05)),
+ autoSetRate:1+Math.max(0,v('autoDeploy')-1)*.1,baitRank:v('bait'),
+ priceBonus:1+v('price')*.025+part('chiller')*.02,baitCost:Math.round(150*Math.max(.3,1-part('freezer')*.05)),
  protection:b.protection/(Math.max(.25,1-v('hull')*.04-part('hull')*.07)),risk:Math.max(.3,1-v('risk')*.05-part('radio')*.04),steer:1+v('steer')*.07+part('rudder')*.08,
  netWork:1+v('net')*.1,unload:1+v('unload')*.1+part('landing')*.08,crewShare:.3-v('fleet')*.01,
  serviceCost:Math.max(.4,1-v('service')*.04-part('workshop')*.05),roll:Math.max(.3,1-v('stability')*.05-part('stabilizer')*.07),spacing:[80,160,220].includes(c.potSpacing)?c.potSpacing:80,minSoak:2-(Math.max(1,v('autoHaul'))-1)*.2};

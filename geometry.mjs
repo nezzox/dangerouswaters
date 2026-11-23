@@ -1,10 +1,10 @@
-import {deckSign,hullPaint,vesselExterior,workX,HIGHWATER_SEARCHLIGHT} from './vessel-profile.mjs?v=0.18.72';
-import {craneColor} from './crane-style.mjs?v=0.18.72';
-import {crewStations} from './crew-stations.mjs?v=0.18.72';
-import {canStand} from './deck-layout.mjs?v=0.18.72';
-import {lineHaulerMounts} from './line-hauler.mjs?v=0.18.72';
-import {vesselStyle,rackPositions,rackFrames,gantryPlacement} from './vessel-style.mjs?v=0.18.72';
-import {HULL_STATIONS,hullWidthAt} from './fenders.mjs?v=0.18.72';
+import {deckSign,hullPaint,vesselExterior,workX,HIGHWATER_SEARCHLIGHT} from './vessel-profile.mjs?v=0.18.73';
+import {craneColor} from './crane-style.mjs?v=0.18.73';
+import {crewStations} from './crew-stations.mjs?v=0.18.73';
+import {canStand} from './deck-layout.mjs?v=0.18.73';
+import {lineHaulerMounts} from './line-hauler.mjs?v=0.18.73';
+import {vesselStyle,rackPositions,rackFrames,gantryPlacement} from './vessel-style.mjs?v=0.18.73';
+import {HULL_STATIONS,hullWidthAt} from './fenders.mjs?v=0.18.73';
 const steel=[.19,.24,.25],paint=[.68,.7,.64],dark=[.045,.08,.1],glass=[.055,.13,.17],brass=[.43,.31,.13],orange=[.72,.29,.065];
 export function geometry(){const data=[];
  function tri(a,b,c,color,rough=.6,emit=0){const u=b.map((x,i)=>x-a[i]),v=c.map((x,i)=>x-a[i]),n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]],len=Math.hypot(...n);if(len<1e-8)return;for(const p of [a,b,c])data.push(...p,...n.map(x=>x/len),...color,rough,emit);}

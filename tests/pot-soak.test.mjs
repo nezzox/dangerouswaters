@@ -8,3 +8,12 @@ test('existing soaked gear keeps its set time across save and uses the new non-d
 test('hired captains use the same pot fill curve and keep long-soaked catch',async()=>{const {tickFleet}=await import('../fleet.mjs');const s=createGame();s.hour=96;const b={id:'fleet-1',boat:'boat-1-1',name:'Test vessel',parts:{},x:1000,y:500,heading:0,fuel:500,hull:100,started:true,phase:'haul',timer:0,pots:[{...pot,haul:1000}],cargo:0,salmon:0,expenses:0,earnings:0,trips:0,fishing:'crab'};s.career.fleet=[b];tickFleet(s,1,{waves:0});assert.equal(b.pots.length,0);assert.equal(b.cargo,catchAt(pot,36));});
 
 test("poor habitat fills much slower and bonuses never exceed 90 kg",()=>{const poor={...pot,legacyAbundance:.1},medium={...pot,legacyAbundance:.5};assert.equal(catchAt(poor,36),1);assert.equal(catchAt(medium,36),23);assert.equal(catchAt({...pot,legacyAbundance:0},36),0);assert.equal(catchAt(pot,6,100),90);assert.equal(catchAt(pot,96,100),90);});
+test('bait quality follows the pot through a save and preserves the capacity limit',()=>{
+ const s=createGame();
+ s.pots=[{...pot,legacyAbundance:.7,baitRank:5}];
+ const saved=restoreSeason(JSON.parse(seasonJSON(s))).pots[0];
+ assert.equal(saved.baitRank,5);
+ assert.equal(catchAt(saved,24),43);
+ assert.equal(catchAt({...saved,baitRank:0},24),34);
+ assert.equal(catchAt({...saved,legacyAbundance:1},36),90);
+});

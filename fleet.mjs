@@ -1,16 +1,16 @@
-import {addSalmonCatch,salmonHoldRate} from './salmon-market.mjs?v=0.18.72';
-import {crabHoldValue,addCrabCatch,captureCrabSpecies} from './catch-value.mjs?v=0.18.72';
-import {PARTS,boatById} from './catalog.mjs?v=0.18.72';
-import {solarCharge,electricBurn,energyPrice} from './energy.mjs?v=0.18.72';
-import {recoverFleetContact} from './fleet-recovery.mjs?v=0.18.72';
-import {nearbyGreeting} from './fleet-greetings.mjs?v=0.18.72';
-import {potCatchAt} from './pot-soak.mjs?v=0.18.72';
-import {prepareRareCatch,awardRareCatch,rareValue} from './rare-catch.mjs?v=0.18.72';
-import {FUEL_SCALE,SEA_WEAR_SCALE} from './balance.mjs?v=0.18.72';
-import {groundsAt,crabHotspot} from './fishing-grounds.mjs?v=0.18.72';
-import {nearestWater,geoToWorld,clearWater} from './world.mjs?v=0.18.72';
-import {planSeaRoute,seaLane} from './navigation.mjs?v=0.18.72';
-import {vesselStats,settleLanding,tradeValue} from './career.mjs?v=0.18.72';
+import {addSalmonCatch,salmonHoldRate} from './salmon-market.mjs?v=0.18.73';
+import {crabHoldValue,addCrabCatch,captureCrabSpecies} from './catch-value.mjs?v=0.18.73';
+import {PARTS,boatById} from './catalog.mjs?v=0.18.73';
+import {solarCharge,electricBurn,energyPrice} from './energy.mjs?v=0.18.73';
+import {recoverFleetContact} from './fleet-recovery.mjs?v=0.18.73';
+import {nearbyGreeting} from './fleet-greetings.mjs?v=0.18.73';
+import {potCatchAt} from './pot-soak.mjs?v=0.18.73';
+import {prepareRareCatch,awardRareCatch,rareValue} from './rare-catch.mjs?v=0.18.73';
+import {FUEL_SCALE,SEA_WEAR_SCALE} from './balance.mjs?v=0.18.73';
+import {groundsAt,crabHotspot} from './fishing-grounds.mjs?v=0.18.73';
+import {nearestWater,geoToWorld,clearWater} from './world.mjs?v=0.18.73';
+import {planSeaRoute,seaLane} from './navigation.mjs?v=0.18.73';
+import {vesselStats,settleLanding,tradeValue} from './career.mjs?v=0.18.73';
 export function fleetStats(s,b){return vesselStats({...b,career:{boat:b.boat,parts:b.parts,skills:s.career.skills}});}
 export const fleetNoticeCount=s=>(s.career?.fleet||[]).filter(b=>b.upgradeRequest?.status==='pending'||!b.autoService&&(b.unreadMessage||b.request?.status==='pending')).length;
 export function readFleetMessages(s){for(const b of s.career?.fleet||[])b.unreadMessage=false;}
@@ -39,7 +39,7 @@ export function tickFleet(s,dt,w){for(const [i,b] of s.career.fleet.entries()){
  // Captains reserve enough fuel to return; no teleporting or unattended spending.
  if((b.fuel<Math.max(85,(Math.hypot(b.x-160,b.y-80)+4500)/Math.max(3,speed)*(stats.powertrain==='electric'?electricBurn(.75,stats,1):.07*stats.fuelUse*FUEL_SCALE))||b.hull<50)&&!['return','landing'].includes(b.phase)){b.phase=b.pots.length?'haul':'return';b.waypoint=0;b.timer=0;b.navigation=null;}
  if(b.phase==='outbound'){const points=[[350,80],[ground.x,ground.y]],p=points[b.waypoint||0];if(navigate(s,b,...p,speed,dt)){b.waypoint=(b.waypoint||0)+1;if(b.waypoint>=points.length){b.phase=b.fishing==='salmon'&&stats.salmon?'net':'deploy';b.timer=0;}}}
- else if(b.phase==='deploy'){const n=b.pots.length,target={x:ground.x+(n%10)*165,y:ground.y+Math.floor(n/10)*165},arrived=navigate(s,b,target.x,target.y,Math.min(speed,2.3),dt);if(arrived&&b.timer>=14/stats.work){b.pots.push({id:n+1,x:b.x,y:b.y,setAt:s.hour,crabSpecies:captureCrabSpecies(b,s.hour)});b.timer=0;if(b.pots.length>=stats.potCapacity){b.phase='soak';b.timer=0;}}}
+ else if(b.phase==='deploy'){const n=b.pots.length,target={x:ground.x+(n%10)*165,y:ground.y+Math.floor(n/10)*165},arrived=navigate(s,b,target.x,target.y,Math.min(speed,2.3),dt);if(arrived&&b.timer>=14/(stats.work*stats.autoSetRate)){b.pots.push({id:n+1,x:b.x,y:b.y,setAt:s.hour,baitRank:stats.baitRank,crabSpecies:captureCrabSpecies(b,s.hour)});b.timer=0;if(b.pots.length>=stats.potCapacity){b.phase='soak';b.timer=0;}}}
  else if(b.phase==='soak'){if(b.timer>=112.5){b.phase='haul';b.timer=0;}}
  else if(b.phase==='haul'){const pot=b.pots[0];if(!pot){b.phase='return';b.waypoint=0;b.timer=0;}else if(navigate(s,b,pot.x,pot.y,Math.min(speed,2.3),dt)){pot.haul=(pot.haul||0)+dt;if(pot.haul>=32/(stats.work*stats.haul)){const kg=potCatchAt(pot,s.hour,stats.crabYield);const room=stats.capacity-b.cargo-b.salmon;addCrabCatch(b,Math.max(0,Math.min(room,kg)),pot,s.hour);if(room>0)fleetRare(s,b,prepareRareCatch(s,pot,'crab',kg));b.pots.shift();}}}
  else if(b.phase==='net'){if(b.timer>120/(stats.work*stats.netWork)){addSalmonCatch(b,Math.min(stats.capacity,Math.round(250*stats.salmonYield)),b,s.hour);fleetRare(s,b,prepareRareCatch(s,{},'salmon',b.salmon));b.phase='return';b.waypoint=0;b.timer=0;}}
