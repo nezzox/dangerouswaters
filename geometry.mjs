@@ -1,10 +1,10 @@
-import {deckSign,hullPaint,vesselExterior} from './vessel-profile.mjs?v=0.18.67';
-import {craneColor} from './crane-style.mjs?v=0.18.67';
-import {crewStations} from './crew-stations.mjs?v=0.18.67';
-import {canStand} from './deck-layout.mjs?v=0.18.67';
-import {lineHaulerMounts} from './line-hauler.mjs?v=0.18.67';
-import {vesselStyle,rackPositions,rackFrames,gantryPlacement} from './vessel-style.mjs?v=0.18.67';
-import {HULL_STATIONS,hullWidthAt} from './fenders.mjs?v=0.18.67';
+import {deckSign,hullPaint,vesselExterior,workX} from './vessel-profile.mjs?v=0.18.68';
+import {craneColor} from './crane-style.mjs?v=0.18.68';
+import {crewStations} from './crew-stations.mjs?v=0.18.68';
+import {canStand} from './deck-layout.mjs?v=0.18.68';
+import {lineHaulerMounts} from './line-hauler.mjs?v=0.18.68';
+import {vesselStyle,rackPositions,rackFrames,gantryPlacement} from './vessel-style.mjs?v=0.18.68';
+import {HULL_STATIONS,hullWidthAt} from './fenders.mjs?v=0.18.68';
 const steel=[.19,.24,.25],paint=[.68,.7,.64],dark=[.045,.08,.1],glass=[.055,.13,.17],brass=[.43,.31,.13],orange=[.72,.29,.065];
 export function geometry(){const data=[];
  function tri(a,b,c,color,rough=.6,emit=0){const u=b.map((x,i)=>x-a[i]),v=c.map((x,i)=>x-a[i]),n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]],len=Math.hypot(...n);if(len<1e-8)return;for(const p of [a,b,c])data.push(...p,...n.map(x=>x/len),...color,rough,emit);}
@@ -206,7 +206,7 @@ export function buildVessel(potCount=8,design={}){const orange=craneColor(design
   face([x,1.75,a*side],[xx,1.75,b*side],[xx,2.15,b*side],[x,2.15,a*side],paint,.55);
   tube([x,2.2,a*side],[xx,2.2,b*side],.075,paint);tube([x,3.,a*side],[xx,3.,b*side],.035,paint);
   tube([x,2.15,a*side],[x,3.,a*side],.035,paint);
- }const opening=orientation>0?[-2.8,-1]:[1,2.8],cuts=[x,...opening.filter(v=>v>x&&v<xx),xx];for(let j=0;j<cuts.length-1;j++){const l=cuts[j],r=cuts[j+1],lw=a+(b-a)*(l-x)/(xx-x),rw=a+(b-a)*(r-x)/(xx-x);if(l>=opening[0]&&r<=opening[1]){quad([l,1.7,-lw],[l,1.7,-1.4],[r,1.7,-1.4],[r,1.7,-rw],[.25,.29,.23],.82);quad([l,1.7,.4],[l,1.7,lw],[r,1.7,rw],[r,1.7,.4],[.25,.29,.23],.82);}else quad([l,1.7,-lw],[l,1.7,lw],[r,1.7,rw],[r,1.7,-rw],[.25,.29,.23],.82);}}
+ }const opening=design.forwardWork?[5.2,7]:orientation>0?[-2.8,-1]:[1,2.8],cuts=[x,...opening.filter(v=>v>x&&v<xx),xx];for(let j=0;j<cuts.length-1;j++){const l=cuts[j],r=cuts[j+1],lw=a+(b-a)*(l-x)/(xx-x),rw=a+(b-a)*(r-x)/(xx-x);if(l>=opening[0]&&r<=opening[1]){quad([l,1.7,-lw],[l,1.7,-1.4],[r,1.7,-1.4],[r,1.7,-rw],[.25,.29,.23],.82);quad([l,1.7,.4],[l,1.7,lw],[r,1.7,rw],[r,1.7,.4],[.25,.29,.23],.82);}else quad([l,1.7,-lw],[l,1.7,lw],[r,1.7,rw],[r,1.7,-rw],[.25,.29,.23],.82);}}
  if(exterior?.electric||exterior?.family===12){
   const x=12.2,width=upperWidth(x,sections.at(-1)[1]),top=2.15+sheer(x);
   quad([x,.56,-.06],[x,top,-width],[x,top,width],[x,.56,.06],exterior.hull,.47);
@@ -287,7 +287,7 @@ export function buildVessel(potCount=8,design={}){const orange=craneColor(design
  }else{roundedBox(3.4,6.2,0,7.8,.45,6.3,.2,paint,.24);tube([3.2,6.5,0],[3.2,8.2,0],.07,steel,8);box(3.2,8.2,0,.45,.18,1.7,paint);for(let x=.4;x<6.4;x+=1.3)for(const z of [-1.5,1.5]){box(x,6.48,z,1.15,.04,2.55,[.035,.07,.085],.18);for(let i=0;i<5;i++)box(x,6.51,z-1+i*.5,1.08,.008,.012,[.25,.31,.32],.5);}}
  }
  // Hull-specific hauler mounts; animated booms are rendered separately.
- const layouts=design.hauler==='both'?['starboard','port']:[design.hauler||'starboard'];for(const layout of layouts){const side=layout==='port'?-1:1,pivot=[-1.5,2.1,side*2.1];tube([pivot[0],1.8,pivot[2]],[pivot[0],5.1,pivot[2]],.18,orange,10);}
+ const layouts=design.hauler==='both'?['starboard','port']:[design.hauler||'starboard'];for(const layout of layouts){const side=layout==='port'?-1:1,pivot=[workX(design,-1.5),2.1,side*2.1];tube([pivot[0],1.8,pivot[2]],[pivot[0],5.1,pivot[2]],.18,orange,10);}
  for(const [x,y,z] of lineHaulerMounts(design)){
  const rubber=[.035,.045,.042];for(const side of [-1,1]){for(let i=0;i<32;i++){const a=i*Math.PI/16,b=(i+1)*Math.PI/16,point=(t,r,d)=>[x+Math.cos(t)*r,y+Math.sin(t)*r,z+d];quad(point(a,.42,side*.16),point(b,.42,side*.16),point(b,.24,side*.025),point(a,.24,side*.025),rubber,.88);quad(point(a,.42,side*.16),point(a,.36,side*.21),point(b,.36,side*.21),point(b,.42,side*.16),rubber,.88);}tube([x,y,z+side*.2],[x,y,z+side*.23],.12,steel,16);}
  for(const dx of [-.3,.3])tube([x+dx,1.85,z-.27],[x+dx,y+.05,z-.27],.045,paint,8);tube([x-.34,y+.05,z-.27],[x+.34,y+.05,z-.27],.045,paint,8);tube([x,y,z-.4],[x,y,z-.23],.15,orange,12);tube([x+.33,y-.22,z-.12],[x+.33,y-.22,z+.12],.12,rubber,16);tube([x+.33,y-.22,z-.23],[x+.33,y-.22,z-.13],.045,steel,8);
@@ -316,12 +316,12 @@ export function buildVessel(potCount=8,design={}){const orange=craneColor(design
    tube([-7.03,1.72,0],[-7.03,4.86,0],.095,steel,10);
    box(-7.03,4.86,0,.45,.14,.42,steel);
    for(const side of [-1,1]){
-    tube([0,4.15,side*1.65],[0,4.96,side*2.61],.095,steel,8);
-    if(side<0)tube([0,1.75,-2.61],[0,4.96,-2.61],.08,steel,8);
+    tube([-8.2,4.11,side*1.87],[-8.2,4.96,side*2.61],.095,steel,8);
+    box(-8.2,4.96,side*2.61,.39,.14,.46,steel);
    }
   }
   addMarineSearchlight(g,[design.forwardWork?-7.24:7.24,5.3,0],0,design.forwardWork?-1:1);
-  for(const side of [-1,1])addMarineSearchlight(g,[0,5.4,side*2.82],side);
+  for(const side of [-1,1])addMarineSearchlight(g,[design.forwardWork?-8.2:0,5.4,side*2.82],side);
  }else{
  // Directional searchlight and side floodlight housings.
  tube([6.8,5.3,0],[7.2,5.3,0],.23,steel,10);tube([7.2,5.3,0],[7.23,5.3,0],.19,[.78,.9,1.],10,.05);box(7.24,5.3,0,.03,.3,.3,[.78,.9,1.],.1,2);
@@ -342,17 +342,31 @@ export function buildVessel(potCount=8,design={}){const orange=craneColor(design
  }
  // Aft cabin doorway: black recess, raised frame and a separately animated door leaf.
  if(design.forwardWork){
-  // Companionway leading down to the passage beneath the pot deck.
-  box(.94,2.94,1.65,1.35,2.45,1.43,paint);
-  box(.87,4.19,1.65,1.60,.18,1.66,exterior.trim);
+  // After bulkhead of the enclosed forecastle, with a clear door recess.
+  for(const [z,width] of [[-.88,3.96],[2.55,.70]]){
+   box(-8.15,2.90,z,.30,2.35,width,paint);
+  }
+  box(-8.07,4.03,0,.19,.26,5.74,exterior.trim);
+  box(-9.67,2.84,1.65,.14,2.04,1.04,dark,.84);
+  box(-8.03,3.97,1.65,.14,.15,1.29,paint);
+  for(const z of [1.07,2.23])box(-8.03,2.83,z,.13,2.20,.09,paint);
+  box(-7.97,1.79,1.65,.53,.12,1.24,steel);
+  const roof=(x,w,y)=>[[x,y,-w],[x,y,w]];
+  const rear=roof(-8,2.87,4.16),front=roof(-10.48,1.52,3.74);
+  quad(rear[0],rear[1],front[1],front[0],exterior.trim,.55);
+  for(const side of [0,1]){
+   const a=rear[side],b=front[side];
+   quad(a,b,[b[0],1.77,b[2]],[a[0],1.77,a[2]],paint,.58);
+  }
+ }else{
+  if(exterior){
+   box(.43,2.85,1.05,.74,2.16,.14,paint);
+   box(.43,2.85,2.25,.74,2.16,.14,paint);
+   box(.43,3.97,1.65,.74,.13,1.31,paint);
+   box(.82,2.85,1.65,.08,2.05,1.05,[.008,.014,.015],.9);
+  }else box(.15,2.85,1.65,.08,2.05,1.05,[.008,.014,.015],.9);
+  for(const z of [1.07,2.23])box(.06,2.85,z,.12,2.2,.08,paint);box(.06,3.97,1.65,.12,.12,1.25,paint);box(-.05,1.79,1.65,.6,.12,1.25,steel);
  }
- if(exterior){
-  box(.43,2.85,1.05,.74,2.16,.14,paint);
-  box(.43,2.85,2.25,.74,2.16,.14,paint);
-  box(.43,3.97,1.65,.74,.13,1.31,paint);
-  box(.82,2.85,1.65,.08,2.05,1.05,[.008,.014,.015],.9);
- }else box(.15,2.85,1.65,.08,2.05,1.05,[.008,.014,.015],.9);
-for(const z of [1.07,2.23])box(.06,2.85,z,.12,2.2,.08,paint);box(.06,3.97,1.65,.12,.12,1.25,paint);box(-.05,1.79,1.65,.6,.12,1.25,steel);
  // Raised metal lettering and deck hardware are actual geometry, so they catch light.
  const glyphs={N:[[0,0,0,1],[0,1,.6,0],[.6,0,.6,1]],O:[[0,0,0,1],[0,1,.6,1],[.6,1,.6,0],[.6,0,0,0]],R:[[0,0,0,1],[0,1,.6,1],[.6,1,.6,.5],[.6,.5,0,.5],[0,.5,.6,0]],D:[[0,0,0,1],[0,1,.5,.85],[.5,.85,.5,.15],[.5,.15,0,0]],V:[[0,1,.3,0],[.3,0,.6,1]],I:[[.3,0,.3,1]]};
  Object.assign(glyphs,{A:[[0,0,.3,1],[.3,1,.6,0],[.15,.45,.45,.45]],B:[[0,0,0,1],[0,1,.6,.8],[.6,.8,0,.5],[0,.5,.6,.25],[.6,.25,0,0]],C:[[.6,1,0,1],[0,1,0,0],[0,0,.6,0]],E:[[0,0,0,1],[0,1,.6,1],[0,.5,.5,.5],[0,0,.6,0]],F:[[0,0,0,1],[0,1,.6,1],[0,.5,.5,.5]],G:[[.6,1,0,1],[0,1,0,0],[0,0,.6,0],[.6,0,.6,.5],[.6,.5,.3,.5]],H:[[0,0,0,1],[.6,0,.6,1],[0,.5,.6,.5]],J:[[.6,1,.6,0],[.6,0,0,0],[0,0,0,.3]],K:[[0,0,0,1],[0,.5,.6,1],[0,.5,.6,0]],L:[[0,1,0,0],[0,0,.6,0]],M:[[0,0,0,1],[0,1,.3,.5],[.3,.5,.6,1],[.6,1,.6,0]],P:[[0,0,0,1],[0,1,.6,1],[.6,1,.6,.5],[.6,.5,0,.5]],Q:[[0,0,0,1],[0,1,.6,1],[.6,1,.6,0],[.6,0,0,0],[.3,.3,.7,-.1]],S:[[.6,1,0,1],[0,1,0,.5],[0,.5,.6,.5],[.6,.5,.6,0],[.6,0,0,0]],T:[[0,1,.6,1],[.3,1,.3,0]],U:[[0,1,0,0],[0,0,.6,0],[.6,0,.6,1]],W:[[0,1,.15,0],[.15,0,.3,.5],[.3,.5,.45,0],[.45,0,.6,1]],X:[[0,0,.6,1],[0,1,.6,0]],Y:[[0,1,.3,.5],[.6,1,.3,.5],[.3,.5,.3,0]],Z:[[0,1,.6,1],[.6,1,0,0],[0,0,.6,0]]});
@@ -361,8 +375,8 @@ for(const z of [1.07,2.23])box(.06,2.85,z,.12,2.2,.08,paint);box(.06,3.97,1.65,.
  for(const side of [-1,1])for(const [i,char] of [...(design.name?.toUpperCase()||'NORDVIND')].entries())for(const [a,b,c,d] of glyphs[char]||[])tube([(side>0?(orientation>0?1:5.25)+orientation*(i*(4.25/Math.max(8,design.name?.length||8))+a*.45):(orientation>0?5.25:1)-orientation*(i*(design.id&&design.id!=='nordvind'?4.25/Math.max(8,design.name?.length||8):.56)+a*.55)),3.15+b*.5,side*2.686],[(side>0?(orientation>0?1:5.25)+orientation*(i*(4.25/Math.max(8,design.name?.length||8))+c*.45):(orientation>0?5.25:1)-orientation*(i*(design.id&&design.id!=='nordvind'?4.25/Math.max(8,design.name?.length||8):.56)+c*.55)),3.15+d*.5,side*2.686],.022,design.powertrain==='electric'?[.65,.76,.72]:dark,4,.45,design.powertrain==='electric'?1.4:0);
  if(design.forwardWork)for(let i=letteringStart;i<g.data.length;i+=11)g.data[i]+=5.25;
  // Recessed hold hatch and sorting chute, with an actual opening in the deck mesh.
- box(-1.9,.55,-.5,1.8,.08,1.8,[.008,.014,.014],1);for(const x of [-2.85,-.95])box(x,1.35,-.5,.13,1.1,2.05,steel);for(const z of [-1.45,.45])box(-1.9,1.35,z,2.,1.1,.13,steel);for(const x of [-2.87,-.93])box(x,1.87,-.5,.16,.25,2.15,[.43,.45,.37]);for(const z of [-1.48,.48])box(-1.9,1.87,z,2.1,.25,.16,[.43,.45,.37]);
- box(-1.5,2.2,-2.3,.9,.9,.8,[.29,.3,.27]);tube([-1.5,2.65,-2.8],[-1.5,2.65,-1.8],.26,steel,12);
+ box(workX(design,-1.9),.55,-.5,1.8,.08,1.8,[.008,.014,.014],1);for(const x of [-2.85,-.95])box(workX(design,x),1.35,-.5,.13,1.1,2.05,steel);for(const z of [-1.45,.45])box(workX(design,-1.9),1.35,z,2.,1.1,.13,steel);for(const x of [-2.87,-.93])box(workX(design,x),1.87,-.5,.16,.25,2.15,[.43,.45,.37]);for(const z of [-1.48,.48])box(workX(design,-1.9),1.87,z,2.1,.25,.16,[.43,.45,.37]);
+ box(workX(design,-1.5),2.2,-2.3,.9,.9,.8,[.29,.3,.27]);tube([workX(design,-1.5),2.65,-2.8],[workX(design,-1.5),2.65,-1.8],.26,steel,12);
  if(!exterior?.electric){
   box(10,2.1,0,.9,.5,1.1,steel);
   tube([9.4,2.3,-.5],[11.7,1.3,-.5],.05,steel);

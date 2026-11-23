@@ -1,16 +1,18 @@
-import {hullWidthAt} from './fenders.mjs?v=0.18.67';
-import {deckSign} from './vessel-profile.mjs?v=0.18.67';
-import {rackPositions,rackFootprints,rackFootprintKey,potBounds,rackFrames,rackScale,deckHardware} from './vessel-style.mjs?v=0.18.67';
+import {hullWidthAt} from './fenders.mjs?v=0.18.68';
+import {deckSign,workX} from './vessel-profile.mjs?v=0.18.68';
+import {rackPositions,rackFootprints,rackFootprintKey,potBounds,rackFrames,rackScale,deckHardware} from './vessel-style.mjs?v=0.18.68';
 export const CREW_RADIUS=.26,CREW_SPACING=.62;
 export const CABIN_DOOR={x:.18,z:1.65};
 export function potPositions(count,design={}){return rackPositions(count,design);}
 const rectangle=(x,z,a,b,c,d,r)=>Math.max(a-x,0,x-b)**2+Math.max(c-z,0,z-d)**2<r*r;
 export function canStand(x,z,count=8,door=false,design={}){
  if(deckSign(design)<0&&Math.abs(z)+CREW_RADIUS+.08>Math.min(hullWidthAt(-x-CREW_RADIUS,design),hullWidthAt(-x+CREW_RADIUS,design)))return false;
- if(x< -11.25||x>-.1||Math.abs(z)>3){if(!(door&&x>=-.3&&x<=.85&&z>=1.3&&z<=2.0))return false;}
- if(rectangle(x,z,-2.95,-.85,-1.55,.65,CREW_RADIUS))return false;
- if(Math.hypot(x+1.5,z-2.1)<.38+CREW_RADIUS||Math.hypot(x+3,z-3.1)<.42+CREW_RADIUS)return false;
- if(rectangle(x,z,-1.95,-1.05,-2.7,-1.9,CREW_RADIUS))return false;
+ if(design.forwardWork&&x< -8)return door&&x>=-8.8&&z>=1.3&&z<=2;
+ const stationX=workX(design,x);
+ if(x< -11.25||x>-.1||Math.abs(z)>3){if(!(door&&!design.forwardWork&&x>=-.3&&x<=.85&&z>=1.3&&z<=2.0))return false;}
+ if(rectangle(stationX,z,-2.95,-.85,-1.55,.65,CREW_RADIUS))return false;
+ if(Math.hypot(stationX+1.5,z-2.1)<.38+CREW_RADIUS||Math.hypot(stationX+3,z-3.1)<.42+CREW_RADIUS)return false;
+ if(rectangle(stationX,z,-1.95,-1.05,-2.7,-1.9,CREW_RADIUS))return false;
  for(const p of rackFootprints(count,design)){const b=potBounds(p);if(b.min[1]>1.7+2*rackScale(design)[1])continue;if(rectangle(x,z,b.min[0],b.max[0],b.min[2],b.max[2],CREW_RADIUS))return false;}
  for(const p of rackFrames(design))for(const dx of [-.82,.82])for(const dz of [-.8,.8])if(Math.hypot(x-p.x-dx*p.scale[0],z-p.z-dz*p.scale[2])<CREW_RADIUS+.055)return false;
  for(const box of deckHardware(design).solid)if(box.min[1]<3.65&&rectangle(x,z,box.min[0],box.max[0],box.min[2],box.max[2],CREW_RADIUS))return false;

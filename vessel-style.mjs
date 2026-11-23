@@ -1,6 +1,6 @@
-import {crewStations} from './crew-stations.mjs?v=0.18.67';
-import {hullWidthAt} from './fenders.mjs?v=0.18.67';
-import {deckSign} from './vessel-profile.mjs?v=0.18.67';
+import {crewStations} from './crew-stations.mjs?v=0.18.68';
+import {hullWidthAt} from './fenders.mjs?v=0.18.68';
+import {deckSign,workX} from './vessel-profile.mjs?v=0.18.68';
 export function vesselStyle(design={}){const family=Number(/^boat-(\d+)-/.exec(design.id||'')?.[1]||0);return {family,netLane:!!design.salmon,gantry:[2,3,4,6,9,10].includes(family),exhausts:[2,7,9,10].includes(family)?2:1,upperBridge:[6,9,10].includes(family),bowShield:family===7,radarArch:[1,3,5,8].includes(family)};}
 export function potRackPosition(i,design={}){return design.salmon?{x:-10+Math.floor(i/4)*2,z:1.7,y:2.4+(i%4)*1.25}:{x:-10+Math.floor(i/6)*2,z:-2.05+(i%2)*2.05,y:2.4+Math.floor((i%6)/2)*1.25};}
 
@@ -21,6 +21,11 @@ function buildDeckHardware(design={}){const style=vesselStyle(design),solid=[],w
  const sides=design.hauler==='both'?[-1,1]:[design.hauler==='port'?-1:1];for(const side of sides){if(design.hauler==='stern'){solid.push({min:[-8.32,1.7,1.38],max:[-7.88,5.35,1.82]},{min:[-10.5,1.6,-.5],max:[-9.5,3.2,.5]});work.push({min:[-8.7,1.7,1.05],max:[-7.35,5.7,2.35]});}else{solid.push({min:[-1.73,1.7,side*2.1-.23],max:[-1.27,5.35,side*2.1+.23]},{min:[-3.45,1.6,side*3.04-.45],max:[-2.55,3.15,side*3.04+.45]});work.push({min:[-4.25,1.7,side>0?1.65:-3.3],max:[-2.35,5.7,side>0?3.3:-1.65]});}}
  if(design.salmon)solid.push({min:[-8.95,1.7,-2.05],max:[-6.5,3.65,.18]});
  if(style.gantry){const {x,z,height:h}=gantryPlacement(design);for(const side of [-1,1])solid.push({min:[x-.2,1.7,side*z-.2],max:[x+1.6,h+.2,side*z+.2]});solid.push({min:[x-.24,h-.24,-z-.2],max:[x+.24,h+.24,z+.2]},{min:[x-.4,h-.35,-.6],max:[x+.4,h+.35,.6]});}
+ if(design.forwardWork)for(const bounds of [...solid,...work]){
+  const start=bounds.min[0];
+  bounds.min[0]=workX(design,bounds.max[0]);
+  bounds.max[0]=workX(design,start);
+ }
  return {solid,work};}
 export const rackCount=count=>Math.max(0,Math.min(200,Math.floor(Number.isFinite(count)?count:0)));
 const rackCache=new Map(),columnCache=new Map();

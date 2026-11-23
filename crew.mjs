@@ -1,6 +1,7 @@
-import {rackFootprints,potBounds} from './vessel-style.mjs?v=0.18.67';
-import {crewStations,crewAction} from './crew-stations.mjs?v=0.18.67';
-import {walkableDeck,routeOnDeck,canStand,CREW_SPACING,CABIN_DOOR} from './deck-layout.mjs?v=0.18.67';
+import {rackFootprints,potBounds} from './vessel-style.mjs?v=0.18.68';
+import {workX} from './vessel-profile.mjs?v=0.18.68';
+import {crewStations,crewAction} from './crew-stations.mjs?v=0.18.68';
+import {walkableDeck,routeOnDeck,canStand,CREW_SPACING,CABIN_DOOR} from './deck-layout.mjs?v=0.18.68';
 const jobs={
  secure:{label:'Lashing pots to transport racks',duration:12,targets:[]},
  undock:{label:'Letting go mooring lines',duration:30,targets:[[-10.8,2.8],[-3.8,2.8],[-.45,1.1]]},
@@ -13,9 +14,9 @@ const jobs={
  repair:{label:'Repairing hull',duration:12,targets:[[-3.8,2.8],[-10.8,1.6],[-2.5,-2.9]]},
  upgrade:{label:'Installing equipment',duration:12,targets:[[-.45,1.0],[-4.5,1.5],[-2.5,-2.9]]}
 };
-const homes=[[-6,1.5],[-4,1.5],[-.45,1.65]],doorOutside=[-.35,CABIN_DOOR.z],inside=[.75,CABIN_DOOR.z];
+const homes=[[-6,1.5],[-4,1.5],[-.45,1.65]];
 export function createCrew(){return {members:homes.map(([x,z],i)=>({x,z,heading:i?Math.PI:0,velocity:0,phase:i*2.1,moving:false,working:false,route:[],home:[x,z],role:i,idle:0,patrol:0,hidden:false,resting:false,restUntil:0,nextRest:65+i*22,blocked:0,sick:null,sickTime:0})),pots:8,job:null,elapsed:0,cruise:0,rough:0,nextSick:150,sickCount:0,door:0,workTime:0,label:'Deck crew standing by',lastActivity:0};}
-function assign(crew,m,target,avoid=false){if(!canStand(target[0],target[1],crew.pots,m.hidden||m.resting||target===inside,crew.design||{})){let nearest=null;for(const {x,z} of walkableDeck(crew.pots,crew.design||{})){const d=Math.hypot(x-target[0],z-target[1]);if(!nearest||d<nearest.d)nearest={x,z,d};}if(nearest)target=[nearest.x,nearest.z];}m.target=target;m.route=routeOnDeck([m.x,m.z],target,crew.pots,avoid?crew.members.filter(p=>p!==m&&!p.hidden):[],m.hidden||m.resting||m.exiting||target===inside,crew.design||{});m.blocked=0;}
+function assign(crew,m,target,avoid=false){if(!canStand(target[0],target[1],crew.pots,m.hidden||m.resting,crew.design||{})){let nearest=null;for(const {x,z} of walkableDeck(crew.pots,crew.design||{})){const d=Math.hypot(x-target[0],z-target[1]);if(!nearest||d<nearest.d)nearest={x,z,d};}if(nearest)target=[nearest.x,nearest.z];}m.target=target;m.route=routeOnDeck([m.x,m.z],target,crew.pots,avoid?crew.members.filter(p=>p!==m&&!p.hidden):[],m.hidden||m.resting||m.exiting,crew.design||{});m.blocked=0;}
 export function commandCrew(crew,kind,options={}){const job=jobs[kind];if(!job)return false;crew.design=options.design||crew.design||{};crew.pots=options.deck??crew.pots;const fishing=['deploy','haul','netSet','netHaul','secure'].includes(kind),stations=fishing?crewStations(crew.design,{...options.operation,kind}):null;if(stations){if(kind==='secure')for(let i=0;i<2;i++)stations[i]={task:'watch',target:crew.members[i].home,face:null};const candidates=[];for(const p of rackFootprints(crew.pots,crew.design)){const b=potBounds(p);for(const [x,z]of [[b.max[0]+.3,p.z],[b.min[0]-.3,p.z],[p.x,b.max[2]+.3],[p.x,b.min[2]-.3]])if(canStand(x,z,crew.pots,false,crew.design)&&!stations.slice(0,2).some(s=>Math.hypot(s.target[0]-x,s.target[1]-z)<CREW_SPACING+.1))candidates.push({task:'lash',target:[x,z],face:[p.x,p.z],distance:Math.hypot(x+4,z-1.25)});}candidates.sort((a,b)=>a.distance-b.distance);const reachable=candidates.find(c=>routeOnDeck([crew.members[2].x,crew.members[2].z],c.target,crew.pots,[],false,crew.design).length);if(reachable)stations[2]=reachable;}
  crew.job={...job,kind,live:!!options.operation,operation:options.operation,targets:stations?stations.map(s=>s.target):job.targets};crew.workTime=0;crew.label=job.label;crew.cruise=0;crew.members.forEach((m,i)=>{m.task=stations?.[i].task;m.face=stations?.[i].face;m.exiting=m.hidden;m.resting=false;m.sick=null;m.working=false;m.pendingWorkTarget=fishing&&i===2?crew.job.targets[i]:null;assign(crew,m,m.pendingWorkTarget?m.home:crew.job.targets[i]);});return true;}
 function finishWork(crew){crew.securePending=!!crew.job?.live&&['deploy','haul','netHaul'].includes(crew.job.kind);crew.job=null;crew.label='Clearing the deck';for(const m of crew.members){m.working=false;m.task=null;m.face=null;assign(crew,m,m.home);}}
@@ -31,24 +32,24 @@ function tick(crew,dt,waves,options){
  for(const m of crew.members){
   if(!crew.job&&!m.sick){
    if(m.hidden&&m.resting&&m.restUntil>0&&crew.elapsed>=m.restUntil){m.exiting=true;m.resting=false;assign(crew,m,m.home);}
-   if(cruising&&crew.cruise>m.nextRest&&!m.resting&&!m.hidden&&crew.members.filter(p=>p.resting).length<2&&!crew.members.some(p=>p.exiting||(p.resting&&!p.hidden))){m.resting=true;m.restUntil=0;m.nextRest=crew.cruise+120+m.role*19;assign(crew,m,inside);}
+   if(cruising&&crew.cruise>m.nextRest&&!m.resting&&!m.hidden&&crew.members.filter(p=>p.resting).length<2&&!crew.members.some(p=>p.exiting||(p.resting&&!p.hidden))){m.resting=true;m.restUntil=0;m.nextRest=crew.cruise+120+m.role*19;assign(crew,m,[workX(crew.design,.75),CABIN_DOOR.z]);}
    if(!m.resting&&!m.hidden&&!m.route.length){m.idle+=dt;if(m.idle>10+m.role*3){m.idle=0;m.patrol++;const stops=[[-9.5,1.5],[-4,2.5],[-.35,1.1],m.home];assign(crew,m,stops[(m.patrol+m.role)%stops.length],true);}}
   }
   if(!crew.job&&crew.rough>=crew.nextSick&&!crew.members.some(p=>p.sick)&&!m.hidden&&!m.resting&&m.role===crew.sickCount%3){m.sick='walking';crew.sickCount++;crew.nextSick=crew.rough+240+m.role*31;assign(crew,m,[-10.9,2.9]);}
   if(m.sick==='retching'){m.sickTime+=dt;m.heading=Math.PI/2;if(m.sickTime>=7){m.sick=null;m.sickTime=0;assign(crew,m,m.home);}}
   if(!m.route.length&&m.target&&Math.hypot(m.x-m.target[0],m.z-m.target[1])>.25){m.blocked+=dt;if(m.blocked>.65)assign(crew,m,m.target,true);}
   m.moving=false;const targetPace=m.route.length?Math.min(pace,Math.max(.35,Math.hypot(m.route.at(-1)[0]-m.x,m.route.at(-1)[1]-m.z)*2.5)):0;m.velocity+=(targetPace-m.velocity)*(1-Math.exp(-dt*6));let budget=m.velocity*dt;
-  while(m.route.length&&budget>0){if((m.resting||m.exiting)&&m.x>-.85&&Math.abs(m.z-CABIN_DOOR.z)<.5&&crew.door<.9)break;const [x,z]=m.route[0],dx=x-m.x,dz=z-m.z,d=Math.hypot(dx,dz);if(d<.015){m.route.shift();continue;}const travel=Math.min(d,budget),nx=m.x+dx/d*travel,nz=m.z+dz/d*travel,visible=nx<.3;
+  while(m.route.length&&budget>0){if((m.resting||m.exiting)&&workX(crew.design,m.x)>-.85&&Math.abs(m.z-CABIN_DOOR.z)<.5&&crew.door<.9)break;const [x,z]=m.route[0],dx=x-m.x,dz=z-m.z,d=Math.hypot(dx,dz);if(d<.015){m.route.shift();continue;}const travel=Math.min(d,budget),nx=m.x+dx/d*travel,nz=m.z+dz/d*travel,visible=workX(crew.design,nx)<.3;
    if(visible&&crew.members.some(p=>p!==m&&!p.hidden&&Math.hypot(p.x-nx,p.z-nz)<CREW_SPACING)){m.blocked+=dt;break;}
    if(!canStand(nx,nz,crew.pots,m.hidden||m.resting||m.exiting,crew.design||{})){m.blocked+=dt;break;}
-   const turn=Math.atan2(dz,dx)-m.heading;m.heading+=Math.atan2(Math.sin(turn),Math.cos(turn))*Math.min(1,dt*9);m.x=nx;m.z=nz;if(m.x<-.9)m.exiting=false;m.hidden=!visible;m.phase+=travel*3.8;budget-=travel;m.moving=true;m.blocked=0;if(travel===d)m.route.shift();
+   const turn=Math.atan2(dz,dx)-m.heading;m.heading+=Math.atan2(Math.sin(turn),Math.cos(turn))*Math.min(1,dt*9);m.x=nx;m.z=nz;if(workX(crew.design,m.x)<-.9)m.exiting=false;m.hidden=!visible;m.phase+=travel*3.8;budget-=travel;m.moving=true;m.blocked=0;if(travel===d)m.route.shift();
   }
   if(m.blocked>.65&&m.target)assign(crew,m,m.target,true);
-  if(m.resting&&m.x>.6&&!m.route.length){if(!m.hidden)m.hidden=true;if(!m.restUntil||m.restUntil<crew.elapsed)m.restUntil=crew.elapsed+40+m.role*12;}
+  if(m.resting&&workX(crew.design,m.x)>.6&&!m.route.length){if(!m.hidden)m.hidden=true;if(!m.restUntil||m.restUntil<crew.elapsed)m.restUntil=crew.elapsed+40+m.role*12;}
   if(m.sick==='walking'&&!m.route.length&&Math.hypot(m.x+10.9,m.z-2.9)<.2){m.sick='retching';m.sickTime=0;}
   m.working=!!crew.job&&!m.pendingWorkTarget&&!m.hidden&&!m.route.length&&!m.moving&&m.target&&Math.hypot(m.x-m.target[0],m.z-m.target[1])<.25;if(m.working)m.heading=m.face?Math.atan2(m.face[1]-m.z,m.face[0]-m.x):crew.job.kind==='repair'&&m.role===2?-Math.PI/2:Math.PI/2;
  }
- const doorWanted=crew.members.some(m=>(m.exiting||(m.resting&&m.restUntil===0))&&m.x>-1.2&&Math.abs(m.z-CABIN_DOOR.z)<1.1);crew.door+=(Number(doorWanted)-crew.door)*(1-Math.exp(-dt*6));
+ const doorWanted=crew.members.some(m=>(m.exiting||(m.resting&&m.restUntil===0))&&workX(crew.design,m.x)>-1.2&&Math.abs(m.z-CABIN_DOOR.z)<1.1);crew.door+=(Number(doorWanted)-crew.door)*(1-Math.exp(-dt*6));
  if(crew.job&&crew.members.every(m=>!m.route.length&&!m.hidden)){crew.workTime+=dt;if(!crew.job.live&&crew.workTime>=crew.job.duration)finishWork(crew);}
  if(!crew.job){const resting=crew.members.filter(m=>m.hidden).length;crew.label=crew.members.some(m=>m.sick==='retching')?'A deckhand is seasick':resting?`${resting} resting in the cabin · watch on deck`:waves>3.5?'Bracing in heavy seas':'Deck crew standing by';}
 }

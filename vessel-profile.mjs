@@ -27,3 +27,5 @@ export function vesselExterior(design={}){
 }
 export const hullPaint=design=>design?.powertrain==='electric'?[.62,.67,.66]:/^boat-1[12]-/.test(design?.id||'')?[.80,.79,.71]:palette[Number(/^boat-(\d+)/.exec(design?.id||'')?.[1]||0)%palette.length];
 export function deckFrame(matrix,design){if(deckSign(design)>0)return matrix;const out=new Float64Array(matrix);for(let i=0;i<4;i++)out[i]*=-1;return out;}
+
+export const workX=(design,x)=>design.forwardWork?-8-x:x;
