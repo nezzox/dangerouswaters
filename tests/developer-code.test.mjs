@@ -2,14 +2,14 @@ import {test} from 'node:test';import assert from 'node:assert/strict';import {r
 test('the exact developer phrase gives 50000 USD and can be reused',()=>{const s=createGame(),before=s.money;assert(redeemDeveloperCode(s,'Nezzox is king'));assert.equal(s.money-before,500000);assert(redeemDeveloperCode(s,'Nezzox is king'));assert.equal(s.money-before,1000000);assert.equal(restoreSeason(JSON.parse(seasonJSON(s))).money,s.money);});
 test('cancelled, empty or incorrect codes do not change the balance',()=>{const s=createGame(),before=s.money;for(const code of [null,'','nezzox is king','Nezzox is king ','hello'])assert(!redeemDeveloperCode(s,code));assert.equal(s.money,before);});
 test('Give me a chance grants 75000 USD only once per saved season',()=>{const s=createGame(),before=s.money;assert(redeemDeveloperCode(s,'Give me a chance'));assert.equal(s.money-before,750000);assert(!redeemDeveloperCode(s,'Give me a chance'));const copy=restoreSeason(JSON.parse(seasonJSON(s)));assert(!redeemDeveloperCode(copy,'Give me a chance'));assert.equal(copy.money,s.money);const other=createGame();assert(redeemDeveloperCode(other,'Give me a chance'));});
-test('Ge mig grants the chosen positive whole amount in the active currency',()=>{
+test('Ge mig grants the chosen positive whole amount in US dollars',()=>{
  const s=createGame(),before=s.money;
- assert(redeemDeveloperCode(s,'Ge mig 350','sv'));
- assert.equal(s.money-before,350);
- assert(redeemDeveloperCode(s,'Ge mig 40','en'));
- assert.equal(s.money-before,750);
+ assert(redeemDeveloperCode(s,'Ge mig 350'));
+ assert.equal(s.money-before,3500);
+ assert(redeemDeveloperCode(s,'Ge mig 40'));
+ assert.equal(s.money-before,3900);
  for(const code of ['Ge mig','Ge mig 0','Ge mig -1','Ge mig 1e3','Ge mig 99999999999999999'])assert(!redeemDeveloperCode(s,code));
- assert.equal(s.money-before,750);
+ assert.equal(s.money-before,3900);
 });
 test('Go to harbor ends towing in clear water while preserving resources',async()=>{
  const {towDestination,vesselOnLand,nearPort}=await import('../simulation.mjs');

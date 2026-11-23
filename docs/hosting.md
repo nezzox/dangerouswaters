@@ -27,7 +27,7 @@ When commissioning a new vessel, recover gear and unload first. Trade in the old
 
 ## Language, currency and mooring (0.11)
 
-Choose English · USD or Svenska · SEK on the welcome screen, in the footer, or in the shop. The choice persists in the browser and is included in the saved season. English is the default for new players. The fixed game exchange rate is 10 SEK = 1 USD; changing language only changes presentation and loan input units, never prices, debt or purchasing power. Older seasons retain their full value. Catalogs, training descriptions, incident names, radio/status messages, menus, accessibility labels and canvas overlays are localized.
+Choose English · USD or Svenska · USD on the welcome screen, in the footer, or in the shop. The choice persists in the browser and is included in the saved season. English is the default for new players. Both languages display US dollars and accept loan amounts in USD. The fixed conversion is ten saved units per USD. Older seasons retain their full value. Catalogs, training descriptions, incident names, radio/status messages, menus, accessibility labels and canvas overlays are localized.
 
 Docking shows its current maneuver and remaining time. If aligned with the berth, the pilot backs directly in without first moving offshore. Other approaches retain pier clearance. After unloading, position and heading remain secured at the berth, including across save/reload. Request nonzero target speed (W/S or the slider), or engage autopilot, to cast off. Merely steering does not turn the moored vessel. Wave heave/roll is still rendered while the mooring holds horizontal position.
 

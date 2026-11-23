@@ -4,8 +4,8 @@ import {CRAB_SPECIES} from './crab-species.mjs?v=0.18.61';
 let language='en';
 export const getLanguage=()=>language;
 export function setLanguage(value){language=value==='sv'?'sv':'en';return language;}
-export const toInternalMoney=(amount,locale=language)=>amount*(locale==='sv'?1:10);
-export function formatMoney(amount,locale=language){const sv=locale==='sv',n=amount/(sv?1:10),fraction=Math.abs(n-Math.round(n))>.000001;return new Intl.NumberFormat(sv?'sv-SE':'en-US',{style:'currency',currency:sv?'SEK':'USD',minimumFractionDigits:fraction?2:0,maximumFractionDigits:2}).format(n);}
+export const toInternalMoney=amount=>amount*10;
+export function formatMoney(amount,locale=language){const sv=locale==='sv',n=amount/10,fraction=Math.abs(n-Math.round(n))>.000001;return new Intl.NumberFormat(sv?'sv-SE':'en-US',{style:'currency',currency:'USD',currencyDisplay:'narrowSymbol',minimumFractionDigits:fraction?2:0,maximumFractionDigits:2}).format(n);}
 const sv={
  'Brighter, wider and longer-reaching work lights per grade; pot deployment 5% faster per grade':'Starkare arbetsljus med bredare ljuskäglor och längre räckvidd per nivå; tinsättning går 5 % snabbare per nivå',
  "for":"för",
@@ -178,7 +178,7 @@ const sv={
 
  'BERING SEA':'BERINGS HAV','ISLANDS':'ÖAR','Chart area':'Kartområde','Preview of':'Förhandsvisning av','Preview unavailable':'Förhandsvisning saknas','No navigable route to destination. Choose a point in open water.':'Ingen farbar rutt till destinationen. Välj en punkt på öppet vatten.','Geographic chart updated. Fishing gear preserved; positions on land moved to nearby water.':'Det geografiska sjökortet är uppdaterat. Redskapen är bevarade; positioner på land har flyttats till närliggande vatten.',
 
- 'Fixed game exchange rate: 10 SEK = 1 USD. Switching language preserves the value of your balance, loans and prices.':'Fast spelkurs: 10 SEK = 1 USD. Språkbyte behåller värdet på ditt saldo, dina lån och alla priser.',
+ 'All amounts are shown in US dollars.':'Alla belopp visas i amerikanska dollar.',
  'Moored alongside':'Förtöjd vid kaj',
  'A COLD MORNING ON THE BERING SEA':'EN KALL MORGON PÅ BERINGS HAV',
  'One boat. Eight pots. A sea that gives nothing away.':'En båt. Åtta tinor. Ett hav som inte ger något gratis.',
@@ -237,7 +237,7 @@ const sv={
  'Total operating profit':'Total rörelsevinst','Crew share':'Besättningens andel','Last trip: gross':'Senaste turen: brutto','loan repayment':'amortering','expenses':'utgifter','landings':'landningar','hull repair':'skrovreparation','supplies':'förnödenheter',
  'Working capital':'Rörelsekapital','Outstanding debt':'Kvarvarande skuld','Borrowed':'Lånat','repaid':'amorterat','Credit ceiling':'Kreditgräns',
  'Each loan adds a fixed 10% fee. Automatically repay 15% of player/fleet landing receipts until the balance reaches zero. No daily interest. Emergency borrowing is available at sea.':'Varje lån har en fast avgift på 10 %. Avbetala automatiskt 15 % av dina och flottans landningsintäkter tills skulden är betald. Ingen daglig ränta. Nödlån kan tas även till havs.',
- 'Loan amount (kr)':'Lånebelopp (kr)','TAKE LOAN':'TA LÅN','Take your season to your webserver':'Flytta din säsong till webbservern',
+ 'Loan amount ($)':'Lånebelopp ($)','TAKE LOAN':'TA LÅN','Take your season to your webserver':'Flytta din säsong till webbservern',
  'Saves belong to this browser and website address. Export before changing domain or computer; import on the new site. Import replaces the current season.':'Sparningen hör till den här webbläsaren och webbadressen. Exportera före byte av domän eller dator och importera på den nya sidan. Import ersätter den aktuella säsongen.',
  'EXPORT SAVED SEASON':'EXPORTERA SPARAD SÄSONG','Choose a saved season (.json)':'Välj en sparad säsong (.json)','REPLACE SEASON WITH SELECTED FILE':'ERSÄTT SÄSONGEN MED VALD FIL','Season downloaded.':'Säsongen har laddats ned.','Season imported.':'Säsongen har importerats.',
  'Save file is too large.':'Sparfilen är för stor.','File selected. Click Replace to import.':'Fil vald. Klicka på Ersätt för att importera.','Invalid JSON file.':'Ogiltig JSON-fil.','Invalid or incompatible season. Your current save is unchanged.':'Ogiltig eller inkompatibel säsong. Din aktuella sparning är oförändrad.',
@@ -285,7 +285,7 @@ Object.assign(sv,{'GET UNSTUCK':'KOM LOSS','Vessel moved clear. Ready to steer.'
 const lookup=new Map(Object.entries(sv).map(([key,value])=>[key.toLowerCase(),value]));
 const escape=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
 const phrases=new RegExp(`(?<![\\p{L}\\p{N}])(?:${[...lookup.keys()].sort((a,b)=>b.length-a.length).map(escape).join('|')})(?![\\p{L}\\p{N}])`,'giu');
-export function translateText(source,locale=language){let text=String(source);if(locale==='sv')text=text.replace(phrases,match=>{const value=lookup.get(match.toLowerCase());return match===match.toUpperCase()&&/\p{L}/u.test(match)?value.toUpperCase():value;});else text=text.replace(/Loan amount \(kr\)/g,'Loan amount ($)');return text.replace(/(-?\d[\d, \u00a0\u202f]*(?:\.\d+)?)\s*kr\b/gi,(whole,amount)=>{amount=amount.trim();if(locale==='sv'&&(/[ \u00a0\u202f]\d{3}/.test(amount)||/,\d{2}$/.test(amount)))return whole;return formatMoney(Number(amount.replace(/[, \u00a0\u202f]/g,'')),locale);});}
+export function translateText(source,locale=language){let text=String(source);if(locale==='sv')text=text.replace(phrases,match=>{const value=lookup.get(match.toLowerCase());return match===match.toUpperCase()&&/\p{L}/u.test(match)?value.toUpperCase():value;});return text.replace(/(-?\d[\d, \u00a0\u202f]*(?:\.\d+)?)\s*kr\b/gi,(_,amount)=>formatMoney(Number(amount.replace(/[, \u00a0\u202f]/g,'')),locale));}
 
 const textSources=new WeakMap(),attributeSources=new WeakMap();
 export function localizeTree(root,locale=language){const doc=root.ownerDocument||root,walker=doc.createTreeWalker(root,4);let n;while((n=walker.nextNode())){if(n.parentElement?.closest('script,style,[data-language]'))continue;const old=textSources.get(n),source=old&&n.data===old.display?old.source:n.data,display=translateText(source,locale);if(display!==n.data)n.data=display;textSources.set(n,{source,display});}

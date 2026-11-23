@@ -5,7 +5,7 @@ import {newWorldCode,newPlayerToken,cleanPlayerName,createMultiplayer,createPeer
 import {startWaypointTravel,advanceWaypointTravel} from './time-to-waypoint.mjs?v=0.18.63';
 import {CRAB_SPECIES,crabSpeciesName} from './crab-species.mjs?v=0.18.61';
 import {LIGHTING_PROFILES} from './light-upgrades.mjs?v=0.18.63';
-import {claimFirstBoatGrant,firstBoatNotice} from './first-boat.mjs?v=0.18.61';
+import {claimFirstBoatGrant,firstBoatNotice} from './first-boat.mjs?v=0.18.64';
 import {crabPriceAt,crabHoldValue} from './catch-value.mjs?v=0.18.61';
 import {watchDonations,appendDonation} from './donation-feed.mjs?v=0.18.61';
 import {DONATION_FEED_URL} from './donation-config.mjs?v=0.18.61';
@@ -17,7 +17,7 @@ import {transitionWeather} from './weather-transition.mjs?v=0.18.61';
 import {ownedUpgrades,createRadioFeed,createLastHaul} from './hud-status.mjs?v=0.18.61';
 import {createIntro} from './intro.mjs?v=0.18.61';
 import {fleetNoticeCount} from './fleet.mjs?v=0.18.61';
-import {redeemDeveloperCode} from './developer-code.mjs?v=0.18.62';
+import {redeemDeveloperCode} from './developer-code.mjs?v=0.18.64';
 import {potSoakStage} from './pot-soak.mjs?v=0.18.61';
 import {createLiveWeather} from './live-weather.mjs?v=0.18.61';
 import {dockingStage,PORT_QUAYS,nearestQuay} from './harbor.mjs?v=0.18.61';
@@ -28,8 +28,8 @@ import {clipChartWater} from './chart-water.mjs?v=0.18.61';
 import {groundsAt,groundReport,crabHotspot,groundMotion} from './fishing-grounds.mjs?v=0.18.61';
 import {createSoundscape} from './soundscape.mjs?v=0.18.61';
 import {WORLD_LAND,WORLD_CENTER,WORLD_BOUNDS,PLACES,worldToGeo,clearWater,ST_PAUL_DIESEL} from './world.mjs?v=0.18.61';
-import {getLanguage,setLanguage,translateText,localizeTree} from './i18n.mjs?v=0.18.62';
-import {createShop} from './shop.mjs?v=0.18.61';
+import {getLanguage,setLanguage,translateText,localizeTree} from './i18n.mjs?v=0.18.64';
+import {createShop} from './shop.mjs?v=0.18.64';
 import {restoreSeason,seasonJSON} from './saves.mjs?v=0.18.61';
 import {vesselStats,toggleAutomation} from './career.mjs?v=0.18.61';
 import {pickupAllPots,skipperCommand,createGame,step,conditions,weatherAt,setWeatherMode,depthAt,PORT,distance,nearPort,handlePot,dock,undock,canUndock,service,beginTow,towDestination,towFee,atDieselStation,getUnstuck,clamp,potAction,POT_RANGE,jobProgress,setAutopilot,autopilotRouteStart,applyAutopilotRoute,setRudder,potBearing,workingSide} from './simulation.mjs?v=0.18.61';
@@ -191,7 +191,7 @@ $('renderer').onclick=()=>{$('code-input').value='';$('code-dialog').returnValue
 $('code-cancel').onclick=()=>$('code-dialog').close('cancel');
 $('code-dialog').addEventListener('close',()=>{
  const code=$('code-input').value;
- if($('code-dialog').returnValue==='redeem'&&redeemDeveloperCode(state,code,getLanguage())){
+ if($('code-dialog').returnValue==='redeem'&&redeemDeveloperCode(state,code)){
   if(code==='Go to harbor'){
    cancelWaypointSearch();waypointTravel=null;Object.assign(wake,createWake());
    view.x=state.x;view.y=state.y;followVessel(chartView,state);
