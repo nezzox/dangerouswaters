@@ -1,9 +1,9 @@
-import {iceLevel} from './vessel-ice.mjs?v=0.18.77';
-import {chooseBerth, nearestQuay, quayPoint, QUAY} from './harbor.mjs?v=0.18.77';
-import {MATTHEW_QUAY} from './world.mjs?v=0.18.77';
-import {ensureRareState,rareCount} from './rare-catch.mjs?v=0.18.77';
-import {INCIDENT_INTERVAL_SCALE,INCIDENT_SCHEDULE_VERSION} from './balance.mjs?v=0.18.77';
-import {SKILLS,PARTS,BOATS,SKILL_SYSTEMS,PART_SYSTEMS,boatById} from './catalog.mjs?v=0.18.77';
+import {iceLevel} from './vessel-ice.mjs?v=0.18.78';
+import {chooseBerth, nearestQuay, quayPoint, QUAY} from './harbor.mjs?v=0.18.78';
+import {MATTHEW_QUAY} from './world.mjs?v=0.18.78';
+import {ensureRareState,rareCount} from './rare-catch.mjs?v=0.18.78';
+import {INCIDENT_INTERVAL_SCALE,INCIDENT_SCHEDULE_VERSION} from './balance.mjs?v=0.18.78';
+import {SKILLS,PARTS,BOATS,SKILL_SYSTEMS,PART_SYSTEMS,boatById} from './catalog.mjs?v=0.18.78';
 const finite=(n,f=0)=>Number.isFinite(n)?n:f,clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 export const inHarbor=s=>Math.hypot(s.x-160,s.y-80)<230||Math.hypot(s.x-MATTHEW_QUAY.x,s.y-MATTHEW_QUAY.y)<230;
 export const shopReady=s=>inHarbor(s)&&(!s.career?.requiresDock||!!s.moored)&&Math.abs(s.speed)<1&&!s.deckJob&&!s.incident&&!s.tow&&!s.overboard;
@@ -19,7 +19,7 @@ export function ensureCareer(s){
 }
 export function vesselStats(s){
  const c=s.career||{},b=boatById(c.boat),k=c.skills||{},p=c.parts||{},crew=b.crew+(p.quarters||0),v=key=>(k[key]||0),part=key=>(p[key]||0);
- return {...b,lightRank:part('lights'),highSpeedHaul:!!v('highSpeedHaul'),maxSpeedHauling:!!v('maxSpeedHauling'),intelligentAutoSet:!!v('intelligentAutoSet'),pickupAll:!!v('pickupAll'),crew,capacity:Math.max(s.capacity||0,b.capacity+(s.hold||0)*400+part('hold')*250),potCapacity:b.pots+(s.gear||0)*4+part('racks')*4,tank:b.tank+part('tank')*150,
+ return {...b,droneSurvey:!!part('droneSurvey'),lightRank:part('lights'),highSpeedHaul:!!v('highSpeedHaul'),maxSpeedHauling:!!v('maxSpeedHauling'),intelligentAutoSet:!!v('intelligentAutoSet'),pickupAll:!!v('pickupAll'),crew,capacity:Math.max(s.capacity||0,b.capacity+(s.hold||0)*400+part('hold')*250),potCapacity:b.pots+(s.gear||0)*4+part('racks')*4,tank:b.tank+part('tank')*150,
  top:b.top+(s.engine||0)*1.1+part('engine')*.45,work:1+v('work')*.08+part('crane')*.1+Math.max(0,crew-3)*.035,
  deploy:1+v('deploy')*.1+part('lights')*.05,haul:1+v('haul')*.09+v('sort')*.07+part('winch')*.1,repair:1+v('repair')*.15+part('pumps')*.1,
  fuelUse:Math.max(.35,1-v('fuel')*.04-part('propeller')*.05),crabYield:1+v('crab')*.06+part('sonar')*.05,salmonYield:1+v('salmon')*.08+part('nets')*.08,

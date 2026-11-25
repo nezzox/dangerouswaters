@@ -1,7 +1,7 @@
-import {QUAY,quayPoint,berthsAt} from './harbor.mjs?v=0.18.77';
-import {geometry} from './geometry.mjs?v=0.18.77';
-import {WORLD_LAND,isLand,SERVICE_APRON} from './world.mjs?v=0.18.77';
-import {groundHeight} from './geography-mesh.mjs?v=0.18.77';
+import {QUAY,quayPoint,berthsAt} from './harbor.mjs?v=0.18.78';
+import {geometry} from './geometry.mjs?v=0.18.78';
+import {WORLD_LAND,isLand,SERVICE_APRON} from './world.mjs?v=0.18.78';
+import {groundHeight} from './geography-mesh.mjs?v=0.18.78';
 const asphalt=[.16,.18,.18],concrete=[.36,.37,.34],steel=[.29,.33,.33],dark=[.07,.09,.085];
 export const MATTHEW_FLOODLIGHTS=[-215,-122,-37,61];
 function buildMatthewDetails(g,quay){
@@ -122,18 +122,25 @@ export function buildPortScenery(selected=QUAY,local=false){const g=geometry();l
  if(quay!==QUAY)buildMatthewDetails(g,quay);
  {
   const {start,end,depth}=SERVICE_APRON,top=quay.deck;
-  const at=(u,v,h)=>{const p=point(u,v);return [p.x,h,p.y];};
+  // Follow the real shore at the north tip, without bending the other berths.
+  // The local shoreline at u=96 is v=-4.173 m, with a 6 m bank top.
+  const bend=u=>quay===QUAY?Math.max(0,(u-57.8)/(end-57.8)):0;
+  const at=(u,v,h)=>{
+   const q=bend(u),p=point(u,v-4.1734*q*Math.max(0,1-v/depth));
+   return [p.x,h-Math.max(0,(q-.7)/.3)*(top-6)*Math.max(0,(h+2)/(top+2)),p.y];
+  };
   const deck=(u0,u1,v0,v1,h,color)=>g.quad(at(u0,v0,h),at(u0,v1,h),at(u1,v1,h),at(u1,v0,h),color,.94,-3);
   const wall=(u0,u1,low,high,color)=>g.quad(at(u1,0,low),at(u0,0,low),at(u0,0,high),at(u1,0,high),color,.95,-3);
-  deck(start,end,0,3,top,[.43,.43,.39]);
-  deck(start,end,3,depth,top,[.29,.31,.30]);
-  for(let u=start;u<end;u+=8){
-   const next=Math.min(end,u+8),tone=(Math.floor((u-start)/8)%3)*.014;
+  for(let u=start;u<end;){
+   const next=Math.min(end,u+8,quay===QUAY&&u<57.8?57.8:end),tone=(Math.floor((u-start)/8)%3)*.014;
+   deck(u,next,0,3,top,[.43,.43,.39]);
+   deck(u,next,3,depth,top,[.29,.31,.30]);
    wall(u,next,-2,2.05,[.17+tone,.20+tone,.17+tone]);
    wall(u,next,2.05,top-.48,[.30+tone,.31+tone,.28+tone]);
    wall(u,next,top-.48,top,[.41,.41,.36]);
    g.tube(at(u,-.01,.55),at(u,-.01,top-.48),.036,[.19,.20,.18],5,.95,-3);
    deck(u+.04,Math.min(u+2.4,next),3.75,3.89,top+.018,[.60,.48,.22]);
+   u=next;
   }
   for(let u=start+5;u<end;u+=9){
    g.tube(at(u,-.32,top-2.1),at(u,-.32,top-.65),.46,dark,8);

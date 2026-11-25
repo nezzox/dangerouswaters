@@ -37,6 +37,8 @@ SKILL_SYSTEMS.push({key:'intelligentAutoSet',name:'Intelligent Auto Set',group:'
 SKILL_SYSTEMS.push({key:'highSpeedHaul',name:'Haul at high speed',group:'Crew',base:20000,maxRank:1,description:'Set and haul crab pots below 7 knots.'});
 SKILL_SYSTEMS.push({key:'maxSpeedHauling',name:'Max Speed Hauling',group:'Crew',base:200000,maxRank:1,description:'Set and haul crab pots at up to 13 knots.'});
 SKILL_SYSTEMS.push({key:'pickupAll',name:'Pickup All Pots',group:'Automation',base:1500000,maxRank:1,description:'Requires Auto Haul. Plots a continuous working-side route through all your own pots, oldest first, and enables Auto Haul. Stops when the hold is full.'});
+// The English currency uses the game's fixed 10 SEK per USD conversion.
+PART_SYSTEMS.push({key:'droneSurvey',name:'Drone Survey',group:'Electronics',base:5000000,maxRank:1,description:'Launch a drone to survey the water around your boat and mark promising crab spots on the chart.'});
 const ranks=(systems,prefix)=>systems.flatMap(d=>Array.from({length:d.maxRank||5},(_,i)=>({id:`${prefix}-${d.key}-${i+1}`,key:d.key,rank:i+1,maxRank:d.maxRank||5,name:d.maxRank===1?d.name:`${d.name} ${['I','II','III','IV','V'][i]}`,group:d.group,price:Math.round(d.base*(i+1)**2.15/100)*100,description:d.description,requires:i?`${prefix}-${d.key}-${i}`:null})));
 export const SKILLS=ranks(SKILL_SYSTEMS,'skill'),PARTS=ranks(PART_SYSTEMS,'part');
 const DESIGNS=[

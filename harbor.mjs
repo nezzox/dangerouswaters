@@ -1,17 +1,19 @@
-import {boatById} from './catalog.mjs?v=0.18.77';
-import {isLand,MATTHEW_QUAY,DUTCH_QUAY} from './world.mjs?v=0.18.77';
-import {planSeaRoute} from './navigation.mjs?v=0.18.77';
+import {boatById} from './catalog.mjs?v=0.18.78';
+import {isLand,MATTHEW_QUAY,DUTCH_QUAY} from './world.mjs?v=0.18.78';
+import {planSeaRoute} from './navigation.mjs?v=0.18.78';
 // Shared frame on the new geographic quay. Positive inland points onto its apron.
 export const QUAY=DUTCH_QUAY;
 export function quayPoint(along=0,inland=0,quay=QUAY){return{x:quay.x+quay.tx*along-quay.ty*inland,y:quay.y+quay.ty*along+quay.tx*inland};}
 const berthOffsets=[0,68,-68,-136,-204,-272];
-const quayBerths=quay=>berthOffsets.map(along=>({...quayPoint(along,-12,quay),heading:quay.heading}));
+const quayBerths=quay=>berthOffsets.map(along=>({...quayPoint(along,quay===QUAY&&along===68?-17:-12,quay),heading:quay.heading}));
 export const BERTHS=quayBerths(QUAY);
 export const BERTH=BERTHS[0];
 export const PORT_QUAYS=[QUAY,MATTHEW_QUAY];
 const matthewBerths=quayBerths(MATTHEW_QUAY);
 export const berthsAt=quay=>quay===QUAY?BERTHS:matthewBerths;
 export function restoreBerth(saved){
+ const formerOuter=quayPoint(68,-12);
+ if(Math.hypot(saved.x-formerOuter.x,saved.y-formerOuter.y)<.1)return BERTHS[1];
  for(const quay of PORT_QUAYS){
   const berths=berthsAt(quay);
   const match=berths.find(b=>Math.hypot(saved.x-b.x,saved.y-b.y)<.1);

@@ -39,3 +39,22 @@ test('both enlarged service quays can fit six of the largest vessels alongside',
   assert.equal(chooseBerth(s,occupied),null);
  }
 });
+
+test('bent Dutch Harbor quay moves the outer berth clear and restores its old coordinates',async()=>{
+ const {BERTHS,quayPoint,buildDockRoute,dockRouteDuration,dockingPose,vesselIntersectsHarbor}=await import('../harbor.mjs');
+ const {BOATS}=await import('../catalog.mjs');
+ const {restoreSeason,seasonJSON}=await import('../saves.mjs');
+ const former={...quayPoint(68,-12),heading:BERTH.heading},outer=BERTHS[1];
+ assert.deepEqual({x:outer.x,y:outer.y},quayPoint(68,-17));
+ for(const boat of BOATS){
+  const s=createGame();s.career.boat=boat.id;Object.assign(s,former,{moored:former,cargo:12});
+  const restored=restoreSeason(JSON.parse(seasonJSON(s)));
+  assert.deepEqual(restored.moored,outer);
+  assert.equal(restored.cargo,12);
+  assert(!vesselIntersectsHarbor(restored),boat.id);
+  const approach={...quayPoint(68,-40),heading:outer.heading,career:s.career};
+  const route=buildDockRoute(approach,outer),end=dockRouteDuration(route);
+  assert(end>0);
+  for(let t=0;t<=end;t+=.5)assert(!vesselIntersectsHarbor({...dockingPose(route,t),career:s.career}),boat.id);
+ }
+});

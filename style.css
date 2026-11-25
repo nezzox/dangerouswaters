@@ -116,3 +116,5 @@
 #air-temperature[data-freezing="true"],#watch-temperature[data-freezing="true"],.weather-ice{color:#a9d9ee}
 .weather-ice{font:8px/1.5 monospace;margin:2px 0}
 @media(max-width:760px){.weather-numbers{display:grid;grid-template-columns:1fr 1fr;gap:3px 6px}}
+
+#drone-survey{grid-column:1/-1}#drone-survey[data-flying=true],#drone-markers button{color:#a3e8df;border-color:#5faaa4}#drone-markers{margin-bottom:5px}

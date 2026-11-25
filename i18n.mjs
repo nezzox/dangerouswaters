@@ -1,4 +1,4 @@
-import {CRAB_SPECIES} from './crab-species.mjs?v=0.18.77';
+import {CRAB_SPECIES} from './crab-species.mjs?v=0.18.78';
 // Saved money/prices remain in legacy SEK units. Fixed game conversion: 10 SEK = 1 USD.
 // Translation is applied at the presentation boundary; save data and simulation never change language.
 let language='en';
@@ -293,6 +293,14 @@ const sv={
  'Captain preparing the next trip.':'Kaptenen förbereder nästa tur.','landed catch:':'landade fångst:','liters of diesel bunkered.':'liter diesel bunkrat.','Towed to harbor. Cost':'Bogserad till hamnen. Kostnad','You need':'Du behöver','for bait.':'för bete.','emptied.':'tömd.','upgraded to level':'uppgraderad till nivå',
  'kg crab +':'kg krabba +','kg salmon landed. Net':'kg lax landat. Netto','loan repaid':'amorterat','You are in the service area. Balance':'Du är i serviceområdet. Saldo','meters to harbor. Slow below 2 knots for service.':'meter till hamnen. Sänk farten under 2 knop för service.',
  'no hired vessels':'inga anställda kaptener','own pots':'egna tinor','fleet pots':'flottans tinor',
+ 'Drone Survey':'Drönarsökning','Drone Survey · Locked':'Drönarsökning · Låst','Drone Survey · In Flight':'Drönarsökning · I luften',
+ 'Launch a drone to survey the water around your boat and mark promising crab spots on the chart.':'Skicka upp en drönare som söker av vattnet runt båten och markerar lovande krabbplatser på sjökortet.',
+ 'Launch a short drone survey and chart promising crab spots.':'Gör en snabb drönarsökning och markera lovande krabbplatser.',
+ 'Drone survey waypoints':'Drönarens waypoints','EST.':'UPPSK.','Estimated crab signal, not a catch guarantee. Hold Shift to append to the route.':'Uppskattad krabbsignal, inte en garanterad fångst. Håll Skift för att lägga till den i rutten.',
+ 'Drone launching. Surveying the water around the vessel.':'Drönaren lyfter och söker av vattnet runt båten.',
+ 'Drone landed. Crab survey waypoints are ready on the chart.':'Drönaren har landat. Lovande krabbplatser är markerade på sjökortet.',
+ 'Drone landed. No promising crab signals in this area.':'Drönaren har landat. Inga lovande krabbsignaler i området.',
+ 'Drone · Scanning':'Drönare · Skannar','Drone · Returning':'Drönare · Återvänder','Drone · Launching':'Drönare · Lyfter',
  'Automation':'Automatik','Crew':'Besättning','Safety':'Säkerhet','Navigation':'Navigering','Fishing':'Fiske','Business':'Företagande','Propulsion':'Framdrivning','Storage':'Förvaring','Deck':'Däck','Electronics':'Elektronik',
  'Coastal crabber':'Kustkrabbfartyg','Heavy crabber':'Tungt krabbfartyg','Dual-hauler crabber':'Krabbfartyg med dubbla halare','Stern-working crabber':'Krabbfartyg med akterhalare','Salmon seiner':'Laxnotfartyg','Multi-fishery vessel':'Kombinationsfiskefartyg','Ice-strengthened crabber':'Isförstärkt krabbfartyg','Fast long-range seiner':'Snabbt långdistansnotfartyg','Factory crabber':'Fabrikskrabbfartyg','Expedition multi-fishery':'Expeditionsfiskefartyg','Classic offshore crabber':'Klassiskt havsgående krabbfartyg','Live crab carrier':'Fartyg för levande krabba','Forward-working crabber':'Krabbfartyg med arbetsdäck i fören','Aft-wheelhouse crabber':'Krabbfartyg med akterhytt',
  'Crab & salmon':'Krabba & lax','port & starboard haulers':'babords- och styrbordshalare','salmon nets':'laxnät','hauler':'halare','Size':'Storlek',
@@ -308,7 +316,7 @@ const sv={
 sv['Crab species']='Krabbarter';
 for(const species of Object.values(CRAB_SPECIES))sv[species.en]=species.sv;
 sv['VOLUME']='VOLYM';sv['Sound volume']='Ljudvolym';
-Object.assign(sv,{'SKIP TO WAYPOINT':'HOPPA TILL RUTTPUNKT','Not enough fuel to skip to the waypoint.':'Inte tillräckligt med bränsle för att hoppa till ruttpunkten.','Cannot skip: check the vessel or route.':'Kan inte hoppa: kontrollera båten eller rutten.','TIME TO WAYPOINT':'TID TILL RUTTPUNKT','CANCEL TRAVEL':'AVBRYT RESAN','Time to waypoint cancelled.':'Resan till ruttpunkten avbröts.','Travelling to next waypoint…':'Reser till nästa ruttpunkt…','Next waypoint reached.':'Nästa ruttpunkt nådd.','Time to waypoint stopped: check the vessel or route.':'Resan avbröts: kontrollera båten eller rutten.','Set an autopilot waypoint and finish any active work or repairs first.':'Ange en ruttpunkt och avsluta pågående arbete eller reparation först.'});
+Object.assign(sv,{'SKIP TO WAYPOINT':'HOPPA TILL RUTTPUNKT','Not enough fuel to skip to the waypoint.':'Inte tillräckligt med bränsle för att hoppa till ruttpunkten.','Cannot skip: check the vessel or route.':'Kan inte hoppa: kontrollera båten eller rutten.','TIME TO WAYPOINT':'TID TILL RUTTPUNKT','CANCEL TRAVEL':'AVBRYT RESAN','Time to waypoint cancelled.':'Resan till ruttpunkten avbröts.','Travelling to next waypoint…':'Reser till nästa ruttpunkt…','Casting off, then skipping to the next waypoint…':'Kastar loss och hoppar sedan till nästa ruttpunkt…','Next waypoint reached.':'Nästa ruttpunkt nådd.','Time to waypoint stopped: check the vessel or route.':'Resan avbröts: kontrollera båten eller rutten.','Set an autopilot waypoint and finish any active work or repairs first.':'Ange en ruttpunkt och avsluta pågående arbete eller reparation först.'});
 Object.assign(sv,{'LEADERBOARD':'TOPPLISTA','WORLD ID':'VÄRLDS-ID','JOIN WORLD':'ANSLUT TILL VÄRLD','YOUR NAME':'DITT NAMN','Player name':'Spelarnamn','SAVE NAME':'SPARA NAMN','World ID':'Världs-ID','Enter a six-character World ID.':'Ange ett världs-ID med sex tecken.','World not found or server unavailable.':'Världen hittades inte eller servern är inte tillgänglig.','offline':'frånkopplad','online':'ansluten'});
 sv['PLAYERS']='SPELARE';sv['No free harbor berth.']='Ingen ledig kajplats.';
 Object.assign(sv,{'GET UNSTUCK':'KOM LOSS','Vessel moved clear. Ready to steer.':'Båten är flyttad till fritt vatten.','No clear water nearby.':'Inget fritt vatten i närheten.','Berth occupied. Docking stopped; choose another berth.':'Kajplatsen är upptagen. Dockningen avbröts.'});
