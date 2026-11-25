@@ -1,8 +1,8 @@
-import {harborElevation} from './harbor-elevation.mjs?v=0.18.76';
-import {TERRAIN_DATA as data} from './terrain-data.mjs?v=0.18.76';
-import {PORT_BUILDINGS,PORT_ROADS,PORT_PIERS} from './port-data.mjs?v=0.18.76';
-import {geoToWorld,WORLD_LAND,isLand,MATTHEW_QUAY} from './world.mjs?v=0.18.76';
-import {geometry} from './geometry.mjs?v=0.18.76';
+import {harborElevation} from './harbor-elevation.mjs?v=0.18.77';
+import {TERRAIN_DATA as data} from './terrain-data.mjs?v=0.18.77';
+import {PORT_BUILDINGS,PORT_ROADS,PORT_PIERS} from './port-data.mjs?v=0.18.77';
+import {geoToWorld,WORLD_LAND,isLand,MATTHEW_QUAY,DUTCH_QUAY,SERVICE_APRON} from './world.mjs?v=0.18.77';
+import {geometry} from './geometry.mjs?v=0.18.77';
 const bounds=[];for(let i=0;i<data.length;i+=9)bounds.push([Math.min(data[i],data[i+3],data[i+6]),Math.max(data[i],data[i+3],data[i+6]),Math.min(data[i+1],data[i+4],data[i+7]),Math.max(data[i+1],data[i+4],data[i+7])]);
 export function groundHeight(x,y){for(let n=0;n<bounds.length;n++){const b=bounds[n];if(x<b[0]||x>b[1]||y<b[2]||y>b[3])continue;const i=n*9,ax=data[i],ay=data[i+1],bx=data[i+3],by=data[i+4],cx=data[i+6],cy=data[i+7],det=(by-cy)*(ax-cx)+(cx-bx)*(ay-cy);if(Math.abs(det)<.001)continue;const a=((by-cy)*(x-cx)+(cx-bx)*(y-cy))/det,c=((cy-ay)*(x-cx)+(ax-cx)*(y-cy))/det,d=1-a-c;if(a>=-.0001&&c>=-.0001&&d>=-.0001)return harborElevation(x,y,a*data[i+2]+c*data[i+5]+d*data[i+8]);}return 6;}
 const city=PORT_BUILDINGS.map(b=>({...b,points:b.ring.map(([a,b])=>geoToWorld(a,b))})),roads=PORT_ROADS.map(r=>r.map(([a,b])=>geoToWorld(a,b))),piers=PORT_PIERS.map(r=>r.map(([a,b])=>geoToWorld(a,b)));
@@ -63,6 +63,30 @@ function shoreStone(g,x,y,z,size,seed){
  for(let i=1;i<5;i++)g.tri(top[0],top[i+1],top[i],color,.84,-2);
 }
 
+// The modelled Dutch Harbor wall replaces the natural bank on this frontage.
+// Keep the rest of each coast segment, including at either end of the quay.
+const {start:quayStart,end:quayEnd,depth:quayDepth}=SERVICE_APRON;
+const bankSeaEdge=-8;
+const quayUV=({x,y})=>{
+ const q=DUTCH_QUAY,dx=x-q.x,dy=y-q.y;
+ return [dx*q.tx+dy*q.ty,dy*q.tx-dx*q.ty];
+};
+function bankSegments(a,b){
+ const p=quayUV(a),q=quayUV(b);
+ let enter=0,exit=1;
+ for(const [i,lo,hi] of [[0,quayStart,quayEnd],[1,bankSeaEdge,quayDepth]]){
+  const d=q[i]-p[i];
+  if(Math.abs(d)<1e-6){if(p[i]<lo||p[i]>hi)return [[a,b]];continue;}
+  const x=(lo-p[i])/d,y=(hi-p[i])/d;
+  enter=Math.max(enter,Math.min(x,y));exit=Math.min(exit,Math.max(x,y));
+  if(exit-enter<1e-6)return [[a,b]];
+ }
+ const at=t=>({x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t});
+ const keep=[];
+ if(enter>1e-6)keep.push([a,at(enter)]);
+ if(exit<1-1e-6)keep.push([at(exit),b]);
+ return keep;
+}
 function pileShoreRocks(g,x,y,radius){
  let count=0;
  for(const {outer} of WORLD_LAND)for(let i=1;i<outer.length&&count<1600;i++){
@@ -76,7 +100,8 @@ function pileShoreRocks(g,x,y,radius){
    const sx=a.x+tx*d,sy=a.y+ty*d;
    if(Math.hypot(sx-x,sy-y)>range)continue;
    // Leave working quay faces and their approaches clear.
-   if(Math.hypot(sx-MATTHEW_QUAY.x,sy-MATTHEW_QUAY.y)<260||Math.hypot(sx-47,sy+70)<230)continue;
+   const [u,v]=quayUV({x:sx,y:sy});
+   if(Math.hypot(sx-MATTHEW_QUAY.x,sy-MATTHEW_QUAY.y)<260||Math.hypot(sx-47,sy+70)<230||u>quayStart-5&&u<quayEnd+5&&v>bankSeaEdge-5&&v<quayDepth+5)continue;
    const landSide=isLand(sx-ty*4,sy+tx*4)?1:-1;
    const seed=i*113+d+sx*.013+sy*.011;
    const bankHeight=startHeight+(endHeight-startHeight)*d/length;
@@ -111,7 +136,7 @@ export function buildGeography(x,y,radius=2200,local=false){if(Math.hypot(x,y)<2
  subdivideTerrain(g,points,inHarborRegion&&edge<225?2:0);
  }
  // Give the shoreline a solid bank instead of a floating paper-thin surface.
- for(const land of WORLD_LAND){for(const ring of [land.outer,...land.holes])for(let i=1;i<ring.length;i++){const a=ring[i-1],b=ring[i];if(Math.min(a.x,b.x)>x+radius||Math.max(a.x,b.x)<x-radius||Math.min(a.y,b.y)>y+radius||Math.max(a.y,b.y)<y-radius)continue;const ah=Math.max(6,groundHeight(a.x,a.y)),bh=Math.max(6,groundHeight(b.x,b.y));g.quad([a.x,-8,a.y],[b.x,-8,b.y],[b.x,bh,b.y],[a.x,ah,a.y],[.25,.27,.24],.98,-1);}}
+ for(const land of WORLD_LAND){for(const ring of [land.outer,...land.holes])for(let i=1;i<ring.length;i++){const a=ring[i-1],b=ring[i];if(Math.min(a.x,b.x)>x+radius||Math.max(a.x,b.x)<x-radius||Math.min(a.y,b.y)>y+radius||Math.max(a.y,b.y)<y-radius)continue;for(const [l,r] of bankSegments(a,b)){const lh=Math.max(6,groundHeight(l.x,l.y)),rh=Math.max(6,groundHeight(r.x,r.y));g.quad([l.x,-8,l.y],[r.x,-8,r.y],[r.x,rh,r.y],[l.x,lh,l.y],[.25,.27,.24],.98,-1);}}}
  for(const building of city){const points=building.points,at=points[0];if(Math.abs(at.x-x)>radius||Math.abs(at.y-y)>radius)continue;const base=Math.max(...points.slice(0,8).map(p=>groundHeight(p.x,p.y))),h=base+building.height;for(let j=1;j<points.length;j++){const a=points[j-1],b=points[j];g.quad([a.x,base,a.y],[a.x,h,a.y],[b.x,h,b.y],[b.x,base,b.y],[.39,.42,.38],.85);}for(let j=2;j<points.length-1;j++)g.tri([at.x,h,at.y],[points[j-1].x,h,points[j-1].y],[points[j].x,h,points[j].y],[.27,.31,.31],.8);}
  for(const road of roads){if(road.every(p=>Math.abs(p.x-x)>radius||Math.abs(p.y-y)>radius))continue;for(let i=1;i<road.length;i++){const a=road[i-1],b=road[i],dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||1,nx=-dy/d*2.6,ny=dx/d*2.6,ah=groundHeight(a.x,a.y)+.14,bh=groundHeight(b.x,b.y)+.14;g.quad([a.x+nx,ah,a.y+ny],[b.x+nx,bh,b.y+ny],[b.x-nx,bh,b.y-ny],[a.x-nx,ah,a.y-ny],[.18,.20,.20],.98);}}
  for(const pier of piers){

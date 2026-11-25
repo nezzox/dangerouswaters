@@ -1,4 +1,4 @@
-import {CRAB_SPECIES} from './crab-species.mjs?v=0.18.76';
+import {CRAB_SPECIES} from './crab-species.mjs?v=0.18.77';
 // Saved money/prices remain in legacy SEK units. Fixed game conversion: 10 SEK = 1 USD.
 // Translation is applied at the presentation boundary; save data and simulation never change language.
 let language='en';
@@ -229,7 +229,7 @@ const sv={
  'POTS ON DECK':'TINOR PÅ DÄCK','POTS AT SEA':'TINOR TILL HAVS','BALANCE':'SALDO','DEPTH':'DJUP','M TO HARBOR':'M TILL HAMN','F/V':'F/F',
  'AUTO SET':'AUTO SÄTTNING','AUTO HAUL':'AUTO HALNING','LOCKED':'LÅST','FISHERY':'FISKE','Crab pots':'Krabbtinor','Salmon nets':'Laxnät',
  'SET / HAUL':'SÄTT / HALA','UNLOAD IN HARBOR':'LOSSA I HAMN','RUDDER':'RODER','WEATHER':'VÄDER','LANGUAGE':'SPRÅK','Dynamic':'Dynamiskt','Calm':'Lugnt','Fog':'Dimma',
- 'WORK LIGHTS ON':'ARBETSLJUS PÅ','WORK LIGHTS OFF':'ARBETSLJUS AV','SOUND ON':'LJUD PÅ','SOUND OFF':'LJUD AV','CAMERA · ANGLED':'KAMERA · VINKLAD','CAMERA · OVERHEAD':'KAMERA · OVANIFRÅN',
+ 'WORK LIGHTS ON':'ARBETSLJUS PÅ','WORK LIGHTS OFF':'ARBETSLJUS AV','SOUND ON':'LJUD PÅ','SOUND OFF':'LJUD AV','MUSIC ON':'MUSIK PÅ','MUSIC OFF':'MUSIK AV','CAMERA · ANGLED':'KAMERA · VINKLAD','CAMERA · OVERHEAD':'KAMERA · OVANIFRÅN',
  'Pause game':'Pausa spelet','Resume game':'Återuppta spelet','Target speed in knots':'Önskad fart i knop','Simulation speed':'Simuleringshastighet',
  'Switch between angled and overhead view':'Växla mellan vinklad vy och vy ovanifrån',
  'Scroll to zoom, left-drag to pan, right-click for autopilot. Keyboard: arrows, +/−, Home and Enter.':'Rulla för zoom, dra med vänster musknapp för panorering, högerklicka för autopilot. Tangentbord: pilar, +/−, Home och Enter.',

@@ -1,9 +1,9 @@
-import {iceLevel} from './vessel-ice.mjs?v=0.18.76';
-import {chooseBerth, nearestQuay, quayPoint, QUAY} from './harbor.mjs?v=0.18.76';
-import {MATTHEW_QUAY} from './world.mjs?v=0.18.76';
-import {ensureRareState,rareCount} from './rare-catch.mjs?v=0.18.76';
-import {INCIDENT_INTERVAL_SCALE,INCIDENT_SCHEDULE_VERSION} from './balance.mjs?v=0.18.76';
-import {SKILLS,PARTS,BOATS,SKILL_SYSTEMS,PART_SYSTEMS,boatById} from './catalog.mjs?v=0.18.76';
+import {iceLevel} from './vessel-ice.mjs?v=0.18.77';
+import {chooseBerth, nearestQuay, quayPoint, QUAY} from './harbor.mjs?v=0.18.77';
+import {MATTHEW_QUAY} from './world.mjs?v=0.18.77';
+import {ensureRareState,rareCount} from './rare-catch.mjs?v=0.18.77';
+import {INCIDENT_INTERVAL_SCALE,INCIDENT_SCHEDULE_VERSION} from './balance.mjs?v=0.18.77';
+import {SKILLS,PARTS,BOATS,SKILL_SYSTEMS,PART_SYSTEMS,boatById} from './catalog.mjs?v=0.18.77';
 const finite=(n,f=0)=>Number.isFinite(n)?n:f,clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 export const inHarbor=s=>Math.hypot(s.x-160,s.y-80)<230||Math.hypot(s.x-MATTHEW_QUAY.x,s.y-MATTHEW_QUAY.y)<230;
 export const shopReady=s=>inHarbor(s)&&(!s.career?.requiresDock||!!s.moored)&&Math.abs(s.speed)<1&&!s.deckJob&&!s.incident&&!s.tow&&!s.overboard;

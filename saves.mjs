@@ -1,11 +1,11 @@
-import {DEICE_SECONDS,iceLevel} from './vessel-ice.mjs?v=0.18.76';
-import {normalizePotNumbers} from './pot-numbers.mjs?v=0.18.76';
-import {boatById} from './catalog.mjs?v=0.18.76';
-import {BERTH,restoreBerth} from './harbor.mjs?v=0.18.76';
-import {migrateWorld} from './world.mjs?v=0.18.76';
-import {createGame} from './simulation.mjs?v=0.18.76';
-import {ensureCareer,vesselStats,installedVesselValue} from './career.mjs?v=0.18.76';
-import {INCIDENTS} from './incidents.mjs?v=0.18.76';
+import {DEICE_SECONDS,iceLevel} from './vessel-ice.mjs?v=0.18.77';
+import {normalizePotNumbers} from './pot-numbers.mjs?v=0.18.77';
+import {boatById} from './catalog.mjs?v=0.18.77';
+import {BERTH,restoreBerth} from './harbor.mjs?v=0.18.77';
+import {migrateWorld} from './world.mjs?v=0.18.77';
+import {createGame} from './simulation.mjs?v=0.18.77';
+import {ensureCareer,vesselStats,installedVesselValue} from './career.mjs?v=0.18.77';
+import {INCIDENTS} from './incidents.mjs?v=0.18.77';
 const numbers=(obj,keys)=>keys.every(k=>Number.isFinite(obj?.[k]));
 export function validJob(j){if(!j||!['deploy','haul','unload','undock','netSet','netHaul','deice'].includes(j.kind)||!numbers(j,['elapsed','duration','x','y'])||j.elapsed<0||j.duration<=0||j.elapsed>=j.duration)return null;if(j.kind==='unload'&&(!numbers(j,['startHeading','cargoKg','approach'])||j.approach<=0||j.approach>=j.duration))return null;if(j.kind==='haul'&&!numbers(j,['potId','catchKg']))return null;if(j.kind==='netHaul'&&!numbers(j,['netId','catchKg']))return null;if(j.kind==='undock'&&(!numbers(j,['startHeading','targetX','targetY','targetHeading'])||Math.hypot(j.targetX-j.x,j.targetY-j.y)>141||j.duration>300))return null;if(j.kind==='deice'&&(!Number.isFinite(j.initialIce)||j.initialIce<=0||j.initialIce>1||j.duration!==DEICE_SECONDS))return null;const job={...j};if(job.kind==='undock')delete job.route;if(['cargoKg','salmonKg','catchKg'].some(k=>job[k]!==undefined&&(!Number.isFinite(job[k])||job[k]<0)))return null;if(job.released&&!numbers(job.released,['x','y','at']))delete job.released;if(job.kind==='unload'){delete job.route;if(!Number.isFinite(job.unloadSeconds))delete job.unloadSeconds;}return job;}
 export function restoreSeason(raw){if(!raw||raw.version!==1||!numbers(raw,['x','y','heading','hour','money','fuel','hull','cargo','capacity','deck','nextPot','engine','hold','gear'])||!Array.isArray(raw.pots)||raw.pots.length>200||!raw.pots.every(p=>numbers(p,['x','y','id','setAt']))||Math.abs(raw.money)>1e12||raw.fuel<0||raw.fuel>1e6||raw.hull<0||raw.hull>100||raw.capacity<900||raw.capacity>1e6||raw.deck<0||raw.deck>200||raw.cargo<0||!['engine','hold','gear'].every(k=>raw[k]>=0&&raw[k]<=3))return null;

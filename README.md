@@ -24,7 +24,7 @@ Open http://127.0.0.1:8780. Python 3 is sufficient; no packages, API keys, exter
 - Below 2 knots inside the harbor service area, **E** or **Harbor & Upgrades → Dock & Unload** starts docking. The pilot first moves clear of nearby piers, turns in open water and backs into the berth with the hull parallel to the pier. The conservative hull and fender envelope is checked against piers during normal navigation as well. The maneuver takes time; the simulation-speed buttons also accelerate docking. Then the harbor crane moves baskets from the open hold to the receiving bin. Revenue at 65 kr/kg is credited after the sequence completes. Service and other deck jobs are locked during this operation.
 - Buy engine, hold and pot upgrades; refuel and repair in harbor. A tow costs up to 12,000 kr.
 - Mouse wheel over the sea zooms the 3D view. The camera button switches between angled and overhead views. **Esc** or the pause button pauses. Losing window focus also pauses.
-- Work lights, synthesized engine/wind sound, weather previews and time acceleration have individual controls.
+- Work lights, engine/wind sound, weather previews and time acceleration have individual controls. The separate **Music** button enables original background loops that crossfade between calm seas, rain, snowfall and storms. Music is off by default, and your preference is saved in the browser.
 
 The season and active fishing, de-icing and docking operations are saved locally under the existing `dangerous-waters-v1` key. Use the same browser and URL to continue. Existing saves remain supported. **Harbor → Start over** replaces the saved season.
 
