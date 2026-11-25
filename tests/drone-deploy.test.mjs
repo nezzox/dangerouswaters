@@ -79,8 +79,8 @@ test('eight survey marks are cleared by actual moving releases on one plotted ro
   if(job?.released&&!releases.has(job)){
    releases.add(job);
    assert(s.speed>.6,'crew dropped a pot while stationary');
-   assert(s.speed*1.94384<=5,'crew exceeded the normal setting speed');
-   assert(Math.hypot(job.released.x-job.surveyTarget.x,job.released.y-job.surveyTarget.y)<24);
+   assert(s.speed*1.94384<=9,'crew exceeded the prepared-pot setting speed');
+   assert(Math.hypot(job.released.x-job.surveyTarget.x,job.released.y-job.surveyTarget.y)<=20);
   }
  }
  assert.equal(releases.size,8);
@@ -100,14 +100,39 @@ test('a 52-pot survey cruises between drops without sacrificing placement or dec
  assert.equal(points.length,52);
  s.droneSurvey={origin:{x:s.x,y:s.y},hour,points};
  assert(startDroneSet(s,points));
- let steps=0,cruising=0;
- while(s.skipperMission&&steps++<10000){
+ let steps=0,cruising=0;const fastDrops=new Set();
+ while(s.skipperMission&&steps++<6500){
   step(s,.25,fixed);
-  if(!s.deckJob&&s.speed*1.94384>8)cruising++;
-  if(s.deckJob?.kind==='deploy'&&s.deckJob.released)assert(s.speed>0&&s.speed*1.94384<5);
+  if((!s.deckJob||s.deckJob.surveyPrep)&&s.speed*1.94384>8)cruising++;
+  if(s.deckJob?.kind==='deploy'&&s.deckJob.released){
+   assert(s.speed>0&&s.speed*1.94384<=9);
+   const {released,surveyTarget}=s.deckJob;
+   if(s.speed*1.94384>8)fastDrops.add(released);
+   assert(Math.hypot(released.x-surveyTarget.x,released.y-surveyTarget.y)<=20);
+  }
  }
  assert(!s.skipperMission,'52-pot time budget exceeded');
  assert.equal(s.pots.length,52);
  assert.equal(s.droneSurvey.points.length,0);
  assert(cruising>1200,'expected at least five simulated minutes above eight knots');
+ assert(fastDrops.size>=45,'most drops should take place near the new speed limit');
+});
+
+test('the crane gets the first pot ready before arrival, and manual takeover or reload returns the pot and bait',async()=>{
+ const {seasonJSON,restoreSeason}=await import('../saves.mjs');
+ const {deckWorkPose}=await import('../deck-work.mjs');
+ const s=setup(),mark={x:1650,y:500},deck=s.deck,money=s.money;
+ s.droneSurvey={origin:{x:s.x,y:s.y},hour:s.hour,points:[{...mark,score:.7}]};
+ assert(startDroneSet(s,[mark]));
+ while(s.hour<7&&deckWorkPose(s.deckJob,s)?.stage!=='Pot ready in crane')step(s,.1,fixed);
+ assert.equal(deckWorkPose(s.deckJob,s)?.stage,'Pot ready in crane');
+ assert(s.deckJob.surveyPrep&&!s.deckJob.released);
+ assert(s.speed>1&&Math.hypot(s.x-mark.x,s.y-mark.y)>100);
+ assert.equal(s.deck,deck-1);assert(s.money<money);
+ const loaded=restoreSeason(JSON.parse(seasonJSON(s)));
+ assert.equal(loaded.deck,deck);assert.equal(loaded.money,money);assert.equal(loaded.deckJob,null);
+ assert.equal(loaded.droneSurvey.points.length,1);
+ setRudder(s,4);
+ assert.equal(s.deck,deck);assert.equal(s.money,money);assert.equal(s.deckJob,null);
+ assert.equal(s.pots.length,0);
 });
