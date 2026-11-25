@@ -112,3 +112,7 @@
 
 .side-instruments .leaderboard pre{font-size:9px}
 #leaderboard-sort{font:8px monospace;padding:4px}
+#watch-temperature{white-space:nowrap;color:#c7d6d4}
+#air-temperature[data-freezing="true"],#watch-temperature[data-freezing="true"],.weather-ice{color:#a9d9ee}
+.weather-ice{font:8px/1.5 monospace;margin:2px 0}
+@media(max-width:760px){.weather-numbers{display:grid;grid-template-columns:1fr 1fr;gap:3px 6px}}

@@ -1,5 +1,5 @@
-import {hullWaterGLSL} from './deck-water.mjs?v=0.18.75';
-import {seaHeightGLSL} from './sea-spectrum.mjs?v=0.18.75';
+import {hullWaterGLSL} from './deck-water.mjs?v=0.18.76';
+import {seaHeightGLSL} from './sea-spectrum.mjs?v=0.18.76';
 // Shared atmosphere and ocean functions keep lighting and reflections consistent.
 export const common=`
 precision highp float;precision highp int;
@@ -81,6 +81,17 @@ void main(){if(insideHullLocal(hullLocalPoint(vec3(vWaterLocal.x,vWorld.y,vWater
 
  vec2 warp=vec2(noise(detail*.17+vec2(uDetailTime*.025,0.)),noise(detail*.17+vec2(37.,uDetailTime*.02)));vec2 microPoint=mat2(.83,-.56,.56,.83)*detail*1.3+warp*2.;float microBase=fbm(microPoint);vec2 grainSlope=vec2(fbm(microPoint+vec2(.12,0.))-microBase,fbm(microPoint+vec2(0.,.12))-microBase)/.12;float grainFilter=1.-smoothstep(.3,1.4,length(fwidth(vWaterLocal*1.3)));float agitation=smoothstep(.14,.72,field.w+length(field.yz)*.75);
  slope+=grainSlope*(.10+uWeather.x*.026+agitation*.14)*grainFilter;
+ // Local rain impacts distort the water normal, without changing buoyancy.
+ float dropFilter=1.-smoothstep(.045,.18,length(fwidth(vWaterLocal)));
+ if(uWeather.z>.06&&dropFilter>.001){
+  vec2 grid=detail*4.,cell=floor(grid),xy=fract(grid);
+  float seed=hash(cell),age=fract(uDetailTime*(2.8+seed*2.)+seed*27.);
+  vec2 r=xy-(.31+.38*vec2(hash(cell+vec2(19.,0.)),hash(cell+vec2(0.,21.))));
+  float d=length(r),radius=.035+age*.255;
+  float rings=sin((d-radius)*59.)*exp(-pow((d-radius)*19.,2.));
+  slope+=r/max(.04,d)*rings*dropFilter*uWeather.z*max(0.,1.-age)*.24;
+ }
+
  vec3 n=normalize(vec3(-slope.x,1.,-slope.y)),v=normalize(uEye-vWorld),l=sunDir(),halfway=normalize(v+l);float nv=max(.001,dot(n,v)),nl=max(0.,dot(n,l)),fresnel=.0204+.9796*pow(1.-nv,5.);
  vec3 reflected=sky(reflect(-v,n));vec4 clip=uReflectionVP*vec4(vWaterLocal.x,0.,vWaterLocal.y,1.);vec2 uv=clip.xy/clip.w*.5+.5+slope*.007;vec4 objects=textureLod(uReflection,clamp(uv,vec2(.002),vec2(.998)),.7+uWeather.x*.2);float edge=smoothstep(0.,.04,min(min(uv.x,1.-uv.x),min(uv.y,1.-uv.y)));reflected=mix(reflected,objects.rgb/max(vec3(.035),1.-objects.rgb),objects.a*edge);
  float trough=smoothstep(-1.15,.65,h);
@@ -100,7 +111,7 @@ layout(location=4) in vec3 aInstance;uniform float uInstanced;uniform vec3 uRack
 void main(){vec4 local=vec4(aPosition*mix(vec3(1.),uRackScale,uInstanced)+aInstance*uInstanced,1.);vec4 p=uModel*local;vWorld=p.xyz;vNormal=transpose(inverse(mat3(uModel)))*(aNormal/mix(vec3(1.),uRackScale,uInstanced));vColor=aColor;vSurface=aSurface;vLocal=aPosition;vRelative=mat3(uModel)*local.xyz;vShadow=uShadowMVP*local;gl_Position=uMVP*local;}`;
 export const meshFragment=`#version 300 es
 ${common}
-in vec3 vWorld;in vec3 vNormal;in vec3 vColor;in vec2 vSurface;in vec3 vLocal;in vec3 vRelative;in vec4 vShadow;uniform sampler2D uShadow;out vec4 outColor;
+in vec3 vWorld;in vec3 vNormal;in vec3 vColor;in vec2 vSurface;in vec3 vLocal;in vec3 vRelative;in vec4 vShadow;uniform sampler2D uShadow;uniform float uVesselIce;out vec4 outColor;
 const float PI=3.14159265;
 vec3 brdf(vec3 base,vec3 f0,float rough,vec3 n,vec3 v,vec3 l){vec3 h=normalize(l+v);float nv=max(.02,dot(n,v)),nl=max(0.,dot(n,l)),nh=max(0.,dot(n,h)),vh=max(0.,dot(v,h)),a=rough*rough,a2=a*a,d=a2/(PI*pow(nh*nh*(a2-1.)+1.,2.)+.00001),k=pow(rough+1.,2.)/8.,g=nv/(nv*(1.-k)+k)*nl/(nl*(1.-k)+k);vec3 F=f0+(1.-f0)*pow(1.-vh,5.);return ((1.-F)*base/PI+F*d*g/max(.08,4.*nv*nl))*nl;}
 float filteredGrain(vec2 p){float footprint=max(length(dFdx(p)),length(dFdy(p)));return mix(noise(p),.5,smoothstep(.35,1.2,footprint));}
@@ -142,6 +153,14 @@ void main(){if(uReflectionPass>.5&&vWorld.y<.04)discard;
  }else if(uKind>2.5){height=grain*.001;rough=max(.58,rough);base*=.91+grain*.1;}
  base=mix(base,vec3(.23,.085,.032),rust);base*=1.-seam*.22;
  float wet=clamp(uWeather.z*.6+(.48-macro)*.5,0.,.8)*detail;rough=max(.085,rough*(1.-wet*.55));base*=1.-wet*.13;
+ if(uVesselIce>.001&&glass<.5&&lowerHull<.5){
+  // Irregular pale rime over translucent blue-gray glaze, thicker on top.
+  float crust=fbm(uv*vec2(1.5,2.8)),drips=noise(uv*vec2(12.,.7));
+  float exposed=uKind<.5||uKind>4.5?1.:mix(.55,1.,smoothstep(1.65,2.35,vLocal.y));
+  float ice=smoothstep(.60,.77,crust*.77+drips*.23+uVesselIce*exposed*(.64+.25*max(0.,n.y)));
+  base=mix(base,mix(vec3(.35,.53,.61),vec3(.83,.88,.91),smoothstep(.28,.72,crust+grain*.16)),ice*.96);
+  rough=mix(rough,mix(.22,.68,crust),ice);height+=ice*(grain-.5)*.013;
+ }
  if(detail>.5&&uKind<3.5){vec3 dx=dFdx(vRelative),dy=dFdy(vRelative),r1=cross(dy,n),r2=cross(n,dx);float det=dot(dx,r1);n=normalize(n-sign(det)*(dFdx(height)*r1+dFdy(height)*r2)/max(abs(det),.0001));}
  vec3 l=sunDir(),f0=mix(vec3(.045),base*.5,(1.-painted)*.3);float shade=shadowAt(vShadow,uShadow),skyVisibility=.75+.25*n.y,contact=1.;
  if(uKind>.5&&uKind<1.5&&n.y>.5&&vLocal.y<2.){float cabin=length(max(abs(vLocal.xz-vec2(3.4,0.))-vec2(3.3,2.65),0.));contact=.5+.5*smoothstep(0.,1.6,cabin);}

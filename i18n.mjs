@@ -1,4 +1,4 @@
-import {CRAB_SPECIES} from './crab-species.mjs?v=0.18.75';
+import {CRAB_SPECIES} from './crab-species.mjs?v=0.18.76';
 // Saved money/prices remain in legacy SEK units. Fixed game conversion: 10 SEK = 1 USD.
 // Translation is applied at the presentation boundary; save data and simulation never change language.
 let language='en';
@@ -213,6 +213,9 @@ const sv={
  'TAKE COMMAND':'TA BEFÄLET','CONTINUE YOUR SEASON':'FORTSÄTT DIN SÄSONG','GAME PROTOTYPE':'SPELPROTOTYP','AUTOSAVED LOCALLY':'SPARAS AUTOMATISKT LOKALT',
  'BERING SEA · CRAB SEASON 01':'BERINGS HAV · KRABBSÄSONG 01','DANGEROUS WATERS / COMPANY':'DANGEROUS WATERS / REDERI',
  'VESSEL / 01':'FARTYG / 01','CRAB FISHING VESSEL':'KRABBFISKEFARTYG','COURSE OVER GROUND':'KURS ÖVER GRUND','TARGET SPEED':'ÖNSKAD FART','KNOTS':'KNOP','HULL':'SKROV',
+ 'AIR / °C':'LUFT / °C','Air temperature':'Lufttemperatur','VESSEL ICE':'IS PÅ BÅTEN','SLOWING FOR DE-ICING':'SAKTAR IN FÖR AVISNING','CHIPPING ICE':'HACKAR BORT IS','DE-ICING WAITING FOR REPAIRS':'AVISNING VÄNTAR PÅ REPARATION',
+ 'Ice on deck. Slowing to a stop for the crew.':'Is på däck. Båten saktar in så att besättningen kan hacka bort isen.','Ice cleared. Resuming course.':'Isen är borta. Återupptar färden.',
+ 'Crew chipping ice off the deck':'Besättningen hackar bort is på däck',
  'WEATHER STATION':'VÄDERSTATION','SEAS / M':'VÅGOR / M','WIND / KN':'VIND / KNOP','VISIBILITY / KM':'SIKT / KM','FORECAST +6 H · UNCERTAINTY INCREASES WITH TIME':'PROGNOS +6 TIM · OSÄKERHETEN ÖKAR MED TIDEN',
  'Slight seas':'Lätt sjö','Building seas':'Tilltagande sjö','Heavy seas':'Hård sjö','Dense fog':'Tät dimma','Updating forecast.':'Uppdaterar prognosen.',
  'A front is approaching. Winds increasing within three hours.':'En front närmar sig. Vinden ökar inom tre timmar.',

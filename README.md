@@ -9,8 +9,8 @@ A local crab fishing game on the Bering Sea. Version 0.10 replaces the inflated 
 ## Run
 
 ```bash
-cd ~/Spel/Dangerous-Waters
-./start.sh
+cd ~/Projects/Dangerous-Waters
+bash start.sh
 ```
 
 Open http://127.0.0.1:8780. Python 3 is sufficient; no packages, API keys, external assets or build step are required. The server only listens locally. Reload after changing source files.
@@ -26,7 +26,7 @@ Open http://127.0.0.1:8780. Python 3 is sufficient; no packages, API keys, exter
 - Mouse wheel over the sea zooms the 3D view. The camera button switches between angled and overhead views. **Esc** or the pause button pauses. Losing window focus also pauses.
 - Work lights, synthesized engine/wind sound, weather previews and time acceleration have individual controls.
 
-The season and active fishing/docking operations are saved locally under the existing `dangerous-waters-v1` key. Use the same browser and URL to continue. Existing saves remain supported. **Harbor → Start over** replaces the saved season.
+The season and active fishing, de-icing and docking operations are saved locally under the existing `dangerous-waters-v1` key. Use the same browser and URL to continue. Existing saves remain supported. **Harbor → Start over** replaces the saved season.
 
 ## Chart
 
@@ -40,9 +40,11 @@ Material lighting uses a GGX microfacet approximation, linearized color, environ
 
 `sea-spectrum.mjs` provides a shared eight-component Gerstner-style swell. It inverts horizontal compression to sample the same choppy height field for CPU buoyancy and GPU water. A spring-and-damper response smooths vessel heave, pitch and roll instead of rigidly copying every short crest. The ocean grid concentrates vertices close to the vessel and becomes coarser at distance. Filtered, spatially modulated wind ripples and gravity-driven spray supplement that displacement.
 
-Wake stamps remain in world coordinates through turns and fade over 42 seconds. Fine turbulent foam breaks up sharper wave crests. Thin raised foam strands travel with the dominant wave crests; the former fixed grid of tall patches is removed. Wake foam spreads from historical positions. Fenders are suspended outside the sampled hull width, respond as damped pendulums and stop at contact limits. Their thin matte ropes have a changing curve, with their endpoints attached to the rail and moving eyelet. These are approximate animations rather than rigid-body or fluid physics. Wind-driven rain has several depth layers, with intermittent sleet/snow mixed in. These effects, the deterministic weather fronts, volumetric light beams and simplified light occlusion are artistic real-time approximations. They are not physical fluid, atmospheric or ray-tracing simulations. The graphics remain a prototype rather than photorealism.
+Wake stamps remain in world coordinates through turns and fade over 42 seconds. Fine turbulent foam breaks up sharper wave crests. Thin raised foam strands travel with the dominant wave crests; the former fixed grid of tall patches is removed. Wake foam spreads from historical positions. Fenders are suspended outside the sampled hull width, respond as damped pendulums and stop at contact limits. Their thin matte ropes have a changing curve, with their endpoints attached to the rail and moving eyelet. These are approximate animations rather than rigid-body or fluid physics. Wind-driven rain uses streaks at several apparent depths, haze and close-range rain ripples; snow has slower, tumbling flakes. These effects, the deterministic weather fronts, volumetric light beams and simplified light occlusion are artistic real-time approximations. They are not physical fluid, atmospheric or ray-tracing simulations. The graphics remain a prototype rather than photorealism.
 
-The legacy WebGPU ocean and Canvas fallback remain available if WebGL 2 cannot run. Detailed harbor crane and crew visuals require the 3D renderer; gameplay and delayed unloading settlement still work in fallback. Prices are fixed, and detailed quotas, icing, seabed mapping and crew management remain future work.
+The legacy WebGPU ocean and Canvas fallback remain available if WebGL 2 cannot run. Detailed harbor crane and crew visuals require the 3D renderer; gameplay and delayed unloading settlement still work in fallback. Prices are fixed, and detailed quotas, seabed mapping and crew management remain future work.
+
+The weather station displays Celsius for Open-Meteo Real Weather, as well as for Dynamic and the offline fallback. Below freezing, exposed vessels under the player's command accumulate visible ice. Colder air, spray, wind, waves and precipitation increase the accumulation rate, while harbors shelter the vessel and warmer air melts ice. Once the ice reaches 72%, the vessel gives the deck crew time to finish any active job, then stops for about 24 simulation seconds of chipping and resumes the selected speed or autopilot route. This is a gameplay model, not a stability or real marine icing forecast. Remote boats do not currently share their ice load over multiplayer.
 
 ## Source and verification
 
@@ -52,7 +54,7 @@ The legacy WebGPU ocean and Canvas fallback remain available if WebGL 2 cannot r
 - `deck-work.mjs`, `wake.mjs`, `foam.mjs`, `fenders.mjs`: fishing animations, wake history, raised foam and hanging fittings.
 - `voyage.mjs`: shared scaled clock with bounded simulation steps.
 - `buoyancy.mjs`, `harbor.mjs`: damped vessel motion, conservative hull collision tests and docking route poses.
-- `tests/visual.html`: isolated visual fixture for cabin breaks, seasickness, water, moving pot work and dock staff; never reads or writes season saves.
+- `tests/visual.html`: isolated visual fixture for cabin breaks, seasickness, water, moving pot work, dock staff, rain, and a near-threshold snow/icing scenario; never reads or writes season saves.
 - `chart.mjs`, `game.mjs`, `index.html`, `style.css`: chart, input, UI, sound and saves.
 - `ocean.mjs`: legacy ocean renderer.
 

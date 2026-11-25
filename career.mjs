@@ -1,8 +1,9 @@
-import {chooseBerth, nearestQuay, quayPoint, QUAY} from './harbor.mjs?v=0.18.75';
-import {MATTHEW_QUAY} from './world.mjs?v=0.18.75';
-import {ensureRareState,rareCount} from './rare-catch.mjs?v=0.18.75';
-import {INCIDENT_INTERVAL_SCALE,INCIDENT_SCHEDULE_VERSION} from './balance.mjs?v=0.18.75';
-import {SKILLS,PARTS,BOATS,SKILL_SYSTEMS,PART_SYSTEMS,boatById} from './catalog.mjs?v=0.18.75';
+import {iceLevel} from './vessel-ice.mjs?v=0.18.76';
+import {chooseBerth, nearestQuay, quayPoint, QUAY} from './harbor.mjs?v=0.18.76';
+import {MATTHEW_QUAY} from './world.mjs?v=0.18.76';
+import {ensureRareState,rareCount} from './rare-catch.mjs?v=0.18.76';
+import {INCIDENT_INTERVAL_SCALE,INCIDENT_SCHEDULE_VERSION} from './balance.mjs?v=0.18.76';
+import {SKILLS,PARTS,BOATS,SKILL_SYSTEMS,PART_SYSTEMS,boatById} from './catalog.mjs?v=0.18.76';
 const finite=(n,f=0)=>Number.isFinite(n)?n:f,clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 export const inHarbor=s=>Math.hypot(s.x-160,s.y-80)<230||Math.hypot(s.x-MATTHEW_QUAY.x,s.y-MATTHEW_QUAY.y)<230;
 export const shopReady=s=>inHarbor(s)&&(!s.career?.requiresDock||!!s.moored)&&Math.abs(s.speed)<1&&!s.deckJob&&!s.incident&&!s.tow&&!s.overboard;
@@ -11,7 +12,7 @@ export function ensureCareer(s){
  const c=s.career||{};
  c.storedBoats=Array.isArray(c.storedBoats)?c.storedBoats.filter(b=>typeof b?.id==='string'&&boatById(b.boat).id===b.boat&&['deck','fuel','hull','capacity'].every(k=>Number.isFinite(b[k])&&b[k]>=0)).slice(0,100).map(b=>({
   ...b,parts:ranks(b.parts,PART_SYSTEMS),deck:clamp(Math.floor(b.deck),0,200),
-  hull:clamp(b.hull,0,100),capacity:clamp(b.capacity,900,1e6),
+  hull:clamp(b.hull,0,100),ice:iceLevel(b.ice),capacity:clamp(b.capacity,900,1e6),
   lostPots:clamp(Math.floor(finite(b.lostPots)),0,200),
  })):[];
  c.skills=ranks(c.skills,SKILL_SYSTEMS);c.parts=ranks(c.parts,PART_SYSTEMS);c.boat=boatById(c.boat).id;c.debt=clamp(finite(c.debt),0,1e9);c.borrowed=clamp(finite(c.borrowed),0,1e9);c.repaid=clamp(finite(c.repaid),0,1e9);c.autoDeploy=!!c.autoDeploy&&!!c.skills.autoDeploy;c.autoHaul=!!c.autoHaul&&!!c.skills.autoHaul;c.intelligentAutoSet=!!c.intelligentAutoSet&&!!c.skills.intelligentAutoSet&&!!c.skills.autoDeploy;if(c.intelligentAutoSet)c.autoDeploy=false;c.potSpacing=[80,160,220].includes(c.potSpacing)?c.potSpacing:80;c.fishing=c.fishing==='salmon'&&boatById(c.boat).salmon?'salmon':'crab';c.seed=(finite(c.seed,7319281)>>>0)||7319281;c.nextIncident=Math.max(0,finite(c.nextIncident,360));if(c.incidentScheduleVersion!==INCIDENT_SCHEDULE_VERSION){c.nextIncident=c.incidentScheduleVersion===2?c.nextIncident/2:Math.max(270,c.nextIncident)*INCIDENT_INTERVAL_SCALE;c.incidentScheduleVersion=INCIDENT_SCHEDULE_VERSION;}c.fleet=Array.isArray(c.fleet)?c.fleet.filter(b=>b&&typeof b.id==='string'&&['x','y','fuel','hull'].every(k=>Number.isFinite(b[k]))).slice(0,100):[];c.nextFleet=Math.max(1,Math.floor(finite(c.nextFleet,1)));c.fleet=c.fleet.map((b,i)=>{const hull=boatById(b.boat);return {...b,boat:hull.id,name:hull.name,parts:ranks(b.parts,PART_SYSTEMS),engine:clamp(finite(b.engine),0,3),hold:clamp(finite(b.hold),0,3),gear:clamp(finite(b.gear),0,3),capacity:clamp(finite(b.capacity,hull.capacity),900,1000000),fishing:b.fishing==='salmon'&&hull.salmon?'salmon':'crab',heading:finite(b.heading),fuel:clamp(b.fuel,0,Math.max(10000,hull.tank+750)),hull:clamp(b.hull,0,100),phase:['outbound','deploy','soak','haul','net','return','landing','service'].includes(b.phase)?b.phase:'service',timer:Math.max(0,finite(b.timer)),waypoint:clamp(Math.floor(finite(b.waypoint)),0,b.phase==='outbound'?1:2),pots:Array.isArray(b.pots)?b.pots.filter(p=>p&&['id','x','y','setAt'].every(k=>Number.isFinite(p[k]))).slice(0,200):[],cargo:Math.max(0,finite(b.cargo)),salmon:Math.max(0,finite(b.salmon)),expenses:Math.max(0,finite(b.expenses)),earnings:finite(b.earnings),trips:Math.max(0,finite(b.trips)),color:['#70c9df','#cda0ed','#ea859d','#91c97a'][i%4],autoService:!!b.autoService,salePending:!!b.salePending,upgradeRequest:PARTS.some(p=>p.id===b.upgradeRequest?.itemId&&p.rank===((b.parts?.[p.key]||0)+1))?{itemId:b.upgradeRequest.itemId,status:b.upgradeRequest.status==='approved'?'approved':'pending'}:null,nextUpgradeTrip:Math.max(0,finite(b.nextUpgradeTrip,3)),request:b.request&&['cost','fuel','repair','bait'].every(k=>Number.isFinite(b.request[k])&&b.request[k]>=0)?{...b.request,status:b.request.status==='declined'?'declined':'pending'}:null};});if(!['ready','pending','claimed','legacy'].includes(c.firstBoatReward))c.firstBoatReward=c.boat==='nordvind'&&!c.fleet.length&&c.nextFleet===1?'ready':'legacy';s.career=c;s.salmon=clamp(finite(s.salmon),0,1e6);s.nets=Array.isArray(s.nets)?s.nets.filter(n=>n&&['id','x','y','setAt'].every(k=>Number.isFinite(n[k]))).slice(0,1):[];return ensureRareState(s);
@@ -40,7 +41,7 @@ export function tradeValue(s){
 }
 function vesselSnapshot(s){
  return {boat:s.career.boat,parts:{...s.career.parts},engine:s.engine,hold:s.hold,gear:s.gear,
-  capacity:s.capacity,deck:s.deck,fuel:s.fuel,hull:s.hull,lostPots:s.lostPots||0,fishing:s.career.fishing};
+  capacity:s.capacity,deck:s.deck,fuel:s.fuel,hull:s.hull,ice:iceLevel(s.ice),lostPots:s.lostPots||0,fishing:s.career.fishing};
 }
 function emptyVessel(s){
  return !s.cargo&&!s.salmon&&!rareCount(s)&&!s.pots.length&&!s.nets.length;
@@ -48,8 +49,8 @@ function emptyVessel(s){
 function activateVessel(s,vessel,berth){
  const harbor=nearestQuay(s);
  const position=berth||{...quayPoint(0,-110,harbor),heading:harbor.heading};
- const {boat,parts={},engine=0,hold=0,gear=0,capacity,deck,fuel,hull,lostPots=0}=vessel;
- Object.assign(s,position,{engine,hold,gear,capacity,deck,fuel,hull,lostPots,
+ const {boat,parts={},engine=0,hold=0,gear=0,capacity,deck,fuel,hull,ice,lostPots=0}=vessel;
+ Object.assign(s,position,{engine,hold,gear,capacity,deck,fuel,hull,ice:iceLevel(ice),lostPots,
   speed:0,desiredKnots:0,throttle:0,rudder:0,autopilot:null,skipperMission:null,
   intelligentSetRunout:0,moored:berth?{...berth}:null});
  Object.assign(s.career,{boat,parts,requiresDock:true,fishing:vessel.fishing==='salmon'&&boatById(boat).salmon?'salmon':'crab',

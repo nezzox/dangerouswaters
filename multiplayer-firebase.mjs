@@ -1,5 +1,5 @@
 import {firebaseConfig} from './multiplayer-firebase-config.mjs';
-import {positionInterval,vesselPosition,potChanges} from './multiplayer-pacing.mjs?v=0.18.75';
+import {positionInterval,vesselPosition,potChanges} from './multiplayer-pacing.mjs?v=0.18.76';
 
 let firebase;
 function connectFirebase(){

@@ -1,6 +1,6 @@
-import {crabGroundAt} from './fishing-grounds.mjs?v=0.18.75';
-import {CRAB_SPECIES} from './crab-species.mjs?v=0.18.75';
-import {geoToWorld} from './world.mjs?v=0.18.75';
+import {crabGroundAt} from './fishing-grounds.mjs?v=0.18.76';
+import {CRAB_SPECIES} from './crab-species.mjs?v=0.18.76';
+import {geoToWorld} from './world.mjs?v=0.18.76';
 const harbor=geoToWorld(-166.524,53.9034);
 // Gameplay reward for longer voyages: base rate inside 20 km, up to 5x at 1,620 km.
 const marketHours=10*24;
