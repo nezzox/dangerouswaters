@@ -16,3 +16,12 @@ Approximations: vessel designs share a procedural hull family, with dimensions/p
 
 
 Verification: 64 Node tests pass, including every skill/part purchase and all 100 hull docking routes. Browser smoke tests covered search, tier gates, item purchases, trade-in/captain review, captain approval/refusal, loan accounting, offshore shop hiding, chart fleet/pots, incidents and automatic repairs, and a 172 kg salmon net landing into the hold. The real v1 season migrated with its 62,495 kr balance intact; final main-page console was clean. Native JSON file selection could not be automated because the Chrome extension lacks file-URL access; migration/roundtrip and mixed-fishery settlements were tested in Node. Browser download notification reached “Season downloaded”, but the automation download event was not available for the blob, so filesystem download completion was not independently confirmed. No browser permissions were changed.
+
+
+## Local gameplay expansion
+
+- Stored vessels retain their equipment, fuel, hull condition, and pot inventory. Exchange command in harbor after mooring, unloading, and recovering gear. Buying for the fleet keeps the current vessel under player command. An idle hired captain can hand over an empty vessel in the same harbor. The captain follows the existing supply-approval flow.
+- Pickup All collects the original list of buoys. Auto Set can lay new gear along the route. A rejected haul leaves its pot at sea and shows a notice before any catch is taken.
+- Multiplayer uses the host's watch and daylight when a host sample is available. The local elapsed-time clock backs pot and incident timers, including after reconnect or return to solo play. The watch briefly interpolates between samples, so network latency and a paused host can affect what is displayed.
+- Competition is a gameplay approximation sampled when a pot is hauled. Another player counts if their boat and at least one of their pots occupy the same crab zone as the pot being hauled. Each competitor multiplies catch by 0.8. Hired and inactive vessels are excluded.
+- Offshore routine incident parts cost six times their previous amount. A separate 4% branch during an incident roll selects one of three major failures, subject to equipment eligibility. The player pot-line loss roll is 1 in 200 per accepted haul. A snapped line loses the pot and all its catch. Replacements cost $250 each at the docking prompt. These rates and the dynamic snowfall mix are fictional balance settings.

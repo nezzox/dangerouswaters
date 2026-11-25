@@ -1,13 +1,20 @@
-import {MATTHEW_QUAY} from './world.mjs?v=0.18.74';
-import {ensureRareState,rareCount} from './rare-catch.mjs?v=0.18.74';
-import {INCIDENT_INTERVAL_SCALE,INCIDENT_SCHEDULE_VERSION} from './balance.mjs?v=0.18.74';
-import {SKILLS,PARTS,BOATS,SKILL_SYSTEMS,PART_SYSTEMS,boatById} from './catalog.mjs?v=0.18.74';
+import {chooseBerth, nearestQuay, quayPoint, QUAY} from './harbor.mjs?v=0.18.75';
+import {MATTHEW_QUAY} from './world.mjs?v=0.18.75';
+import {ensureRareState,rareCount} from './rare-catch.mjs?v=0.18.75';
+import {INCIDENT_INTERVAL_SCALE,INCIDENT_SCHEDULE_VERSION} from './balance.mjs?v=0.18.75';
+import {SKILLS,PARTS,BOATS,SKILL_SYSTEMS,PART_SYSTEMS,boatById} from './catalog.mjs?v=0.18.75';
 const finite=(n,f=0)=>Number.isFinite(n)?n:f,clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 export const inHarbor=s=>Math.hypot(s.x-160,s.y-80)<230||Math.hypot(s.x-MATTHEW_QUAY.x,s.y-MATTHEW_QUAY.y)<230;
-export const shopReady=s=>inHarbor(s)&&Math.abs(s.speed)<1&&!s.deckJob&&!s.incident;
+export const shopReady=s=>inHarbor(s)&&(!s.career?.requiresDock||!!s.moored)&&Math.abs(s.speed)<1&&!s.deckJob&&!s.incident&&!s.tow&&!s.overboard;
 const ranks=(raw,systems)=>Object.fromEntries(systems.filter(d=>finite(raw?.[d.key])>0).map(d=>[d.key,clamp(Math.floor(raw[d.key]),0,d.maxRank||5)]));
 export function ensureCareer(s){
- const c=s.career||{};c.skills=ranks(c.skills,SKILL_SYSTEMS);c.parts=ranks(c.parts,PART_SYSTEMS);c.boat=boatById(c.boat).id;c.debt=clamp(finite(c.debt),0,1e9);c.borrowed=clamp(finite(c.borrowed),0,1e9);c.repaid=clamp(finite(c.repaid),0,1e9);c.autoDeploy=!!c.autoDeploy&&!!c.skills.autoDeploy;c.autoHaul=!!c.autoHaul&&!!c.skills.autoHaul;c.intelligentAutoSet=!!c.intelligentAutoSet&&!!c.skills.intelligentAutoSet&&!!c.skills.autoDeploy;if(c.intelligentAutoSet)c.autoDeploy=false;c.potSpacing=[80,160,220].includes(c.potSpacing)?c.potSpacing:80;c.fishing=c.fishing==='salmon'&&boatById(c.boat).salmon?'salmon':'crab';c.seed=(finite(c.seed,7319281)>>>0)||7319281;c.nextIncident=Math.max(0,finite(c.nextIncident,360));if(c.incidentScheduleVersion!==INCIDENT_SCHEDULE_VERSION){c.nextIncident=c.incidentScheduleVersion===2?c.nextIncident/2:Math.max(270,c.nextIncident)*INCIDENT_INTERVAL_SCALE;c.incidentScheduleVersion=INCIDENT_SCHEDULE_VERSION;}c.fleet=Array.isArray(c.fleet)?c.fleet.filter(b=>b&&typeof b.id==='string'&&['x','y','fuel','hull'].every(k=>Number.isFinite(b[k]))).slice(0,100):[];c.nextFleet=Math.max(1,Math.floor(finite(c.nextFleet,1)));c.fleet=c.fleet.map((b,i)=>{const hull=boatById(b.boat);return {...b,boat:hull.id,name:hull.name,parts:ranks(b.parts,PART_SYSTEMS),engine:clamp(finite(b.engine),0,3),hold:clamp(finite(b.hold),0,3),gear:clamp(finite(b.gear),0,3),capacity:clamp(finite(b.capacity,hull.capacity),900,1000000),fishing:b.fishing==='salmon'&&hull.salmon?'salmon':'crab',heading:finite(b.heading),fuel:clamp(b.fuel,0,Math.max(10000,hull.tank+750)),hull:clamp(b.hull,0,100),phase:['outbound','deploy','soak','haul','net','return','landing','service'].includes(b.phase)?b.phase:'service',timer:Math.max(0,finite(b.timer)),waypoint:clamp(Math.floor(finite(b.waypoint)),0,b.phase==='outbound'?1:2),pots:Array.isArray(b.pots)?b.pots.filter(p=>p&&['id','x','y','setAt'].every(k=>Number.isFinite(p[k]))).slice(0,200):[],cargo:Math.max(0,finite(b.cargo)),salmon:Math.max(0,finite(b.salmon)),expenses:Math.max(0,finite(b.expenses)),earnings:finite(b.earnings),trips:Math.max(0,finite(b.trips)),color:['#70c9df','#cda0ed','#ea859d','#91c97a'][i%4],autoService:!!b.autoService,salePending:!!b.salePending,upgradeRequest:PARTS.some(p=>p.id===b.upgradeRequest?.itemId&&p.rank===((b.parts?.[p.key]||0)+1))?{itemId:b.upgradeRequest.itemId,status:b.upgradeRequest.status==='approved'?'approved':'pending'}:null,nextUpgradeTrip:Math.max(0,finite(b.nextUpgradeTrip,3)),request:b.request&&['cost','fuel','repair','bait'].every(k=>Number.isFinite(b.request[k])&&b.request[k]>=0)?{...b.request,status:b.request.status==='declined'?'declined':'pending'}:null};});if(!['ready','pending','claimed','legacy'].includes(c.firstBoatReward))c.firstBoatReward=c.boat==='nordvind'&&!c.fleet.length&&c.nextFleet===1?'ready':'legacy';s.career=c;s.salmon=clamp(finite(s.salmon),0,1e6);s.nets=Array.isArray(s.nets)?s.nets.filter(n=>n&&['id','x','y','setAt'].every(k=>Number.isFinite(n[k]))).slice(0,1):[];return ensureRareState(s);
+ const c=s.career||{};
+ c.storedBoats=Array.isArray(c.storedBoats)?c.storedBoats.filter(b=>typeof b?.id==='string'&&boatById(b.boat).id===b.boat&&['deck','fuel','hull','capacity'].every(k=>Number.isFinite(b[k])&&b[k]>=0)).slice(0,100).map(b=>({
+  ...b,parts:ranks(b.parts,PART_SYSTEMS),deck:clamp(Math.floor(b.deck),0,200),
+  hull:clamp(b.hull,0,100),capacity:clamp(b.capacity,900,1e6),
+  lostPots:clamp(Math.floor(finite(b.lostPots)),0,200),
+ })):[];
+ c.skills=ranks(c.skills,SKILL_SYSTEMS);c.parts=ranks(c.parts,PART_SYSTEMS);c.boat=boatById(c.boat).id;c.debt=clamp(finite(c.debt),0,1e9);c.borrowed=clamp(finite(c.borrowed),0,1e9);c.repaid=clamp(finite(c.repaid),0,1e9);c.autoDeploy=!!c.autoDeploy&&!!c.skills.autoDeploy;c.autoHaul=!!c.autoHaul&&!!c.skills.autoHaul;c.intelligentAutoSet=!!c.intelligentAutoSet&&!!c.skills.intelligentAutoSet&&!!c.skills.autoDeploy;if(c.intelligentAutoSet)c.autoDeploy=false;c.potSpacing=[80,160,220].includes(c.potSpacing)?c.potSpacing:80;c.fishing=c.fishing==='salmon'&&boatById(c.boat).salmon?'salmon':'crab';c.seed=(finite(c.seed,7319281)>>>0)||7319281;c.nextIncident=Math.max(0,finite(c.nextIncident,360));if(c.incidentScheduleVersion!==INCIDENT_SCHEDULE_VERSION){c.nextIncident=c.incidentScheduleVersion===2?c.nextIncident/2:Math.max(270,c.nextIncident)*INCIDENT_INTERVAL_SCALE;c.incidentScheduleVersion=INCIDENT_SCHEDULE_VERSION;}c.fleet=Array.isArray(c.fleet)?c.fleet.filter(b=>b&&typeof b.id==='string'&&['x','y','fuel','hull'].every(k=>Number.isFinite(b[k]))).slice(0,100):[];c.nextFleet=Math.max(1,Math.floor(finite(c.nextFleet,1)));c.fleet=c.fleet.map((b,i)=>{const hull=boatById(b.boat);return {...b,boat:hull.id,name:hull.name,parts:ranks(b.parts,PART_SYSTEMS),engine:clamp(finite(b.engine),0,3),hold:clamp(finite(b.hold),0,3),gear:clamp(finite(b.gear),0,3),capacity:clamp(finite(b.capacity,hull.capacity),900,1000000),fishing:b.fishing==='salmon'&&hull.salmon?'salmon':'crab',heading:finite(b.heading),fuel:clamp(b.fuel,0,Math.max(10000,hull.tank+750)),hull:clamp(b.hull,0,100),phase:['outbound','deploy','soak','haul','net','return','landing','service'].includes(b.phase)?b.phase:'service',timer:Math.max(0,finite(b.timer)),waypoint:clamp(Math.floor(finite(b.waypoint)),0,b.phase==='outbound'?1:2),pots:Array.isArray(b.pots)?b.pots.filter(p=>p&&['id','x','y','setAt'].every(k=>Number.isFinite(p[k]))).slice(0,200):[],cargo:Math.max(0,finite(b.cargo)),salmon:Math.max(0,finite(b.salmon)),expenses:Math.max(0,finite(b.expenses)),earnings:finite(b.earnings),trips:Math.max(0,finite(b.trips)),color:['#70c9df','#cda0ed','#ea859d','#91c97a'][i%4],autoService:!!b.autoService,salePending:!!b.salePending,upgradeRequest:PARTS.some(p=>p.id===b.upgradeRequest?.itemId&&p.rank===((b.parts?.[p.key]||0)+1))?{itemId:b.upgradeRequest.itemId,status:b.upgradeRequest.status==='approved'?'approved':'pending'}:null,nextUpgradeTrip:Math.max(0,finite(b.nextUpgradeTrip,3)),request:b.request&&['cost','fuel','repair','bait'].every(k=>Number.isFinite(b.request[k])&&b.request[k]>=0)?{...b.request,status:b.request.status==='declined'?'declined':'pending'}:null};});if(!['ready','pending','claimed','legacy'].includes(c.firstBoatReward))c.firstBoatReward=c.boat==='nordvind'&&!c.fleet.length&&c.nextFleet===1?'ready':'legacy';s.career=c;s.salmon=clamp(finite(s.salmon),0,1e6);s.nets=Array.isArray(s.nets)?s.nets.filter(n=>n&&['id','x','y','setAt'].every(k=>Number.isFinite(n[k]))).slice(0,1):[];return ensureRareState(s);
 }
 export function vesselStats(s){
  const c=s.career||{},b=boatById(c.boat),k=c.skills||{},p=c.parts||{},crew=b.crew+(p.quarters||0),v=key=>(k[key]||0),part=key=>(p[key]||0);
@@ -31,8 +38,80 @@ export function installedVesselValue(vessel){
 export function tradeValue(s){
  return Math.round(installedVesselValue({...s.career,engine:s.engine,hold:s.hold,gear:s.gear})*.65);
 }
-export function buyBoat(s,id,disposition){ensureCareer(s);const b=BOATS.find(x=>x.id===id);if(!b||!['sell','captain'].includes(disposition))return result(false,'Choose trade-in or hire a captain.');if(!shopReady(s)||s.cargo||s.salmon||rareCount(s)||s.pots.length||s.nets.length)return result(false,'Unload all catch and retrieve all fishing gear before changing vessels.');if(b.id===s.career.boat)return result(false,'This is your current vessel.');const value=disposition==='sell'?tradeValue(s):0,cost=b.price-value+(disposition==='captain'?25000:0);if(s.money<cost)return result(false,'Insufficient funds for this exchange.');if(disposition==='captain'&&s.career.fleet.length>=100)return result(false,'Your fleet already has 100 vessels.');if(disposition==='captain'){const n=s.career.nextFleet++,old=boatById(s.career.boat);s.career.fleet.push({id:`fleet-${n}`,boat:old.id,name:old.name,parts:{...s.career.parts},engine:s.engine,hold:s.hold,gear:s.gear,capacity:s.capacity,x:270,y:40+(n%3)*20,heading:0,fuel:s.fuel,hull:s.hull,phase:'outbound',timer:0,pots:[],cargo:0,salmon:0,expenses:0,earnings:0,trips:0,color:['#70c9df','#cda0ed','#ea859d','#91c97a'][n%4],request:null,fishing:old.salmon?s.career.fishing:'crab'});}
- if(s.career.firstBoatReward==='ready')s.career.firstBoatReward='pending';s.money-=cost;s.moored=null;s.career.boat=b.id;s.career.parts={};s.career.autoDeploy=false;s.career.autoHaul=false;s.career.intelligentAutoSet=false;s.intelligentSetRunout=0;s.career.fishing='crab';s.engine=0;s.hold=0;s.gear=0;s.capacity=b.capacity;s.deck=b.pots;s.fuel=b.tank;s.hull=100;s.desiredKnots=0;s.speed=0;s.autopilot=null;s.x=180;s.y=80;return result(true,`${b.name} commissioned. ${disposition==='captain'?'Your previous vessel has a hired captain.':'Previous vessel traded in.'}`);
+function vesselSnapshot(s){
+ return {boat:s.career.boat,parts:{...s.career.parts},engine:s.engine,hold:s.hold,gear:s.gear,
+  capacity:s.capacity,deck:s.deck,fuel:s.fuel,hull:s.hull,lostPots:s.lostPots||0,fishing:s.career.fishing};
+}
+function emptyVessel(s){
+ return !s.cargo&&!s.salmon&&!rareCount(s)&&!s.pots.length&&!s.nets.length;
+}
+function activateVessel(s,vessel,berth){
+ const harbor=nearestQuay(s);
+ const position=berth||{...quayPoint(0,-110,harbor),heading:harbor.heading};
+ const {boat,parts={},engine=0,hold=0,gear=0,capacity,deck,fuel,hull,lostPots=0}=vessel;
+ Object.assign(s,position,{engine,hold,gear,capacity,deck,fuel,hull,lostPots,
+  speed:0,desiredKnots:0,throttle:0,rudder:0,autopilot:null,skipperMission:null,
+  intelligentSetRunout:0,moored:berth?{...berth}:null});
+ Object.assign(s.career,{boat,parts,requiresDock:true,fishing:vessel.fishing==='salmon'&&boatById(boat).salmon?'salmon':'crab',
+  autoDeploy:false,autoHaul:false,intelligentAutoSet:false});
+}
+function hireCaptain(s,vessel){
+ const n=s.career.nextFleet++,hull=boatById(vessel.boat);
+ const harbor=nearestQuay(s);
+ const berth=harbor===QUAY?{x:270,y:40+(n%3)*20}:quayPoint(0,-160,harbor);
+ s.career.fleet.push({...vessel,id:`fleet-${n}`,name:hull.name,...berth,heading:0,
+  phase:'outbound',timer:0,pots:[],cargo:0,salmon:0,expenses:0,earnings:0,trips:0,request:null,
+  fishing:vessel.fishing==='salmon'&&hull.salmon?'salmon':'crab',color:['#70c9df','#cda0ed','#ea859d','#91c97a'][n%4]});
+}
+export function buyBoat(s,id,disposition){
+ ensureCareer(s);
+ const b=BOATS.find(x=>x.id===id);
+ if(!b||!['sell','captain','keep','dispatch'].includes(disposition))return result(false,'Choose an acquisition option.');
+ if(!shopReady(s))return result(false,'Dock before buying or switching vessels.');
+ if(disposition!=='dispatch'&&!emptyVessel(s))return result(false,'Unload all catch and retrieve all fishing gear before changing vessels.');
+ if(disposition!=='dispatch'&&b.id===s.career.boat)return result(false,'This is your current vessel.');
+ const hiring=disposition==='captain'||disposition==='dispatch';
+ const cost=b.price-(disposition==='sell'?tradeValue(s):0)+(hiring?25000:0);
+ if(s.money<cost)return result(false,'Insufficient funds for this exchange.');
+ if(hiring&&s.career.fleet.length>=100)return result(false,'Your fleet already has 100 vessels.');
+ if(disposition==='keep'&&s.career.storedBoats.length>=100)return result(false,'Your storage already has 100 vessels.');
+ const newVessel={boat:b.id,parts:{},engine:0,hold:0,gear:0,capacity:b.capacity,deck:b.pots,fuel:b.tank,hull:100,lostPots:0};
+ s.money-=cost;
+ if(disposition==='dispatch'){
+  hireCaptain(s,newVessel);
+  return result(true,`${b.name} commissioned with a hired captain.`);
+ }
+ if(disposition==='captain')hireCaptain(s,vesselSnapshot(s));
+ if(disposition==='keep')s.career.storedBoats.push({...vesselSnapshot(s),id:`stored-${s.career.nextFleet++}`});
+ if(s.career.firstBoatReward==='ready')s.career.firstBoatReward='pending';
+ activateVessel(s,newVessel,null);
+ return result(true,`${b.name} commissioned. Dock before using the harbor shop.`);
+}
+export function captainAvailable(s,boat){
+ return boat.phase==='service'&&inHarbor(boat)&&nearestQuay(s)===nearestQuay(boat)
+  &&!boat.salePending&&!boat.cargo&&!boat.salmon&&!boat.pots.length
+  &&!rareCount(boat)&&boat.upgradeRequest?.status!=='approved';
+}
+export function switchOwnedBoat(s,id){
+ ensureCareer(s);
+ if(!shopReady(s)||!s.moored||!emptyVessel(s))return result(false,'Dock, unload all catch and retrieve all fishing gear before switching.');
+ const index=s.career.storedBoats.findIndex(b=>b.id===id);
+ const captain=index<0?s.career.fleet.find(b=>b.id===id):null;
+ if(captain&&!captainAvailable(s,captain))return result(false,'The captain must be idle in this harbor before you take command.');
+ const next=s.career.storedBoats[index]||captain;
+ if(!next)return result(false,'Unknown stored vessel.');
+ if(captain&&s.career.storedBoats.length>=100)return result(false,'Your storage already has 100 vessels.');
+ const berth=chooseBerth({...s,career:{...s.career,boat:next.boat}},
+  [...s.career.fleet.filter(b=>b!==captain),...(s.remotePlayers||[])]);
+ if(!berth)return result(false,'No berth available.');
+ const previous={...vesselSnapshot(s),id:captain?`stored-${s.career.nextFleet++}`:id};
+ if(captain){
+  s.career.fleet=s.career.fleet.filter(b=>b!==captain);
+  s.career.storedBoats.push(previous);
+ }else s.career.storedBoats[index]=previous;
+ const equipped=captain?vesselStats({...captain,career:{...s.career,boat:captain.boat,parts:captain.parts}}):null;
+ activateVessel(s,equipped?{...next,deck:Math.max(0,equipped.potCapacity-(next.lostPots||0))}:next,berth);
+ return result(true,`Now aboard ${boatById(next.boat).name}.`);
 }
 export function creditLimit(s){return Math.min(2000000,Math.max(50000,Math.round(boatById(s.career?.boat).price*.5)));}
 export function takeLoan(s,amount){ensureCareer(s);if(!Number.isFinite(amount)||amount<1000||Math.round(amount*1.1)>creditLimit(s)-s.career.debt)return result(false,'Loan exceeds available credit (including existing debt).');s.money+=amount;s.career.debt+=Math.round(amount*1.1);s.career.borrowed+=amount;return result(true,`Loan ${Math.round(amount).toLocaleString('en-US')} kr received. Fixed 10% fee; 15% of landings repays debt.`);}

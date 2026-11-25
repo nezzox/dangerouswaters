@@ -1,6 +1,6 @@
-import {crabGroundAt} from './fishing-grounds.mjs?v=0.18.74';
-import {CRAB_SPECIES} from './crab-species.mjs?v=0.18.74';
-import {geoToWorld} from './world.mjs?v=0.18.74';
+import {crabGroundAt} from './fishing-grounds.mjs?v=0.18.75';
+import {CRAB_SPECIES} from './crab-species.mjs?v=0.18.75';
+import {geoToWorld} from './world.mjs?v=0.18.75';
 const harbor=geoToWorld(-166.524,53.9034);
 // Gameplay reward for longer voyages: base rate inside 20 km, up to 5x at 1,620 km.
 const marketHours=10*24;
@@ -20,10 +20,10 @@ export function crabGroundPriceFactor(id,hour){
  const offset=hash%101,step=1+(Math.floor(hash/101)%100);
  return .55+1.10*((offset+step*(cycle%101))%101)/100;
 }
-export function crabPriceAt(point,hour=point.hour??point.setAt??0){
+export function crabPriceAt(point,hour=point.worldHour??point.hour??point.setAt??0){
  const distance=Math.hypot(point.x-harbor.x,point.y-harbor.y);
  const progress=Math.max(0,Math.min(1,(distance-20000)/1600000));
- const ground=crabGroundAt(point,point.setAt??hour);
+ const ground=crabGroundAt(point,point.groundSetAt??point.setAt??hour);
  const species=Object.hasOwn(CRAB_SPECIES,point.crabSpecies)?point.crabSpecies:ground?.species;
  return crabMarketRate(species,hour)*(1+4*progress**.75)*crabGroundPriceFactor(point.groundId??ground?.id,hour);
 }
@@ -31,4 +31,4 @@ export function crabHoldValue(holder){const base=Math.max(0,holder.cargo||0)*65;
 export function addCrabCatch(holder,kg,point,hour){const value=crabHoldValue(holder);holder.cargo+=kg;holder.crabValue=value+kg*crabPriceAt(point,hour);}
 export function landCrab(holder,kg){const amount=Math.min(Math.max(0,kg),holder.cargo),value=holder.cargo?crabHoldValue(holder)*amount/holder.cargo:0;holder.crabValue=Math.max(0,crabHoldValue(holder)-value);holder.cargo-=amount;return value;}
 
-export function captureCrabSpecies(point,hour=point.setAt??0){return Object.hasOwn(CRAB_SPECIES,point.crabSpecies)?point.crabSpecies:crabGroundAt(point,hour)?.species||null;}
+export function captureCrabSpecies(point,hour=point.groundSetAt??point.setAt??0){return Object.hasOwn(CRAB_SPECIES,point.crabSpecies)?point.crabSpecies:crabGroundAt(point,hour)?.species||null;}

@@ -1,7 +1,7 @@
-import {QUAY,quayPoint,berthsAt} from './harbor.mjs?v=0.18.74';
-import {geometry} from './geometry.mjs?v=0.18.74';
-import {WORLD_LAND,isLand,SERVICE_APRON} from './world.mjs?v=0.18.74';
-import {groundHeight} from './geography-mesh.mjs?v=0.18.74';
+import {QUAY,quayPoint,berthsAt} from './harbor.mjs?v=0.18.75';
+import {geometry} from './geometry.mjs?v=0.18.75';
+import {WORLD_LAND,isLand,SERVICE_APRON} from './world.mjs?v=0.18.75';
+import {groundHeight} from './geography-mesh.mjs?v=0.18.75';
 const asphalt=[.16,.18,.18],concrete=[.36,.37,.34],steel=[.29,.33,.33],dark=[.07,.09,.085];
 export const MATTHEW_FLOODLIGHTS=[-215,-122,-37,61];
 function buildMatthewDetails(g,quay){
@@ -97,6 +97,11 @@ export function buildPortScenery(selected=QUAY,local=false){const g=geometry();l
  const span=Math.min(65,length/count),base=Math.min(11,Math.max(6.25,groundHeight(x+nx*12,y+ny*12)+.18)),seed=++index;
  const p=(u,v,h=base)=>[x+tx*u+nx*v,h,y+ty*u+ny*v];
  const slab=(u,v,w,d,h,col,rough=.85)=>{const q=[p(u-w/2,v-d/2),p(u+w/2,v-d/2),p(u+w/2,v+d/2),p(u-w/2,v+d/2)];g.quad(q[0],q[3],q[2],q[1],col,rough,h<.2?-2:0);if(h)for(let k=0;k<4;k++){const a=q[k],b=q[(k+1)%4];g.quad(a,b,[b[0],b[1]+h,b[2]],[a[0],a[1]+h,a[2]],col,rough);}if(h)g.quad(...[q[0],q[3],q[2],q[1]].map(a=>[a[0],a[1]+h,a[2]]),col,rough,h<.2?-2:0);};
+ // The continuous service quay owns this waterfront. Suppress older slabs
+ // and fenders on the same frontage to avoid overlapping depth surfaces.
+ const u=(x-QUAY.x)*QUAY.tx+(y-QUAY.y)*QUAY.ty;
+ const v=-(x-QUAY.x)*QUAY.ty+(y-QUAY.y)*QUAY.tx;
+ if(u>=SERVICE_APRON.start-span/2&&u<=SERVICE_APRON.end+span/2&&Math.abs(v)<SERVICE_APRON.depth)continue;
  // Reclaimed apron, quayside edge, and the road along the foot of the hill.
  slab(0,19,span+.4,37,0,asphalt);slab(0,1,span,.9,.35,concrete);slab(0,43,span+1,7.5,.08,[.12,.14,.14]);
  for(let u=-span/2+4;u<span/2;u+=28){slab(u,43,3,.16,.09,[.66,.64,.49]);const pole=p(u,32);g.tube(p(u,32),p(u,32,base+9),.11,steel,6);g.box(pole[0],base+9,pole[2],.8,.25,.65,[.77,.70,.46],.6,.5);}
@@ -129,6 +134,11 @@ export function buildPortScenery(selected=QUAY,local=false){const g=geometry();l
    wall(u,next,top-.48,top,[.41,.41,.36]);
    g.tube(at(u,-.01,.55),at(u,-.01,top-.48),.036,[.19,.20,.18],5,.95,-3);
    deck(u+.04,Math.min(u+2.4,next),3.75,3.89,top+.018,[.60,.48,.22]);
+  }
+  for(let u=start+5;u<end;u+=9){
+   g.tube(at(u,-.32,top-2.1),at(u,-.32,top-.65),.46,dark,8);
+   g.tube(at(u,1.05,top),at(u,1.05,top+.47),.22,steel,8);
+   g.tube(at(u-.31,1.05,top+.43),at(u+.31,1.05,top+.43),.13,steel,8);
   }
   for(const u of [start,end])g.quad(at(u,0,-2),at(u,depth,-2),at(u,depth,top),at(u,0,top),concrete,.95,-3);
   g.quad(at(start,depth,-2),at(end,depth,-2),at(end,depth,top),at(start,depth,top),concrete,.95,-3);

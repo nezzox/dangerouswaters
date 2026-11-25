@@ -1,5 +1,5 @@
 import {firebaseConfig} from './multiplayer-firebase-config.mjs';
-import {positionInterval,vesselPosition,potChanges} from './multiplayer-pacing.mjs?v=0.18.74';
+import {positionInterval,vesselPosition,potChanges} from './multiplayer-pacing.mjs?v=0.18.75';
 
 let firebase;
 function connectFirebase(){
@@ -44,7 +44,7 @@ export function createFirebaseMultiplayer(presence){
   peers=Object.entries(r.members).filter(([id])=>id!==r.sdk.uid).slice(0,30).map(([id,member])=>{
    const link=r.links.get(id),direct=link?.received&&performance.now()-link.received.at<2300?link.received.data:null;
    const positions=direct||r.positions[id]||{};
-   return unpack(positions.boat,{...member,id,transport:direct?"p2p":"firebase",pots:decodePots(member.pots),
+   return unpack(positions.boat,{...member,id,hour:Number.isFinite(direct?.hour)?direct.hour:member.hour,transport:direct?"p2p":"firebase",pots:decodePots(member.pots),
     fleet:Object.entries(member.fleet||{}).map(([key,b])=>unpack(positions.fleet?.[key],{...b,transport:direct?"p2p":"firebase",pots:decodePots(b.pots)},direct?.sentAt))},direct?.sentAt);
   });
  }
@@ -193,7 +193,7 @@ export function createFirebaseMultiplayer(presence){
    const near=Math.hypot(p.x-peer.x,p.y-peer.y);
    if(link?.channel?.readyState!=='open'){fallback=true;continue;}
    if(now-link.last<positionInterval(near)||link.channel.bufferedAmount>16000)continue;
-   try{link.channel.send(directPacket??=JSON.stringify({...packet,sentAt:performance.timeOrigin+now}));link.last=now;}catch{fallback=true;}
+   try{link.channel.send(directPacket??=JSON.stringify({...packet,sentAt:performance.timeOrigin+now,hour:p.hour}));link.last=now;}catch{fallback=true;}
   }
   if(fallback&&now-r.lastFallback>=600){
    r.lastFallback=now;
@@ -202,7 +202,7 @@ export function createFirebaseMultiplayer(presence){
   if(!r.booking&&(p.berth||r.berth))void bookBerth(r,state,p.berth);
   const changes={},fields=['name','boat','lights','isHost','landed','earned'];
   for(const key of fields)if(p[key]!==previous?.[key])changes[key]=p[key];
-  if(now-r.lastMeta>=3000||!previous){
+  if(now-r.lastMeta>=(r.isHost?1000:3000)||!previous){
    r.lastMeta=now;
    Object.assign(changes,{x:p.x,y:p.y,heading:p.heading,hour:p.hour});
   }

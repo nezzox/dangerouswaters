@@ -1,4 +1,4 @@
-import {createFirebaseMultiplayer} from './multiplayer-firebase.mjs?v=0.18.74';
+import {createFirebaseMultiplayer} from './multiplayer-firebase.mjs?v=0.18.75';
 const alphabet='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 export function newWorldCode(){const values=crypto.getRandomValues(new Uint8Array(6));return Array.from(values,n=>alphabet[n%alphabet.length]).join('');}
 export function newPlayerToken(){return Array.from(crypto.getRandomValues(new Uint8Array(16)),v=>v.toString(16).padStart(2,'0')).join('');}
@@ -77,6 +77,27 @@ export function createPeerSmoother(){
     track.pose={x,y,heading};
     return {...peer,x,y,heading};
    });
+  },
+ };
+}
+
+
+// The host drives the shared watch. Each boat keeps its own elapsed-time
+// counters so reconnecting cannot age or un-age a player's gear or incidents.
+export function createWorldClock(){
+ let sample=null;
+ return {
+  update(worldId,host,now){
+   if(sample?.worldId!==worldId)sample=null;
+   if(!host||!Number.isFinite(host.hour)||host.hour<0){sample=null;return undefined;}
+   if(!sample||sample.id!==host.id||sample.hour!==host.hour){
+    const elapsed=sample&&sample.id===host.id?(now-sample.at)/1000:0;
+    const rate=elapsed>=.05?Math.min(1/3,Math.max(0,(host.hour-sample.hour)/elapsed)):0;
+    sample={worldId,id:host.id,hour:host.hour,at:now,rate};
+   }
+   const age=Math.max(0,(now-sample.at)/1000);
+   const prediction=Math.min(.65,age)*Math.max(0,Math.min(1,(1.65-age)/.65));
+   return sample.hour+sample.rate*prediction;
   },
  };
 }

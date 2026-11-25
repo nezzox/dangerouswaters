@@ -109,3 +109,6 @@
 #chart-dialog #ground-reports{max-height:min(250px,30dvh)}
 #ground-reports button{font:9px/1.35 monospace;text-align:left;white-space:pre-line;padding:4px 6px;overflow-wrap:anywhere}
 #chart-dialog #ground-reports button{font-size:10px}
+
+.side-instruments .leaderboard pre{font-size:9px}
+#leaderboard-sort{font:8px monospace;padding:4px}

@@ -1,6 +1,6 @@
-import {hullWidthAt} from './fenders.mjs?v=0.18.74';
-import {deckSign,workX} from './vessel-profile.mjs?v=0.18.74';
-import {rackPositions,rackFootprints,rackFootprintKey,potBounds,rackFrames,rackScale,deckHardware} from './vessel-style.mjs?v=0.18.74';
+import {hullWidthAt} from './fenders.mjs?v=0.18.75';
+import {deckSign,workX} from './vessel-profile.mjs?v=0.18.75';
+import {rackPositions,rackFootprints,rackFootprintKey,potBounds,rackFrames,rackScale,deckHardware} from './vessel-style.mjs?v=0.18.75';
 export const CREW_RADIUS=.26,CREW_SPACING=.62;
 export const CABIN_DOOR={x:.18,z:1.65};
 export function potPositions(count,design={}){return rackPositions(count,design);}

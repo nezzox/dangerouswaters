@@ -1,4 +1,4 @@
-import {CRAB_SPECIES} from './crab-species.mjs?v=0.18.74';
+import {CRAB_SPECIES} from './crab-species.mjs?v=0.18.75';
 // Saved money/prices remain in legacy SEK units. Fixed game conversion: 10 SEK = 1 USD.
 // Translation is applied at the presentation boundary; save data and simulation never change language.
 let language='en';
@@ -7,6 +7,31 @@ export function setLanguage(value){language=value==='sv'?'sv':'en';return langua
 export const toInternalMoney=amount=>amount*10;
 export function formatMoney(amount,locale=language){const sv=locale==='sv',n=amount/10,fraction=Math.abs(n-Math.round(n))>.000001;return new Intl.NumberFormat(sv?'sv-SE':'en-US',{style:'currency',currency:'USD',currencyDisplay:'narrowSymbol',minimumFractionDigits:fraction?2:0,maximumFractionDigits:2}).format(n);}
 const sv={
+ "The captain must be idle in this harbor before you take command.":"Kaptenen måste ligga i den här hamnen innan du kan ta över båten.",
+ "Severe hull breach":"Allvarlig skrovskada",
+ "Main engine breakdown":"Huvudmotorhaveri",
+ "Switchboard burnout":"Utbränd eltavla",
+ "RETURN TO TOP":"TILL TOPPEN",
+ "MONEY":"PENGAR",
+ "WEIGHT":"VIKT",
+ "Dock services":"Kajservice",
+ "Replace lost pots":"Ersätt förlorade tinor",
+ "Lost pots replaced.":"De förlorade tinorna har ersatts.",
+ "Not enough room in the hold to haul this pot.":"Det finns inte tillräckligt med plats i lastrummet för den här tinan.",
+ "The pot line snapped. The pot and its catch were lost.":"Linan brast. Tinan och fångsten gick förlorade.",
+ "Stored vessels":"Upplagda båtar",
+ "TAKE COMMAND":"TA ÖVER BÅTEN",
+ "BUY & STORE CURRENT":"KÖP OCH BEHÅLL NUVARANDE",
+ "BUY FOR FLEET":"KÖP TILL FLOTTAN",
+ "Store your current vessel":"Lägg upp din nuvarande båt",
+ "Keep it in port and switch back from the fleet tab.":"Behåll den i hamnen och byt tillbaka via flottfliken.",
+ "Dispatch the new vessel":"Skicka ut den nya båten",
+ "Keep command of your current vessel and hire a captain for the new one.":"Behåll befälet på din nuvarande båt och anställ en kapten för den nya.",
+ "Dock before buying or switching vessels.":"Lägg till innan du köper eller byter båt.",
+ "Dock, unload all catch and retrieve all fishing gear before switching.":"Lägg till, lossa fångsten och ta ombord all utrustning innan du byter båt.",
+ "Pickup All Pots complete.":"Alla tinor på rutten är hämtade.",
+ "Pickup All Pots stopped.":"Rutten för att hämta alla tinor stoppades.",
+
  'Aft-wheelhouse crabber':'Krabbfartyg med akterhytt',
  'Vessel refit refund':'Återbetalning för ombyggda fartyg',
  'Brighter, wider and longer-reaching work lights per grade; pot deployment 5% faster per grade':'Starkare arbetsljus med bredare ljuskäglor och längre räckvidd per nivå; tinsättning går 5 % snabbare per nivå',

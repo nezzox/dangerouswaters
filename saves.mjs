@@ -1,14 +1,16 @@
-import {normalizePotNumbers} from './pot-numbers.mjs?v=0.18.74';
-import {boatById} from './catalog.mjs?v=0.18.74';
-import {BERTH,restoreBerth} from './harbor.mjs?v=0.18.74';
-import {migrateWorld} from './world.mjs?v=0.18.74';
-import {createGame} from './simulation.mjs?v=0.18.74';
-import {ensureCareer,vesselStats,installedVesselValue} from './career.mjs?v=0.18.74';
-import {INCIDENTS} from './incidents.mjs?v=0.18.74';
+import {normalizePotNumbers} from './pot-numbers.mjs?v=0.18.75';
+import {boatById} from './catalog.mjs?v=0.18.75';
+import {BERTH,restoreBerth} from './harbor.mjs?v=0.18.75';
+import {migrateWorld} from './world.mjs?v=0.18.75';
+import {createGame} from './simulation.mjs?v=0.18.75';
+import {ensureCareer,vesselStats,installedVesselValue} from './career.mjs?v=0.18.75';
+import {INCIDENTS} from './incidents.mjs?v=0.18.75';
 const numbers=(obj,keys)=>keys.every(k=>Number.isFinite(obj?.[k]));
 export function validJob(j){if(!j||!['deploy','haul','unload','undock','netSet','netHaul'].includes(j.kind)||!numbers(j,['elapsed','duration','x','y'])||j.elapsed<0||j.duration<=0||j.elapsed>=j.duration)return null;if(j.kind==='unload'&&(!numbers(j,['startHeading','cargoKg','approach'])||j.approach<=0||j.approach>=j.duration))return null;if(j.kind==='haul'&&!numbers(j,['potId','catchKg']))return null;if(j.kind==='netHaul'&&!numbers(j,['netId','catchKg']))return null;if(j.kind==='undock'&&(!numbers(j,['startHeading','targetX','targetY','targetHeading'])||Math.hypot(j.targetX-j.x,j.targetY-j.y)>141||j.duration>300))return null;const job={...j};if(job.kind==='undock')delete job.route;if(['cargoKg','salmonKg','catchKg'].some(k=>job[k]!==undefined&&(!Number.isFinite(job[k])||job[k]<0)))return null;if(job.released&&!numbers(job.released,['x','y','at']))delete job.released;if(job.kind==='unload'){delete job.route;if(!Number.isFinite(job.unloadSeconds))delete job.unloadSeconds;}return job;}
 export function restoreSeason(raw){if(!raw||raw.version!==1||!numbers(raw,['x','y','heading','hour','money','fuel','hull','cargo','capacity','deck','nextPot','engine','hold','gear'])||!Array.isArray(raw.pots)||raw.pots.length>200||!raw.pots.every(p=>numbers(p,['x','y','id','setAt']))||Math.abs(raw.money)>1e12||raw.fuel<0||raw.fuel>1e6||raw.hull<0||raw.hull>100||raw.capacity<900||raw.capacity>1e6||raw.deck<0||raw.deck>200||raw.cargo<0||!['engine','hold','gear'].every(k=>raw[k]>=0&&raw[k]<=3))return null;
  const s=ensureCareer({...createGame(),...raw,worldVersion:raw.worldVersion||0,paused:true,weatherMode:raw.weatherMode==='dynamic'?'dynamic':'live',realWeather:null,weatherStatus:null,throttle:0,speed:0,rudder:0,weatherOverride:null,activity:null,desiredKnots:0,lights:raw.lights!==false,deckJob:validJob(raw.deckJob),autopilot:null,skipperMission:null,autoHaulSlowing:false,autoSetSlowing:false,intelligentSetRunout:Number.isFinite(raw.intelligentSetRunout)?Math.max(0,Math.min(300,raw.intelligentSetRunout)):0,message:'Welcome back aboard.',log:[],popupEvents:[],lastHaul:null});const e=INCIDENTS.find(e=>e.id===raw.incident?.id);s.incident=e&&numbers(raw.incident,['remaining','cost'])&&raw.incident.remaining>0?{...raw.incident,system:e.system,name:e.name,remaining:Math.min(raw.incident.remaining,e.duration),cost:e.cost}:null;s.moored=null;if(raw.moored&&numbers(raw.moored,['x','y','heading'])){const berth=restoreBerth(raw.moored);if(berth){s.moored={...berth};Object.assign(s,berth);}else if(Math.hypot(raw.moored.x-61.9,raw.moored.y-79)<.1){s.moored={...BERTH};Object.assign(s,BERTH);}}
+ s.lostPots=Number.isSafeInteger(raw.lostPots)?Math.max(0,Math.min(200,raw.lostPots)):0;
+ delete s.worldHour;
  s.crewLosses=Number.isInteger(raw.crewLosses)&&raw.crewLosses>=0?raw.crewLosses:raw.overboard?1:0;
  const tow=s.tow;
  if(tow&&!(['film','planning'].includes(tow.phase)||(['hook','travel'].includes(tow.phase)&&numbers(tow,['elapsed','index','fee'])&&Number.isInteger(tow.index)&&tow.index>=0&&Array.isArray(tow.route)&&tow.route.length<=20000&&tow.index<=tow.route.length&&tow.route.every(p=>numbers(p,['x','y'])))))s.tow=null;
@@ -35,4 +37,4 @@ export function restoreSeason(raw){if(!raw||raw.version!==1||!numbers(raw,['x','
  if(s.deckJob?.kind==='unload'&&s.deckJob.quayVersion!==2){Object.assign(s.deckJob,{x:s.x,y:s.y,startHeading:s.heading,elapsed:0,quayVersion:2});delete s.deckJob.route;}
  const stats=vesselStats(s);if(raw.energySchema!==1){const convert=(fuel,boat,parts)=>{const match=/boat-(\d+)-(\d+)/.exec(boat.id);if(boat.powertrain!=='electric'||!match)return fuel;const tank=650+(Number(match[1])-1)*65+(Number(match[2])-1)*160+(parts?.tank||0)*150;return Math.max(0,Math.min(1,fuel/tank))*(boat.tank+(parts?.tank||0)*150);};s.fuel=convert(s.fuel,stats,s.career.parts);for(const b of s.career.fleet)b.fuel=convert(b.fuel,boatById(b.boat),b.parts);}s.energySchema=1;for(const gear of [...s.pots,...s.nets])if(gear.legacyAbundance!==undefined&&(!Number.isFinite(gear.legacyAbundance)||gear.legacyAbundance<0||gear.legacyAbundance>1))delete gear.legacyAbundance;s.capacity=stats.capacity;s.fuel=Math.min(s.fuel,stats.tank);return migrateWorld(normalizePotNumbers(s));
 }
-export function seasonJSON(s){const {remotePlayers,...local}=s;return JSON.stringify({...local,lastHaul:null,popupEvents:[],log:[],weatherOverride:null,realWeather:null,weatherStatus:null,activity:null},null,2);}
+export function seasonJSON(s){const {remotePlayers,worldHour,...local}=s;return JSON.stringify({...local,lastHaul:null,popupEvents:[],log:[],weatherOverride:null,realWeather:null,weatherStatus:null,activity:null},null,2);}
