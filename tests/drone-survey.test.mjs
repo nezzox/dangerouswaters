@@ -20,12 +20,13 @@ test('Drone Survey is a single Electronics upgrade that costs $500,000 and survi
  assert.equal(s.money,0);
  assert.equal(restoreSeason(JSON.parse(seasonJSON(s))).career.parts.droneSurvey,1);
 });
-test('the survey ranks separated open-water points by real crab abundance within a two kilometre circuit',()=>{
- const hour=44,core=crabHotspot(groundsAt(hour)[0],5,hour),center={x:core.x+200,y:core.y};
+test('the survey ranks separated open-water points by real crab abundance within a ten kilometre circuit',()=>{
+ const hour=44,core=crabHotspot(groundsAt(hour)[0],5,hour),center={x:core.x+900,y:core.y};
  const points=scanCrab(center,hour);
  assert(points.length>0&&points.length<=4);
  assert.deepEqual(points,scanCrab(center,hour));
- assert(Math.abs(2*Math.PI*DRONE_RADIUS-2000)<25);
+ assert(points.some(p=>Math.hypot(p.x-center.x,p.y-center.y)>318));
+ assert(Math.abs(2*Math.PI*DRONE_RADIUS-10000)<25);
  for(const [i,p] of points.entries()){
   assert(Math.hypot(p.x-center.x,p.y-center.y)<=DRONE_RADIUS);
   assert(inWorld(p.x,p.y)&&clearWater(p.x,p.y,45));

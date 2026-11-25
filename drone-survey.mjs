@@ -1,22 +1,23 @@
-import {crabAbundance} from './fishing-grounds.mjs?v=0.18.78';
-import {clearWater,inWorld} from './world.mjs?v=0.18.78';
+import {crabAbundance} from './fishing-grounds.mjs?v=0.18.79';
+import {clearWater,inWorld} from './world.mjs?v=0.18.79';
 
-export const DRONE_RADIUS=Math.round(2000/(2*Math.PI)),DRONE_DURATION=10;
-const GRID=40,SEPARATION=140,MAX_POINTS=4,MIN_SIGNAL=.16;
+export const DRONE_RADIUS=Math.round(10000/(2*Math.PI)),DRONE_DURATION=10;
+const GRID=100,SEPARATION=140,MAX_POINTS=4,MIN_SIGNAL=.16;
 const valid=p=>Number.isFinite(p?.x)&&Number.isFinite(p?.y)&&inWorld(p.x,p.y);
 const distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
 const safe=p=>valid(p)&&clearWater(p.x,p.y,45);
 
 // Rank samples of the same migrating abundance field that feeds the pot yield.
 // A signal is a relative habitat estimate, not a guaranteed catch percentage.
-export function scanCrab(origin,hour){
+export function scanCrab(origin,hour,allow=()=>true){
  if(!valid(origin)||!Number.isFinite(hour))return [];
  const samples=[];
- for(let x=-280;x<=280;x+=GRID)for(let y=-280;y<=280;y+=GRID){
+ const extent=Math.floor(DRONE_RADIUS/GRID)*GRID;
+ for(let x=-extent;x<=extent;x+=GRID)for(let y=-extent;y<=extent;y+=GRID){
   const p={x:origin.x+x,y:origin.y+y};
-  if(Math.hypot(x,y)>DRONE_RADIUS||!safe(p))continue;
+  if(Math.hypot(x,y)>DRONE_RADIUS||!allow(p))continue;
   const score=crabAbundance(p.x,p.y,hour);
-  if(score>=MIN_SIGNAL)samples.push({...p,score});
+  if(score>=MIN_SIGNAL&&safe(p))samples.push({...p,score});
  }
  samples.sort((a,b)=>b.score-a.score||distance(a,origin)-distance(b,origin));
  const points=[];

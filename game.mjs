@@ -1,49 +1,49 @@
-import {DRONE_RADIUS,DRONE_DURATION,droneCameraFollow,dronePose,scanCrab} from './drone-survey.mjs?v=0.18.78';
-import {deckSign} from './vessel-profile.mjs?v=0.18.78';
-import {canStand} from './deck-layout.mjs?v=0.18.78';
-import {drawPrecipitation} from './precipitation.mjs?v=0.18.78';
-import {replaceLostPots,LOST_POT_PRICE} from './simulation.mjs?v=0.18.78';
-import {shopReady} from './career.mjs?v=0.18.78';
-import {salmonMarket} from './salmon-market.mjs?v=0.18.78';
-import {OVERBOARD_NOTICE,settleOverboard,dispatchReplacement} from './man-overboard.mjs?v=0.18.78';
-import {seaLane} from './navigation.mjs?v=0.18.78';
-import {newWorldCode,newPlayerToken,cleanPlayerName,createMultiplayer,createPeerSmoother,createWorldClock} from './multiplayer.mjs?v=0.18.78';
-import {startWaypointTravel,advanceWaypointTravel} from './time-to-waypoint.mjs?v=0.18.78';
-import {CRAB_SPECIES,crabSpeciesName} from './crab-species.mjs?v=0.18.78';
-import {LIGHTING_PROFILES} from './light-upgrades.mjs?v=0.18.78';
-import {claimFirstBoatGrant,firstBoatNotice} from './first-boat.mjs?v=0.18.78';
-import {crabPriceAt,crabHoldValue} from './catch-value.mjs?v=0.18.78';
-import {watchDonations,appendDonation} from './donation-feed.mjs?v=0.18.78';
-import {DONATION_FEED_URL} from './donation-config.mjs?v=0.18.78';
-import {watchUpdates,formatUpdateNotice} from './update-check.mjs?v=0.18.78';
-import {energyPrice} from './energy.mjs?v=0.18.78';
-import {createMessageQueue} from './message-queue.mjs?v=0.18.78';
-import {visibleFleet} from './fleet-visuals.mjs?v=0.18.78';
-import {transitionWeather} from './weather-transition.mjs?v=0.18.78';
-import {ownedUpgrades,createRadioFeed,createLastHaul} from './hud-status.mjs?v=0.18.78';
-import {createIntro} from './intro.mjs?v=0.18.78';
-import {fleetNoticeCount} from './fleet.mjs?v=0.18.78';
-import {redeemDeveloperCode} from './developer-code.mjs?v=0.18.78';
-import {potSoakStage} from './pot-soak.mjs?v=0.18.78';
-import {createLiveWeather} from './live-weather.mjs?v=0.18.78';
-import {dockingStage,PORT_QUAYS,nearestQuay} from './harbor.mjs?v=0.18.78';
-import {fuelEconomy,fuelToGround} from './fuel-economy.mjs?v=0.18.78';
-import {scanSonar,drawSonar} from './sonar.mjs?v=0.18.78';
-import {rareCount,rareValue} from './rare-catch.mjs?v=0.18.78';
-import {clipChartWater} from './chart-water.mjs?v=0.18.78';
-import {groundsAt,groundReport,crabHotspot,groundMotion} from './fishing-grounds.mjs?v=0.18.78';
-import {createSoundscape} from './soundscape.mjs?v=0.18.78';
-import {WORLD_LAND,WORLD_CENTER,WORLD_BOUNDS,PLACES,worldToGeo,clearWater,ST_PAUL_DIESEL} from './world.mjs?v=0.18.78';
-import {getLanguage,setLanguage,translateText,localizeTree} from './i18n.mjs?v=0.18.78';
-import {createShop} from './shop.mjs?v=0.18.78';
-import {restoreSeason,seasonJSON} from './saves.mjs?v=0.18.78';
-import {vesselStats,toggleAutomation} from './career.mjs?v=0.18.78';
-import {pickupAllPots,skipperCommand,createGame,step,notify,conditions,weatherAt,setWeatherMode,depthAt,PORT,distance,nearPort,handlePot,dock,undock,canUndock,service,beginTow,towDestination,towFee,atDieselStation,getUnstuck,clamp,potAction,POT_RANGE,jobProgress,setAutopilot,autopilotRouteStart,applyAutopilotRoute,setRudder,potBearing,workingSide} from './simulation.mjs?v=0.18.78';
-import {createOcean,drawFallback} from './ocean.mjs?v=0.18.78';
-import {createScene} from './scene.mjs?v=0.18.78';
-import {drawGroundMotion,createChartView,chartPoint,chartWorld,panChart,zoomChart,followVessel,fitPots,updateChartFollow} from './chart.mjs?v=0.18.78';
-import {createWake} from './wake.mjs?v=0.18.78';
-import {advanceVoyage} from './voyage.mjs?v=0.18.78';
+import {DRONE_RADIUS,DRONE_DURATION,droneCameraFollow,dronePose,scanCrab} from './drone-survey.mjs?v=0.18.79';
+import {deckSign} from './vessel-profile.mjs?v=0.18.79';
+import {canStand} from './deck-layout.mjs?v=0.18.79';
+import {drawPrecipitation} from './precipitation.mjs?v=0.18.79';
+import {replaceLostPots,LOST_POT_PRICE} from './simulation.mjs?v=0.18.79';
+import {shopReady} from './career.mjs?v=0.18.79';
+import {salmonMarket} from './salmon-market.mjs?v=0.18.79';
+import {OVERBOARD_NOTICE,settleOverboard,dispatchReplacement} from './man-overboard.mjs?v=0.18.79';
+import {seaLane} from './navigation.mjs?v=0.18.79';
+import {newWorldCode,newPlayerToken,cleanPlayerName,createMultiplayer,createPeerSmoother,createWorldClock} from './multiplayer.mjs?v=0.18.79';
+import {startWaypointTravel,advanceWaypointTravel} from './time-to-waypoint.mjs?v=0.18.79';
+import {CRAB_SPECIES,crabSpeciesName} from './crab-species.mjs?v=0.18.79';
+import {LIGHTING_PROFILES} from './light-upgrades.mjs?v=0.18.79';
+import {claimFirstBoatGrant,firstBoatNotice} from './first-boat.mjs?v=0.18.79';
+import {crabPriceAt,crabHoldValue} from './catch-value.mjs?v=0.18.79';
+import {watchDonations,appendDonation} from './donation-feed.mjs?v=0.18.79';
+import {DONATION_FEED_URL} from './donation-config.mjs?v=0.18.79';
+import {watchUpdates,formatUpdateNotice} from './update-check.mjs?v=0.18.79';
+import {energyPrice} from './energy.mjs?v=0.18.79';
+import {createMessageQueue} from './message-queue.mjs?v=0.18.79';
+import {visibleFleet} from './fleet-visuals.mjs?v=0.18.79';
+import {transitionWeather} from './weather-transition.mjs?v=0.18.79';
+import {ownedUpgrades,createRadioFeed,createLastHaul} from './hud-status.mjs?v=0.18.79';
+import {createIntro} from './intro.mjs?v=0.18.79';
+import {fleetNoticeCount} from './fleet.mjs?v=0.18.79';
+import {redeemDeveloperCode} from './developer-code.mjs?v=0.18.79';
+import {potSoakStage} from './pot-soak.mjs?v=0.18.79';
+import {createLiveWeather} from './live-weather.mjs?v=0.18.79';
+import {dockingStage,PORT_QUAYS,nearestQuay} from './harbor.mjs?v=0.18.79';
+import {fuelEconomy,fuelToGround} from './fuel-economy.mjs?v=0.18.79';
+import {scanSonar,drawSonar} from './sonar.mjs?v=0.18.79';
+import {rareCount,rareValue} from './rare-catch.mjs?v=0.18.79';
+import {clipChartWater} from './chart-water.mjs?v=0.18.79';
+import {groundsAt,groundReport,crabHotspot,groundMotion} from './fishing-grounds.mjs?v=0.18.79';
+import {createSoundscape} from './soundscape.mjs?v=0.18.79';
+import {WORLD_LAND,WORLD_CENTER,WORLD_BOUNDS,PLACES,worldToGeo,clearWater,ST_PAUL_DIESEL} from './world.mjs?v=0.18.79';
+import {getLanguage,setLanguage,translateText,localizeTree} from './i18n.mjs?v=0.18.79';
+import {createShop} from './shop.mjs?v=0.18.79';
+import {restoreSeason,seasonJSON} from './saves.mjs?v=0.18.79';
+import {vesselStats,toggleAutomation} from './career.mjs?v=0.18.79';
+import {pickupAllPots,skipperCommand,createGame,step,notify,startDroneSet,cancelDroneSet,conditions,weatherAt,setWeatherMode,depthAt,PORT,distance,nearPort,handlePot,dock,undock,canUndock,service,beginTow,towDestination,towFee,atDieselStation,getUnstuck,clamp,potAction,POT_RANGE,jobProgress,setAutopilot,autopilotRouteStart,applyAutopilotRoute,setRudder,potBearing,workingSide} from './simulation.mjs?v=0.18.79';
+import {createOcean,drawFallback} from './ocean.mjs?v=0.18.79';
+import {createScene} from './scene.mjs?v=0.18.79';
+import {drawGroundMotion,createChartView,chartPoint,chartWorld,panChart,zoomChart,followVessel,fitPots,updateChartFollow} from './chart.mjs?v=0.18.79';
+import {createWake} from './wake.mjs?v=0.18.79';
+import {advanceVoyage} from './voyage.mjs?v=0.18.79';
 let sonarFrame='';const radioFeed=createRadioFeed(),messageQueue=createMessageQueue();let ownedSignature='';const lastHaulDisplay=createLastHaul();
 const wake=createWake();
 const $=id=>document.getElementById(id),canvas=$('world'),ctx=canvas.getContext('2d'),sea=$('ocean'),chart=$('chart'),map=chart.getContext('2d');
@@ -127,7 +127,7 @@ function requestWaypoint(target,append){
  function launch(start,end,grid,complete){
   let worker;
   try{
-   worker=new Worker(new URL('./waypoint-worker.mjs?v=0.18.78',import.meta.url),{type:'module'});
+   worker=new Worker(new URL('./waypoint-worker.mjs?v=0.18.79',import.meta.url),{type:'module'});
    waypointWorkers.add(worker);
    const done=route=>{
     if(!waypointWorkers.delete(worker))return;
@@ -190,7 +190,7 @@ for(const b of document.querySelectorAll('[data-chart-area]'))b.onclick=()=>{cha
 $('chart-center').onclick=()=>{followVessel(chartView,state);drawChart();};
 let waypointTravel=null;
 $('time-to-waypoint').onclick=()=>{if(state.tow)return;if(waypointTravel){waypointTravel=null;state.message='Time to waypoint cancelled.';updateUI();return;}if($('chart-dialog').open)$('chart-dialog').close();waypointTravel=startWaypointTravel(state);if(!waypointTravel){state.message='Set an autopilot waypoint and finish any active work or repairs first.';updateUI();return;}keys.clear();state.message=state.deckJob?.kind==='undock'?'Casting off, then skipping to the next waypoint…':'Travelling to next waypoint…';updateUI();};
-$('ap-cancel').onclick=()=>{if(state.tow)return;cancelWaypointSearch();state.autopilot=null;state.rudder=0;state.message='Autopilot disengaged. Manual helm control.';updateUI();save();};
+$('ap-cancel').onclick=()=>{if(state.tow)return;cancelWaypointSearch();if(!cancelDroneSet(state)){state.autopilot=null;state.rudder=0;state.message='Autopilot disengaged. Manual helm control.';}updateUI();save();};
 $('speed-target').addEventListener('pointerup',()=>canvas.focus({preventScroll:true}));
 for(const b of document.querySelectorAll('[data-weather-mode]'))b.onclick=()=>{setWeatherMode(state,b.dataset.weatherMode);void liveWeather.update(state);save();updateUI();canvas.focus();};
 $('renderer').onclick=()=>{$('code-input').value='';$('code-dialog').returnValue='';keys.clear();$('code-dialog').showModal();$('code-input').focus();};
@@ -241,7 +241,7 @@ function planTow(){
   save();updateUI();
  }
  for(const grid of grids)try{
-  const worker=new Worker(new URL('./waypoint-worker.mjs?v=0.18.78',import.meta.url),{type:'module'});
+  const worker=new Worker(new URL('./waypoint-worker.mjs?v=0.18.79',import.meta.url),{type:'module'});
   workers.add(worker);
   const done=route=>{
    if(!workers.delete(worker))return;
@@ -287,13 +287,15 @@ function advanceDrone(dt){
  if(state.paused||$('intro').open||document.hidden)return;
  droneFlight.elapsed=Math.min(DRONE_DURATION,droneFlight.elapsed+dt);
  if(droneFlight.elapsed<DRONE_DURATION)return;
- const {origin,hour}=droneFlight,points=scanCrab(origin,hour);
+ const {origin,hour}=droneFlight,points=scanCrab(origin,hour,p=>!nearPort(p));
  state.droneSurvey={origin,hour,points};droneFlight=null;
- notify(state,points.length?'Drone landed. Crab survey waypoints are ready on the chart.':'Drone landed. No promising crab signals in this area.');
+ if(points.length){cancelWaypointSearch();startDroneSet(state,points);}
+ else notify(state,'Drone landed. No promising crab signals in this area.');
  save();updateUI();
 }
 $('drone-survey').onclick=()=>{
  const stats=vesselStats(state);
+ if(cancelDroneSet(state)){save();updateUI();return;}
  if(droneFlight||!stats.droneSurvey||!droneFree())return;
  const deck=[[-9.5,0],[-8,-1.4],[-10,1.3],[-6,-2],[-5,1.8]].find(([x,z])=>canStand(x,z,state.deck,false,stats))||[-6,0];
  droneFlight={origin:{x:state.x,y:state.y},heading:state.heading,hour:watchHour(),elapsed:0,deck,state,boat:state.career.boat};
@@ -320,14 +322,14 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden)audio?.upda
 const stopDonations=watchDonations({url:DONATION_FEED_URL,receive:text=>appendDonation(state,text)});addEventListener('pagehide',event=>{if(!event.persisted)stopDonations();},{once:true});
 const stopUpdateChecks=watchUpdates({currentVersion:new URL(import.meta.url).searchParams.get('v'),notify:(version,notes)=>messageQueue.enqueue({kind:'update',version,notes,text:formatUpdateNotice(version,notes,getLanguage())})});addEventListener('pagehide',event=>{if(!event.persisted)stopUpdateChecks();},{once:true});
 function showQueuedMessage(){messageQueue.collect(state);if(!started||document.querySelector('dialog[open]'))return;if(state.tow?.phase==='film'){
- intro.start({source:'./tow.mp4?v=0.18.78',onFinish:()=>{state.tow.phase='planning';save();updateUI();}});return;
+ intro.start({source:'./tow.mp4?v=0.18.79',onFinish:()=>{state.tow.phase='planning';save();updateUI();}});return;
 }
 if(state.tow?.phase==='planning'){planTow();return;}
 if(state.tow)return;
 if(state.specialCatchFilm){
- intro.start({source:'./special-catch.mp4?v=0.18.78',onFinish:()=>{state.specialCatchFilm=false;save();updateUI();}});return;
+ intro.start({source:'./special-catch.mp4?v=0.18.79',onFinish:()=>{state.specialCatchFilm=false;save();updateUI();}});return;
 }
-if(state.overboard?.phase==='film'){save();intro.start({source:state.crewLosses>1?'./another-lost.mp4?v=0.18.78':'./man-overboard.mp4?v=0.18.78',onFinish:()=>{settleOverboard(state);save();updateUI();}});return;}
+if(state.overboard?.phase==='film'){save();intro.start({source:state.crewLosses>1?'./another-lost.mp4?v=0.18.79':'./man-overboard.mp4?v=0.18.79',onFinish:()=>{settleOverboard(state);save();updateUI();}});return;}
 if(state.overboard?.phase==='notice'){activeMessageKind='overboard';keys.clear();$('message-popup-title').textContent='MAN OVERBOARD';$('message-popup-text').textContent=OVERBOARD_NOTICE;localizeTree($('message-popup'));$('message-popup').showModal();$('message-popup-ok').focus();return;}if(state.career.firstBoatReward==='pending'&&!firstBoatAcknowledgement){firstBoatWasPaused=state.paused;state.paused=true;save();$('intro').setAttribute('aria-label',translateText('First boat celebration'));$('intro-video').setAttribute('aria-label',translateText('First boat celebration video'));intro.start({source:'./new-boat.mp4',onFinish:()=>{firstBoatAcknowledgement=true;state.paused=firstBoatWasPaused;messageQueue.enqueue({kind:'firstBoat',text:firstBoatNotice(getLanguage())});updateUI();}});return;}const entry=messageQueue.next();if(!entry)return;activeMessageKind=entry.kind;keys.clear();if(entry.kind==='update')save();$('message-popup-title').textContent=entry.kind==='firstBoat'?'YOUR FIRST BOAT':entry.kind==='update'?'GAME UPDATE AVAILABLE':entry.kind==='incident'?'REPAIR & VESSEL ALERT':'FLEET RADIO';$('message-popup-text').textContent=entry.kind==='update'&&entry.version?formatUpdateNotice(entry.version,entry.notes,getLanguage()):entry.text;localizeTree($('message-popup'));$('message-popup').showModal();$('message-popup-ok').focus();}
 let offeredMooring=state.moored;
 const refuelPrompt=$('refuel-prompt');
@@ -390,7 +392,7 @@ function updateUI(){
  const strip=$('weather-strip');if(!strip.children.length)for(let i=0;i<24;i++)strip.append(document.createElement('i'));[...strip.children].forEach((el,i)=>{const f=state.realWeather?.forecast?.[i]||weatherAt(watchHour()+i/4);el.style.height=(f.wind/48*100)+'%';el.style.background=f.wind>30?'#d5a366':'#799a93';});
  $('rare-catch-open').textContent=`SPECIAL CATCHES · ${rareCount(state)} ABOARD · ${money(rareValue(state))}`;
  $('cargo').textContent=state.cargo+state.salmon;$('catch-split').textContent=`${state.cargo} / ${state.salmon} kg`;$('cargo-meter').max=stats.capacity;$('cargo-capacity').textContent=stats.capacity.toLocaleString(getLanguage()==='sv'?'sv-SE':'en-US')+' KG';const haul=lastHaulDisplay(state.lastHaul,performance.now());$('last-haul').hidden=!haul;if(haul){$('last-haul').textContent='+'+haul.kg+' KG';$('last-haul').title=state.lastHaul?.crabSpecies?crabSpeciesName(state.lastHaul.crabSpecies,getLanguage()):'';$('last-haul').style.opacity=haul.opacity;}$('cargo-meter').value=state.cargo+state.salmon;$('deck').textContent=`${state.deck} / ${stats.potCapacity}`;$('pots').textContent=state.pots.length;$('money').textContent=money(state.money);$('depth').textContent=`DEPTH ${depthAt(state.x,state.y)} M`;const geo=worldToGeo(state.x,state.y);$('coordinates').textContent=`${geo.lat.toFixed(4)}° N ${Math.abs(geo.lon).toFixed(4)}° ${geo.lon<0?'W':'E'}`;$('sea-position').textContent=`${depthAt(state.x,state.y)} M DEPTH · ${Math.round(distance(state,nearestQuay(state)))} M TO HARBOR`;
- const droneButton=$('drone-survey');droneButton.disabled=!stats.droneSurvey||!!droneFlight||!droneFree();droneButton.dataset.flying=String(!!droneFlight);droneButton.textContent=droneFlight?'DRONE SURVEY · IN FLIGHT':stats.droneSurvey?'DRONE SURVEY':'DRONE SURVEY · LOCKED';
+ const droneButton=$('drone-survey');const droneSetting=state.skipperMission?.kind==='droneSet';droneButton.disabled=!droneSetting&&(!stats.droneSurvey||!!droneFlight||!droneFree());droneButton.dataset.flying=String(!!droneFlight);droneButton.textContent=droneSetting?'CANCEL DRONE POT SETTING':droneFlight?'DRONE SURVEY · IN FLIGHT':stats.droneSurvey?'DRONE SURVEY':'DRONE SURVEY · LOCKED';
  const collecting=state.skipperMission?.kind==='pickupAll',pickupUnlocked=!!state.career.skills.pickupAll;$('pickup-all').disabled=!pickupUnlocked||(!collecting&&(!!state.deckJob||!state.pots.length));$('pickup-all').textContent=collecting?'CANCEL PICKUP ALL':pickupUnlocked?'PICKUP ALL POTS':'PICKUP ALL POTS · LOCKED';$('pickup-all').setAttribute('aria-pressed',String(collecting));
  for(const [id,rank,label]of [['skipper-home',1,'RETURN & DOCK'],['skipper-pot',2,'OLDEST POT']]){const locked=(state.career.skills.steer||0)<rank;$(id).disabled=locked||!!state.deckJob||(id==='skipper-pot'&&!state.pots.length);$(id).textContent=label+(locked?' · LOCKED':'');}
  const atFuelStation=atDieselStation(state);
@@ -476,7 +478,7 @@ function drawChart(){
  const boat=point(state.x,state.y);if(state.autopilot){const nav=state.autopilot;map.strokeStyle='#e4ac64';map.setLineDash([4,4]);map.beginPath();map.moveTo(boat.x,boat.y);for(const node of (nav.route||[nav]).slice(nav.index||0)){const p=point(node.x,node.y);map.lineTo(p.x,p.y);}map.stroke();map.setLineDash([]);for(const [i,node] of (nav.waypoints||[nav]).entries()){const p=point(node.x,node.y);map.fillStyle='#11272e';map.beginPath();map.arc(p.x,p.y,8,0,Math.PI*2);map.fill();map.stroke();map.fillStyle='#f0c58a';map.font='9px monospace';map.textAlign='center';map.fillText(String(i+1),p.x,p.y+3);map.textAlign='start';}}
 
  map.save();map.translate(boat.x,boat.y);map.rotate(state.heading);map.fillStyle='#f0be7c';map.beginPath();map.moveTo(7,0);map.lineTo(-5,-4);map.lineTo(-3,0);map.lineTo(-5,4);map.closePath();map.fill();map.restore();map.fillStyle='#9db3b3';map.font='9px monospace';map.fillText('N ↑',cw-25,17);chart.setAttribute('aria-label',`Chart: ${vesselStats(state).name}; ${state.pots.length} own pots; ${state.career.fleet.map(b=>`${b.name} ${Math.round(b.x)}, ${Math.round(b.y)}, ${b.pots.length} fleet pots`).join('; ')||'no hired vessels'}`);
- $('chart-status').textContent=state.tow?'SCROLL: ZOOM · DRAG: PAN':planningWaypoint?'PLANNING ROUTE…':state.autopilot?`AUTOPILOT · ${state.autopilot.waypoints?.length||1} WAYPOINTS · ${Math.round(distance(state,state.autopilot))} M TO DESTINATION`:`SCROLL: ZOOM · DRAG: PAN · RIGHT CLICK: AP`;$('ap-cancel').disabled=!!state.tow||(!state.autopilot&&!planningWaypoint);$('time-to-waypoint').disabled=!!droneFlight||!!state.tow||(!state.autopilot&&!waypointTravel);$('time-to-waypoint').textContent=waypointTravel?'CANCEL TRAVEL':'SKIP TO WAYPOINT';map.fillStyle='#9db3b3';map.font='7px monospace';const bar=Math.min(70,cw/3),meters=Math.round(bar/scale);map.fillRect(10,ch-12,bar,1);map.fillText(meters>=1852?`${(meters/1852).toFixed(1)} NM`:`${meters} M`,10,ch-17);
+ $('chart-status').textContent=state.tow?'SCROLL: ZOOM · DRAG: PAN':planningWaypoint?'PLANNING ROUTE…':state.autopilot?`AUTOPILOT · ${state.autopilot.waypoints?.length||1} WAYPOINTS · ${Math.round(distance(state,state.autopilot))} M TO DESTINATION`:`SCROLL: ZOOM · DRAG: PAN · RIGHT CLICK: AP`;$('ap-cancel').disabled=!!state.tow||(!state.autopilot&&!planningWaypoint&&state.skipperMission?.kind!=='droneSet');$('time-to-waypoint').disabled=state.skipperMission?.kind==='droneSet'||!!droneFlight||!!state.tow||(!state.autopilot&&!waypointTravel);$('time-to-waypoint').textContent=waypointTravel?'CANCEL TRAVEL':'SKIP TO WAYPOINT';map.fillStyle='#9db3b3';map.font='7px monospace';const bar=Math.min(70,cw/3),meters=Math.round(bar/scale);map.fillRect(10,ch-12,bar,1);map.fillText(meters>=1852?`${(meters/1852).toFixed(1)} NM`:`${meters} M`,10,ch-17);
 }
 function drawHarbor(){ctx.fillStyle='#34433a';ctx.strokeStyle='#729082';for(const land of WORLD_LAND){ctx.beginPath();for(const ring of [land.outer,...land.holes]){ring.forEach((v,i)=>{const p=pos(v.x,v.y);i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y);});ctx.closePath();}ctx.fill('evenodd');ctx.stroke();}}
 function drawGrounds(){ctx.save();clipChartWater(ctx,pos,width,height);for(const g of groundsAt(watchHour())){const p=pos(g.x,g.y);if(p.x< -200||p.x>width+200||p.y< -200||p.y>height+200)continue;ctx.save();ctx.strokeStyle='#8db8a626';ctx.setLineDash([3,15]);ctx.beginPath();ctx.ellipse(p.x,p.y,g.rx*view.scale,g.ry*view.scale,g.angle,0,Math.PI*2);ctx.stroke();ctx.fillStyle='#b8d0bd77';ctx.textAlign='center';ctx.font='9px monospace';ctx.fillText(g.name,p.x,p.y);drawGroundMotion(ctx,p,groundMotion(g,state.career.skills.crab,state.hour));ctx.restore();}ctx.restore();}

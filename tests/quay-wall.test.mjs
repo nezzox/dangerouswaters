@@ -33,3 +33,13 @@ test('Dutch Harbor’s outer quay end joins the shoreline instead of leaving a s
  const berthFace=face.flat().filter(([u,v])=>u>35&&u<=57.801&&Math.abs(v)<.001);
  assert(berthFace.length>0,'keep a straight wall along the main service quay');
 });
+
+
+test('shore rocks reach the outer Dutch quay end without crossing into the concrete berth',()=>{
+ const mesh=buildGeography(q.x,q.y);
+ const points=[];
+ for(let i=0;i<mesh.length;i+=11)if(mesh[i+10]===-2)points.push(uv(mesh[i],mesh[i+2]));
+ const nearby=points.filter(([u,v])=>u>apron.end-10&&u<apron.end+10&&v>-12&&v<0);
+ assert(nearby.some(([u])=>u>=apron.end&&u<=apron.end+4),'gap between the rocks and the concrete wall');
+ assert(!nearby.some(([u])=>u<apron.end-.05),'rocks cross the end of the working quay');
+});

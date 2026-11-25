@@ -1,4 +1,4 @@
-import {CRAB_SPECIES} from './crab-species.mjs?v=0.18.78';
+import {CRAB_SPECIES} from './crab-species.mjs?v=0.18.79';
 // Saved money/prices remain in legacy SEK units. Fixed game conversion: 10 SEK = 1 USD.
 // Translation is applied at the presentation boundary; save data and simulation never change language.
 let language='en';
@@ -297,6 +297,14 @@ const sv={
  'Launch a drone to survey the water around your boat and mark promising crab spots on the chart.':'Skicka upp en drönare som söker av vattnet runt båten och markerar lovande krabbplatser på sjökortet.',
  'Launch a short drone survey and chart promising crab spots.':'Gör en snabb drönarsökning och markera lovande krabbplatser.',
  'Drone survey waypoints':'Drönarens waypoints','EST.':'UPPSK.','Estimated crab signal, not a catch guarantee. Hold Shift to append to the route.':'Uppskattad krabbsignal, inte en garanterad fångst. Håll Skift för att lägga till den i rutten.',
+ 'Cancel Drone Pot Setting':'Avbryt drönarens tinsättning',
+ 'Drone landed. The skipper will set pots at the survey marks.':'Drönaren har landat. Skepparen sätter tinor på de markerade platserna.',
+ 'Drone landed. No survey marks clear of harbor.':'Drönaren har landat. Inga markeringar ligger utanför hamnområdet.',
+ 'Drone pot setting needs pots, bait and fuel.':'För att sätta ut tinor behövs tinor ombord, bete och bränsle.',
+ 'Drone pot setting cancelled.':'Drönarens tinsättning avbröts.',
+ 'Drone pot setting finished. Some marks could not be used.':'Tinsättningen är klar. Några markeringar kunde inte användas.',
+ 'Drone pot setting complete.':'En tina har satts på varje markering.',
+ 'Drone pot setting stopped: out of pots, bait or fuel.':'Tinsättningen stoppades: tinor, bete eller bränsle saknas.',
  'Drone launching. Surveying the water around the vessel.':'Drönaren lyfter och söker av vattnet runt båten.',
  'Drone landed. Crab survey waypoints are ready on the chart.':'Drönaren har landat. Lovande krabbplatser är markerade på sjökortet.',
  'Drone landed. No promising crab signals in this area.':'Drönaren har landat. Inga lovande krabbsignaler i området.',
