@@ -1,4 +1,4 @@
-import {createFirebaseMultiplayer} from './multiplayer-firebase.mjs?v=0.18.81';
+import {createFirebaseMultiplayer} from './multiplayer-firebase.mjs?v=0.18.82';
 const alphabet='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 export function newWorldCode(){const values=crypto.getRandomValues(new Uint8Array(6));return Array.from(values,n=>alphabet[n%alphabet.length]).join('');}
 export function newPlayerToken(){return Array.from(crypto.getRandomValues(new Uint8Array(16)),v=>v.toString(16).padStart(2,'0')).join('');}

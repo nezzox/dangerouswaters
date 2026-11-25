@@ -88,3 +88,26 @@ test('eight survey marks are cleared by actual moving releases on one plotted ro
  assert.equal(s.droneSurvey.points.length,0);
  assert.equal(s.skipperMission,null);
 });
+
+test('a 52-pot survey cruises between drops without sacrificing placement or deck speed',async()=>{
+ const {crabHotspot,groundsAt}=await import('../fishing-grounds.mjs');
+ const {scanCrab}=await import('../drone-survey.mjs');
+ const {BOATS}=await import('../catalog.mjs');
+ const s=setup(),hour=44,c=crabHotspot(groundsAt(hour)[0],5,hour),boat=BOATS.find(b=>b.id==='boat-3-10');
+ Object.assign(s,{x:c.x+180,y:c.y+120,hour,deck:52,money:8e6,fuel:boat.tank});
+ s.career.boat=boat.id;
+ const points=scanCrab(s,hour,s.deck);
+ assert.equal(points.length,52);
+ s.droneSurvey={origin:{x:s.x,y:s.y},hour,points};
+ assert(startDroneSet(s,points));
+ let steps=0,cruising=0;
+ while(s.skipperMission&&steps++<10000){
+  step(s,.25,fixed);
+  if(!s.deckJob&&s.speed*1.94384>8)cruising++;
+  if(s.deckJob?.kind==='deploy'&&s.deckJob.released)assert(s.speed>0&&s.speed*1.94384<5);
+ }
+ assert(!s.skipperMission,'52-pot time budget exceeded');
+ assert.equal(s.pots.length,52);
+ assert.equal(s.droneSurvey.points.length,0);
+ assert(cruising>1200,'expected at least five simulated minutes above eight knots');
+});
