@@ -1,4 +1,4 @@
-import {CRAB_SPECIES} from './crab-species.mjs?v=0.18.79';
+import {CRAB_SPECIES} from './crab-species.mjs?v=0.18.80';
 // Saved money/prices remain in legacy SEK units. Fixed game conversion: 10 SEK = 1 USD.
 // Translation is applied at the presentation boundary; save data and simulation never change language.
 let language='en';
@@ -300,6 +300,10 @@ const sv={
  'Cancel Drone Pot Setting':'Avbryt drönarens tinsättning',
  'Drone landed. The skipper will set pots at the survey marks.':'Drönaren har landat. Skepparen sätter tinor på de markerade platserna.',
  'Drone landed. No survey marks clear of harbor.':'Drönaren har landat. Inga markeringar ligger utanför hamnområdet.',
+ 'Live weather unavailable · simulated conditions':'Liveväder otillgängligt · simulerat väder',
+ 'Connecting to live weather · simulated conditions':'Hämtar liveväder · simulerat väder',
+ 'Cached weather':'Senast hämtat väder','Estimated waves':'Uppskattade vågor','Live weather':'Liveväder','Wind':'Vind','Seas':'Sjö','Snow':'Snö','Rain':'Regn',
+ 'Drone Survey needs at least one pot on board.':'Drone Survey behöver minst en tina ombord.',
  'Drone pot setting needs pots, bait and fuel.':'För att sätta ut tinor behövs tinor ombord, bete och bränsle.',
  'Drone pot setting cancelled.':'Drönarens tinsättning avbröts.',
  'Drone pot setting finished. Some marks could not be used.':'Tinsättningen är klar. Några markeringar kunde inte användas.',

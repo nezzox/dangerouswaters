@@ -1,18 +1,19 @@
-import {crabAbundance} from './fishing-grounds.mjs?v=0.18.79';
-import {clearWater,inWorld} from './world.mjs?v=0.18.79';
+import {crabAbundance} from './fishing-grounds.mjs?v=0.18.80';
+import {clearWater,inWorld} from './world.mjs?v=0.18.80';
 
 export const DRONE_RADIUS=Math.round(10000/(2*Math.PI)),DRONE_DURATION=10;
-const GRID=100,SEPARATION=140,MAX_POINTS=4,MIN_SIGNAL=.16;
+const GRID=100,SEPARATION=140,MIN_SIGNAL=.16;
+const GRID_STEPS=Math.floor(DRONE_RADIUS/GRID),MAX_SAMPLES=(2*GRID_STEPS+1)**2;
 const valid=p=>Number.isFinite(p?.x)&&Number.isFinite(p?.y)&&inWorld(p.x,p.y);
 const distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
 const safe=p=>valid(p)&&clearWater(p.x,p.y,45);
 
 // Rank samples of the same migrating abundance field that feeds the pot yield.
 // A signal is a relative habitat estimate, not a guaranteed catch percentage.
-export function scanCrab(origin,hour,allow=()=>true){
- if(!valid(origin)||!Number.isFinite(hour))return [];
+export function scanCrab(origin,hour,pots,allow=()=>true){
+ if(!valid(origin)||!Number.isFinite(hour)||!Number.isInteger(pots)||pots<1)return [];
  const samples=[];
- const extent=Math.floor(DRONE_RADIUS/GRID)*GRID;
+ const extent=GRID_STEPS*GRID;
  for(let x=-extent;x<=extent;x+=GRID)for(let y=-extent;y<=extent;y+=GRID){
   const p={x:origin.x+x,y:origin.y+y};
   if(Math.hypot(x,y)>DRONE_RADIUS||!allow(p))continue;
@@ -24,16 +25,15 @@ export function scanCrab(origin,hour,allow=()=>true){
  for(const p of samples){
   if(p.score<samples[0].score*.72)break;
   if(points.every(other=>distance(p,other)>=SEPARATION))points.push(p);
-  if(points.length===MAX_POINTS)break;
+  if(points.length===pots)break;
  }
  return points;
 }
 export function readSurvey(raw){
  if(!valid(raw?.origin)||!Number.isFinite(raw.hour)||raw.hour<0||!Array.isArray(raw.points))return null;
  const {x,y}=raw.origin,points=[];
- for(const p of raw.points.slice(0,MAX_POINTS*2)){
+ for(const p of raw.points.slice(0,MAX_SAMPLES)){
   if(safe(p)&&distance(raw.origin,p)<=DRONE_RADIUS&&Number.isFinite(p.score)&&p.score>=MIN_SIGNAL&&p.score<=1&&points.every(q=>distance(p,q)>=SEPARATION))points.push({x:p.x,y:p.y,score:p.score});
-  if(points.length===MAX_POINTS)break;
  }
  return {origin:{x,y},hour:raw.hour,points};
 }

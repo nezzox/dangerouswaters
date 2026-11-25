@@ -1,5 +1,25 @@
-import {test} from 'node:test';import assert from 'node:assert/strict';import {createGame,conditions,weatherAt,setWeatherMode} from '../simulation.mjs';import {restoreSeason,seasonJSON} from '../saves.mjs';import {createLiveWeather} from '../live-weather.mjs';
-test('dynamic mode ignores live conditions and persists in saved seasons',()=>{const s=createGame();s.realWeather={value:{wind:90,waves:9,rain:1,fog:.4,front:1}};assert.equal(conditions(s).wind,90);setWeatherMode(s,'dynamic');assert.equal(s.realWeather,null);assert.deepEqual(conditions(s),weatherAt(s.hour));assert.equal(restoreSeason(JSON.parse(seasonJSON(s))).weatherMode,'dynamic');setWeatherMode(s,'live');assert.equal(s.weatherMode,'live');});
-test('older and malformed saved modes retain the current real-weather default',()=>{for(const mode of [undefined,'calm',null]){const raw=JSON.parse(seasonJSON(createGame()));raw.weatherMode=mode;assert.equal(restoreSeason(raw).weatherMode,'live');}});
-test('dynamic weather makes no external weather requests',async()=>{let calls=0;const s=createGame();setWeatherMode(s,'dynamic');const c=createLiveWeather({fetchImpl:async()=>{calls++;throw Error('unexpected fetch');}});await c.update(s);assert.equal(calls,0);assert.equal(s.realWeather,null);});
-test('switching during a request cannot reactivate live weather; switching back reuses fresh data',async()=>{const now=Date.now(),time=[Math.floor(now/1000)-3600,Math.floor(now/1000)+3600],air={hourly:{time,wind_speed_10m:[10,10],wind_direction_10m:[90,90],temperature_2m:[3,3]}},sea={hourly:{time,wave_height:[1,1]}};let release,calls=0;const gate=new Promise(r=>release=r),s=createGame(),c=createLiveWeather({now:()=>now,fetchImpl:async u=>{calls++;await gate;return {ok:true,json:async()=>u.includes('marine-api')?sea:air};}});const pending=c.update(s);setWeatherMode(s,'dynamic');release();await pending;assert.equal(s.realWeather,null);assert.deepEqual(conditions(s),weatherAt(s.hour));setWeatherMode(s,'live');await c.update(s);assert.equal(calls,2);assert.equal(conditions(s).wind,10);});
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {createGame,conditions,weatherAt} from '../simulation.mjs';
+import {restoreSeason,seasonJSON} from '../saves.mjs';
+import {createLiveWeather} from '../live-weather.mjs';
+
+test('every saved season, including a former Dynamic season, looks up real vessel weather',async()=>{
+ const now=Date.now(),times=[Math.floor(now/1000)-3600,Math.floor(now/1000)+3600];
+ const air={hourly:{time:times,wind_speed_10m:[10,10],wind_direction_10m:[90,90],temperature_2m:[3,3]}};
+ const sea={hourly:{time:times,wave_height:[1,1]}};
+ for(const mode of [undefined,'dynamic','calm',null]){
+  const value=JSON.parse(seasonJSON(createGame()));value.weatherMode=mode;
+  const s=restoreSeason(value);
+  assert.equal(s.weatherMode,'live');
+  assert.deepEqual(conditions(s),weatherAt(s.hour));
+  let requests=0;
+  const client=createLiveWeather({now:()=>now,fetchImpl:async url=>{
+   requests++;return {ok:true,json:async()=>url.includes('marine-api')?sea:air};
+  }});
+  await client.update(s);
+  assert.equal(requests,2);
+  assert.equal(conditions(s).temperature,3);
+  assert.equal(conditions(s).wind,10);
+ }
+});

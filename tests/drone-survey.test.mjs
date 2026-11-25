@@ -22,9 +22,12 @@ test('Drone Survey is a single Electronics upgrade that costs $500,000 and survi
 });
 test('the survey ranks separated open-water points by real crab abundance within a ten kilometre circuit',()=>{
  const hour=44,core=crabHotspot(groundsAt(hour)[0],5,hour),center={x:core.x+900,y:core.y};
- const points=scanCrab(center,hour);
- assert(points.length>0&&points.length<=4);
- assert.deepEqual(points,scanCrab(center,hour));
+ const points=scanCrab(center,hour,8);
+ assert.equal(points.length,8);
+ assert.deepEqual(points,scanCrab(center,hour,8));
+ assert.deepEqual(scanCrab(center,hour,2),points.slice(0,2));
+ assert.deepEqual(scanCrab(center,hour,0),[]);
+ assert.deepEqual(scanCrab(center,hour,8,()=>false),[]);
  assert(points.some(p=>Math.hypot(p.x-center.x,p.y-center.y)>318));
  assert(Math.abs(2*Math.PI*DRONE_RADIUS-10000)<25);
  for(const [i,p] of points.entries()){
@@ -34,10 +37,11 @@ test('the survey ranks separated open-water points by real crab abundance within
   if(i)assert(p.score<=points[i-1].score);
   for(const other of points.slice(0,i))assert(Math.hypot(p.x-other.x,p.y-other.y)>=140);
  }
- assert.deepEqual(scanCrab({x:Infinity,y:0},hour),[]);
+ assert.deepEqual(scanCrab({x:Infinity,y:0},hour,8),[]);
 });
 test('crab markers survive reload but invalid or implausible entries do not',()=>{
- const hour=44,core=crabHotspot(groundsAt(hour)[0],5,hour),origin={x:core.x+200,y:core.y},points=scanCrab(origin,hour);
+ const hour=44,core=crabHotspot(groundsAt(hour)[0],5,hour),origin={x:core.x+200,y:core.y},points=scanCrab(origin,hour,8);
+ assert.equal(points.length,8);
  const report={origin,points,hour},s=createGame();
  s.droneSurvey=report;
  assert.deepEqual(restoreSeason(JSON.parse(seasonJSON(s))).droneSurvey,report);

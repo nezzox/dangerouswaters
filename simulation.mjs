@@ -1,30 +1,30 @@
-import {ICE_STOP,DEICE_SECONDS,iceLevel,iceRate} from './vessel-ice.mjs?v=0.18.79';
-import {addSalmonCatch,salmonHoldRate} from './salmon-market.mjs?v=0.18.79';
-import {moveTow,roundTowRoute} from './tow.mjs?v=0.18.79';
-import {rollOverboard,stepOverboard} from './man-overboard.mjs?v=0.18.79';
-import {ST_PAUL_DIESEL} from './world.mjs?v=0.18.79';
-import {travelBoost} from './speed-curve.mjs?v=0.18.79';
-import {crabSpeciesName} from './crab-species.mjs?v=0.18.79';
-import {landCrab,addCrabCatch,captureCrabSpecies} from './catch-value.mjs?v=0.18.79';
-import {intelligentSetSignal} from './sonar-signal.mjs?v=0.18.79';
-import {nextPotNumber} from './pot-numbers.mjs?v=0.18.79';
-import {deckSign} from './vessel-profile.mjs?v=0.18.79';
-import {solarCharge,electricBurn,energyPrice} from './energy.mjs?v=0.18.79';
-import {potDropLocal} from './crane-style.mjs?v=0.18.79';
-import {resolveFleetContact} from './vessel-collision.mjs?v=0.18.79';
-import {potCatchAt} from './pot-soak.mjs?v=0.18.79';
-import {fuelBurnRate} from './fuel-economy.mjs?v=0.18.79';
-import {prepareRareCatch,awardRareCatch,rareValue,rareById} from './rare-catch.mjs?v=0.18.79';
-import {SEA_WEAR_SCALE} from './balance.mjs?v=0.18.79';
-import {crabAbundance,salmonAbundance,crabGroundAt} from './fishing-grounds.mjs?v=0.18.79';
-export {groundsAt} from './fishing-grounds.mjs?v=0.18.79';
-import {WORLD_VERSION,WORLD_BOUNDS,FISHING_GROUNDS,isLand,inWorld,clearWater} from './world.mjs?v=0.18.79';
-import {planSeaRoute,seaLane} from './navigation.mjs?v=0.18.79';
-import {tickFleet} from './fleet.mjs?v=0.18.79';
-import {ensureCareer,vesselStats,settleLanding} from './career.mjs?v=0.18.79';
-import {tickIncidents,blocksDeck,randomCareer} from './incidents.mjs?v=0.18.79';
-import {QUAY,BERTH,nearestQuay,chooseBerth,quayPoint,buildDockRoute,dockRouteDuration,dockingPose,vesselIntersectsHarbor,castOffPosition,buildCastOffRoute} from './harbor.mjs?v=0.18.79';
-export {BERTH} from './harbor.mjs?v=0.18.79';
+import {ICE_STOP,DEICE_SECONDS,iceLevel,iceRate} from './vessel-ice.mjs?v=0.18.80';
+import {addSalmonCatch,salmonHoldRate} from './salmon-market.mjs?v=0.18.80';
+import {moveTow,roundTowRoute} from './tow.mjs?v=0.18.80';
+import {rollOverboard,stepOverboard} from './man-overboard.mjs?v=0.18.80';
+import {ST_PAUL_DIESEL} from './world.mjs?v=0.18.80';
+import {travelBoost} from './speed-curve.mjs?v=0.18.80';
+import {crabSpeciesName} from './crab-species.mjs?v=0.18.80';
+import {landCrab,addCrabCatch,captureCrabSpecies} from './catch-value.mjs?v=0.18.80';
+import {intelligentSetSignal} from './sonar-signal.mjs?v=0.18.80';
+import {nextPotNumber} from './pot-numbers.mjs?v=0.18.80';
+import {deckSign} from './vessel-profile.mjs?v=0.18.80';
+import {solarCharge,electricBurn,energyPrice} from './energy.mjs?v=0.18.80';
+import {potDropLocal} from './crane-style.mjs?v=0.18.80';
+import {resolveFleetContact} from './vessel-collision.mjs?v=0.18.80';
+import {potCatchAt} from './pot-soak.mjs?v=0.18.80';
+import {fuelBurnRate} from './fuel-economy.mjs?v=0.18.80';
+import {prepareRareCatch,awardRareCatch,rareValue,rareById} from './rare-catch.mjs?v=0.18.80';
+import {SEA_WEAR_SCALE} from './balance.mjs?v=0.18.80';
+import {crabAbundance,salmonAbundance,crabGroundAt} from './fishing-grounds.mjs?v=0.18.80';
+export {groundsAt} from './fishing-grounds.mjs?v=0.18.80';
+import {WORLD_VERSION,WORLD_BOUNDS,FISHING_GROUNDS,isLand,inWorld,clearWater} from './world.mjs?v=0.18.80';
+import {planSeaRoute,seaLane} from './navigation.mjs?v=0.18.80';
+import {tickFleet} from './fleet.mjs?v=0.18.80';
+import {ensureCareer,vesselStats,settleLanding} from './career.mjs?v=0.18.80';
+import {tickIncidents,blocksDeck,randomCareer} from './incidents.mjs?v=0.18.80';
+import {QUAY,BERTH,nearestQuay,chooseBerth,quayPoint,buildDockRoute,dockRouteDuration,dockingPose,vesselIntersectsHarbor,castOffPosition,buildCastOffRoute} from './harbor.mjs?v=0.18.80';
+export {BERTH} from './harbor.mjs?v=0.18.80';
 export const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 export const PORT={x:BERTH.x,y:BERTH.y};
 export const DECK_LIMIT_KNOTS=5;
@@ -66,7 +66,7 @@ export function weatherAt(hour){
  const snowShare=clamp((1-temperature)/2,0,1);
  return {wind:clamp(7+front*34+gust,4,48),waves:.4+front*4.7,fog:clamp((Math.sin(hour*.31+1.1)-.25)*1.25,0,.92),rain:precipitation*(1-snowShare),snow:precipitation*snowShare,temperature,front};
 }
-export function conditions(s){if(s.weatherMode!=='dynamic'&&!s.weatherOverride&&s.realWeather?.value&&['wind','waves','rain','fog','front'].every(k=>Number.isFinite(s.realWeather.value[k])))return s.realWeather.value;return s.weatherOverride==='calm'?{wind:7,waves:.5,fog:0,rain:0,temperature:4,front:0}:s.weatherOverride==='rough'?{wind:42,waves:5.5,fog:.13,rain:.95,temperature:4,front:1}:s.weatherOverride==='fog'?{wind:12,waves:1.1,fog:.9,rain:.15,temperature:3,front:.2}:weatherAt(s.worldHour??s.hour);}
+export function conditions(s){if(!s.weatherOverride&&s.realWeather?.value&&['wind','waves','rain','fog','front'].every(k=>Number.isFinite(s.realWeather.value[k])))return s.realWeather.value;return s.weatherOverride==='calm'?{wind:7,waves:.5,fog:0,rain:0,temperature:4,front:0}:s.weatherOverride==='rough'?{wind:42,waves:5.5,fog:.13,rain:.95,temperature:4,front:1}:s.weatherOverride==='fog'?{wind:12,waves:1.1,fog:.9,rain:.15,temperature:3,front:.2}:weatherAt(s.worldHour??s.hour);}
 export function depthAt(x,y){return Math.round(55+Math.min(180,Math.hypot(x,y)*.055)+24*Math.sin(x*.002)*Math.cos(y*.003));}
 export function abundanceAt(x,y,hour=0){return crabAbundance(x,y,hour);}
 export const catchAt=potCatchAt;
@@ -344,6 +344,5 @@ export function vesselOnLand(s){const stats=vesselStats(s),c=Math.cos(s.heading)
 
 function revealRare(s,id,species){const r=rareById(id);if(r?.species===species&&awardRareCatch(s,s,id)){s.specialCatchFilm=true;notify(s,`SPECIAL CATCH · ${r.name} · ${r.tier} · Bonus ${r.value.toLocaleString('en-US')} kr on landing!`);}}
 
-export function setWeatherMode(s,mode){s.weatherMode=mode==='dynamic'?'dynamic':'live';s.weatherOverride=null;if(s.weatherMode==='dynamic'){s.realWeather=null;s.weatherStatus='dynamic';}}
 
 export function getUnstuck(s){if(s.overboard||s.tow)return false;if(s.deckJob?.kind==='unload'&&s.deckJob.elapsed<s.deckJob.approach||s.deckJob?.kind==='undock')s.deckJob=null;else if(s.deckJob)return notify(s,"Finish the deck operation first.");const boats=[...(s.career?.fleet||[]),...(s.remotePlayers||[])],origin={x:s.x,y:s.y},stats=vesselStats(s);for(let d=20;d<=500;d+=10)for(let i=0;i<24;i++){const a=i*Math.PI/12,p={...s,x:origin.x+Math.cos(a)*d,y:origin.y+Math.sin(a)*d};if(vesselIntersectsHarbor(p)||vesselOnLand(p)||boats.some(b=>Math.hypot(p.x-b.x,p.y-b.y)<(stats.length+vesselStats({...b,career:{boat:b.boat,parts:b.parts,skills:s.career.skills}}).length)*.65))continue;Object.assign(s,{x:p.x,y:p.y,speed:0,desiredKnots:0,throttle:0,rudder:0,moored:null,autopilot:null,skipperMission:null});notify(s,"Vessel moved clear. Ready to steer.");return true;}return notify(s,"No clear water nearby.");}
