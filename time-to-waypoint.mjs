@@ -1,9 +1,9 @@
-import {travelBoost} from './speed-curve.mjs?v=0.18.80';
-import {vesselStats} from './career.mjs?v=0.18.80';
-import {conditions} from './simulation.mjs?v=0.18.80';
-import {fuelBurnRate} from './fuel-economy.mjs?v=0.18.80';
-import {electricBurn} from './energy.mjs?v=0.18.80';
-import {seaLane} from './navigation.mjs?v=0.18.80';
+import {travelBoost} from './speed-curve.mjs?v=0.18.81';
+import {vesselStats} from './career.mjs?v=0.18.81';
+import {conditions} from './simulation.mjs?v=0.18.81';
+import {fuelBurnRate} from './fuel-economy.mjs?v=0.18.81';
+import {electricBurn} from './energy.mjs?v=0.18.81';
+import {seaLane} from './navigation.mjs?v=0.18.81';
 // Instant travel uses the existing safe route and consumes estimated cruising fuel.
 export function startWaypointTravel(s){const ap=s.autopilot;if(!ap||(s.deckJob&&s.deckJob.kind!=='undock')||s.moored||s.incident||s.tow||(s.skipperMission&&s.skipperMission.kind!=='home')||s.fuel<=0)return null;const route=ap.route||[ap],index=ap.index||0,points=ap.waypoints||[ap];for(const waypoint of points){const routeIndex=route.findIndex((p,i)=>i>=index&&Math.hypot(p.x-waypoint.x,p.y-waypoint.y)<.01);if(routeIndex>=0)return {ap,routeIndex,waypoint,elapsed:0};}return null;}
 export function advanceWaypointTravel(s,travel){if(s.tow||s.autopilot!==travel.ap||s.incident||(s.deckJob&&s.deckJob.kind!=='undock')||s.moored||s.fuel<=0)return {done:true,reason:'interrupted',elapsed:0};

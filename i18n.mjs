@@ -1,4 +1,4 @@
-import {CRAB_SPECIES} from './crab-species.mjs?v=0.18.80';
+import {CRAB_SPECIES} from './crab-species.mjs?v=0.18.81';
 // Saved money/prices remain in legacy SEK units. Fixed game conversion: 10 SEK = 1 USD.
 // Translation is applied at the presentation boundary; save data and simulation never change language.
 let language='en';
@@ -303,6 +303,10 @@ const sv={
  'Live weather unavailable · simulated conditions':'Liveväder otillgängligt · simulerat väder',
  'Connecting to live weather · simulated conditions':'Hämtar liveväder · simulerat väder',
  'Cached weather':'Senast hämtat väder','Estimated waves':'Uppskattade vågor','Live weather':'Liveväder','Wind':'Vind','Seas':'Sjö','Snow':'Snö','Rain':'Regn',
+ 'Requires Crab Grounds Knowledge V and Bottom Sounder I on this boat.':'Kräver kunskap om krabbområden V och ekolod I på den här båten.',
+ 'Requires Crab Grounds Knowledge V.':'Kräver kunskap om krabbområden V.',
+ 'Requires Bottom Sounder I on this boat.':'Kräver ekolod I på den här båten.',
+ 'Click to cancel automatic drone pot setting.':'Klicka för att avbryta drönarens automatiska tinsättning.',
  'Drone Survey needs at least one pot on board.':'Drone Survey behöver minst en tina ombord.',
  'Drone pot setting needs pots, bait and fuel.':'För att sätta ut tinor behövs tinor ombord, bete och bränsle.',
  'Drone pot setting cancelled.':'Drönarens tinsättning avbröts.',

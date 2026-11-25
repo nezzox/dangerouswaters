@@ -16,6 +16,13 @@ test('Drone Survey is a single Electronics upgrade that costs $500,000 and survi
  assert.equal(item.group,'Electronics');
  assert.equal(formatMoney(item.price,'en'),'$500,000');
  s.money=item.price;
+ s.career.parts.sonar=1;s.career.skills.crab=4;
+ assert.match(buyItem(s,'parts',item.id).message,/Crab Grounds Knowledge V/);
+ assert.equal(s.money,item.price);
+ s.career.skills.crab=5;s.career.parts.sonar=0;
+ assert.match(buyItem(s,'parts',item.id).message,/Bottom Sounder I/);
+ assert.equal(s.money,item.price);
+ s.career.parts.sonar=1;
  assert(buyItem(s,'parts',item.id).ok);
  assert.equal(s.money,0);
  assert.equal(restoreSeason(JSON.parse(seasonJSON(s))).career.parts.droneSurvey,1);

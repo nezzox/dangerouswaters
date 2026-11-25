@@ -1,30 +1,30 @@
-import {ICE_STOP,DEICE_SECONDS,iceLevel,iceRate} from './vessel-ice.mjs?v=0.18.80';
-import {addSalmonCatch,salmonHoldRate} from './salmon-market.mjs?v=0.18.80';
-import {moveTow,roundTowRoute} from './tow.mjs?v=0.18.80';
-import {rollOverboard,stepOverboard} from './man-overboard.mjs?v=0.18.80';
-import {ST_PAUL_DIESEL} from './world.mjs?v=0.18.80';
-import {travelBoost} from './speed-curve.mjs?v=0.18.80';
-import {crabSpeciesName} from './crab-species.mjs?v=0.18.80';
-import {landCrab,addCrabCatch,captureCrabSpecies} from './catch-value.mjs?v=0.18.80';
-import {intelligentSetSignal} from './sonar-signal.mjs?v=0.18.80';
-import {nextPotNumber} from './pot-numbers.mjs?v=0.18.80';
-import {deckSign} from './vessel-profile.mjs?v=0.18.80';
-import {solarCharge,electricBurn,energyPrice} from './energy.mjs?v=0.18.80';
-import {potDropLocal} from './crane-style.mjs?v=0.18.80';
-import {resolveFleetContact} from './vessel-collision.mjs?v=0.18.80';
-import {potCatchAt} from './pot-soak.mjs?v=0.18.80';
-import {fuelBurnRate} from './fuel-economy.mjs?v=0.18.80';
-import {prepareRareCatch,awardRareCatch,rareValue,rareById} from './rare-catch.mjs?v=0.18.80';
-import {SEA_WEAR_SCALE} from './balance.mjs?v=0.18.80';
-import {crabAbundance,salmonAbundance,crabGroundAt} from './fishing-grounds.mjs?v=0.18.80';
-export {groundsAt} from './fishing-grounds.mjs?v=0.18.80';
-import {WORLD_VERSION,WORLD_BOUNDS,FISHING_GROUNDS,isLand,inWorld,clearWater} from './world.mjs?v=0.18.80';
-import {planSeaRoute,seaLane} from './navigation.mjs?v=0.18.80';
-import {tickFleet} from './fleet.mjs?v=0.18.80';
-import {ensureCareer,vesselStats,settleLanding} from './career.mjs?v=0.18.80';
-import {tickIncidents,blocksDeck,randomCareer} from './incidents.mjs?v=0.18.80';
-import {QUAY,BERTH,nearestQuay,chooseBerth,quayPoint,buildDockRoute,dockRouteDuration,dockingPose,vesselIntersectsHarbor,castOffPosition,buildCastOffRoute} from './harbor.mjs?v=0.18.80';
-export {BERTH} from './harbor.mjs?v=0.18.80';
+import {ICE_STOP,DEICE_SECONDS,iceLevel,iceRate} from './vessel-ice.mjs?v=0.18.81';
+import {addSalmonCatch,salmonHoldRate} from './salmon-market.mjs?v=0.18.81';
+import {moveTow,roundTowRoute} from './tow.mjs?v=0.18.81';
+import {rollOverboard,stepOverboard} from './man-overboard.mjs?v=0.18.81';
+import {ST_PAUL_DIESEL} from './world.mjs?v=0.18.81';
+import {travelBoost} from './speed-curve.mjs?v=0.18.81';
+import {crabSpeciesName} from './crab-species.mjs?v=0.18.81';
+import {landCrab,addCrabCatch,captureCrabSpecies} from './catch-value.mjs?v=0.18.81';
+import {intelligentSetSignal} from './sonar-signal.mjs?v=0.18.81';
+import {nextPotNumber} from './pot-numbers.mjs?v=0.18.81';
+import {deckSign} from './vessel-profile.mjs?v=0.18.81';
+import {solarCharge,electricBurn,energyPrice} from './energy.mjs?v=0.18.81';
+import {potDropLocal} from './crane-style.mjs?v=0.18.81';
+import {resolveFleetContact} from './vessel-collision.mjs?v=0.18.81';
+import {potCatchAt} from './pot-soak.mjs?v=0.18.81';
+import {fuelBurnRate} from './fuel-economy.mjs?v=0.18.81';
+import {prepareRareCatch,awardRareCatch,rareValue,rareById} from './rare-catch.mjs?v=0.18.81';
+import {SEA_WEAR_SCALE} from './balance.mjs?v=0.18.81';
+import {crabAbundance,salmonAbundance,crabGroundAt} from './fishing-grounds.mjs?v=0.18.81';
+export {groundsAt} from './fishing-grounds.mjs?v=0.18.81';
+import {WORLD_VERSION,WORLD_BOUNDS,FISHING_GROUNDS,isLand,inWorld,clearWater} from './world.mjs?v=0.18.81';
+import {planSeaRoute,seaLane} from './navigation.mjs?v=0.18.81';
+import {tickFleet} from './fleet.mjs?v=0.18.81';
+import {ensureCareer,vesselStats,droneRequirement,settleLanding} from './career.mjs?v=0.18.81';
+import {tickIncidents,blocksDeck,randomCareer} from './incidents.mjs?v=0.18.81';
+import {QUAY,BERTH,nearestQuay,chooseBerth,quayPoint,buildDockRoute,dockRouteDuration,dockingPose,vesselIntersectsHarbor,castOffPosition,buildCastOffRoute} from './harbor.mjs?v=0.18.81';
+export {BERTH} from './harbor.mjs?v=0.18.81';
 export const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 export const PORT={x:BERTH.x,y:BERTH.y};
 export const DECK_LIMIT_KNOTS=5;
@@ -107,7 +107,32 @@ function advancePickupAll(s){
  if(!s.deckJob&&distance(s,pot)<POT_RANGE&&canWorkPots(s)&&workingSide(s,pot)&&!blocksDeck(s))handlePot(s,pot.id);
 }
 export function nearPort(s){return distance(s,PORT)<230||distance(s,nearestQuay(s))<230||(s.moored&&Math.hypot(s.x-s.moored.x,s.y-s.moored.y)<2);}
-// A survey runs an ordinary route and deck operation for each mark, never a teleport.
+// Plot straight setting lanes with enough room to line up, slow down and release underway.
+const surveyKnots=s=>Math.min(4.4,potSpeedLimit(s)-.5);
+const surveyTolerance=24;
+function surveyRoute(s,from,points){
+ const route=[],waypoints=[],pending=[...points],budget={remaining:180000};
+ let skipped=0;
+ while(pending.length){
+  pending.sort((a,b)=>distance(from,a)-distance(from,b));
+  const mark=pending.shift(),bearing=Math.atan2(mark.y-from.y,mark.x-from.x);
+  let planned=false;
+  for(const turn of [0,1,-1,2,-2,3,-3,4]){
+   const heading=bearing+turn*Math.PI/4,dx=Math.cos(heading),dy=Math.sin(heading);
+   const drop=releasePoint({...s,x:0,y:0,heading});
+   const center={x:mark.x-drop.x,y:mark.y-drop.y};
+   const aim=meters=>({x:center.x+dx*meters,y:center.y+dy*meters});
+   const entry=aim(-64),exit=aim(46);
+   if(!clearWater(entry.x,entry.y,28)||!clearWater(exit.x,exit.y,28)||nearPort(center)||!seaLane(entry,exit,30))continue;
+   const leg=planSeaRoute(from,entry,false,budget);
+   if(!leg?.length)continue;
+   route.push(...leg.slice(0,-1),{...entry,surveyEntry:true},{...exit,surveyMark:mark});
+   waypoints.push(mark);from=exit;planned=true;break;
+  }
+  if(!planned)skipped++;
+ }
+ return {route,waypoints,skipped};
+}
 export function cancelDroneSet(s,text='Drone pot setting cancelled.'){
  if(s.skipperMission?.kind!=='droneSet')return false;
  s.skipperMission=null;s.autopilot=null;s.desiredKnots=0;s.rudder=0;notify(s,text);
@@ -115,48 +140,48 @@ export function cancelDroneSet(s,text='Drone pot setting cancelled.'){
 }
 export function startDroneSet(s,points){
  const stats=vesselStats(s);
- if(!stats.droneSurvey||s.tow||s.overboard)return false;
+ if(!stats.droneSurvey||s.tow||s.overboard||droneRequirement(s))return false;
  const queue=points.filter(p=>inWorld(p.x,p.y)&&!nearPort(p)&&clearWater(p.x,p.y,45));
  if(!queue.length){notify(s,'Drone landed. No survey marks clear of harbor.');return false;}
  if(!s.deck||s.money<stats.baitCost||s.fuel<=0){notify(s,'Drone pot setting needs pots, bait and fuel.');return false;}
+ const from=autopilotRouteStart(s),plan=from&&surveyRoute(s,from,queue);
+ if(!plan?.route.length){notify(s,'Drone pot setting finished. Some marks could not be used.');return false;}
  if(s.skipperMission?.kind==='pickupAll')finishPickup(s,'Pickup All Pots cancelled.');
- s.autopilot=null;s.desiredKnots=0;s.career.fishing='crab';
- s.skipperMission={kind:'droneSet',queue:[...queue],target:null,setting:false,skipped:points.length-queue.length};
+ if(!applyAutopilotRoute(s,plan.route.at(-1).x,plan.route.at(-1).y,false,plan.route))return false;
+ // The navigation route is already installed. Keep the original survey marks on the chart.
+ s.autopilot.waypoints=plan.waypoints;
+ s.desiredKnots=stats.top*1.94384;s.career.fishing='crab';
+ s.skipperMission={kind:'droneSet',skipped:points.length-queue.length+plan.skipped,setting:false};
  notify(s,'Drone landed. The skipper will set pots at the survey marks.');
  return true;
 }
 function advanceDroneSet(s){
- const m=s.skipperMission;if(m?.kind!=='droneSet'||s.deckJob)return;
- if(m.setting){m.setting=false;m.target=null;}
- if(!m.target&&!m.queue.length){
-  cancelDroneSet(s,m.skipped?'Drone pot setting finished. Some marks could not be used.':'Drone pot setting complete.');
-  return;
+ const m=s.skipperMission,ap=s.autopilot;
+ if(m?.kind!=='droneSet'||s.deckJob)return;
+ if(!ap||s.career.fishing!=='crab'){cancelDroneSet(s);return;}
+ const exit=ap.route[ap.index],mark=exit?.surveyMark;
+ if(mark&&distance(s,exit)<15){
+  if(!m.setting||s.droneSurvey?.points.some(p=>distance(p,mark)<.01))m.skipped++;
+  m.setting=false;
+  if(ap.index===ap.route.length-1){
+   cancelDroneSet(s,m.skipped?'Drone pot setting finished. Some marks could not be used.':'Drone pot setting complete.');return;
+  }
+  ap.index++;
  }
- if(s.career.fishing!=='crab'){cancelDroneSet(s);return;}
- if(!s.deck||s.money<vesselStats(s).baitCost||s.fuel<=0){cancelDroneSet(s,'Drone pot setting stopped: out of pots, bait or fuel.');return;}
- if(s.incident)return;
- if(s.autopilot)return;
- if(m.target&&distance(s,m.target)<20){
-  if(Math.abs(s.speed)>.22)return;
-  const release=releasePoint(s);
-  if(nearPort(s)||isLand(release.x,release.y)){m.skipped++;m.target=null;return;}
-  handlePot(s,null,{automatic:true});
-  if(s.deckJob?.kind==='deploy'){s.deckJob.intelligent=false;s.deckJob.surveyTarget=m.target;m.setting=true;}
-  return;
+ if(!s.deck||s.money<vesselStats(s).baitCost||s.fuel<=0){
+  if(mark&&m.setting&&ap.index===ap.route.length-1)return;
+  cancelDroneSet(s,'Drone pot setting stopped: out of pots, bait or fuel.');return;
  }
- if(!m.target){
-  m.queue.sort((a,b)=>distance(s,a)-distance(s,b));
-  m.target=m.queue.shift();
- }
- const next=m.target;
- if(setAutopilot(s,next.x,next.y,false,{remaining:45000})){
-  s.skipperMission=m;s.autopilot.arrivalRadius=7;
-  s.desiredKnots=vesselStats(s).top*1.94384;
- }else{m.target=null;m.skipped++;}
+ if(!mark||exit!==ap.route[ap.index]||m.setting||s.incident||nearPort(s)||s.speed<.6||!canWorkPots(s))return;
+ const current=releasePoint(s),lead=s.speed*deployDuration(vesselStats(s),true)*.9;
+ const predicted={x:current.x+lead*Math.cos(s.heading),y:current.y+lead*Math.sin(s.heading)};
+ if(distance(predicted,mark)>10)return;
+ handlePot(s,null,{automatic:true});
+ if(s.deckJob?.kind==='deploy'){s.deckJob.intelligent=false;s.deckJob.surveyTarget=mark;m.setting=true;}
 }
 function clearSurveyMark(s,drop,target){
  const report=s.droneSurvey;if(!report?.points?.length)return;
- const points=report.points.filter(p=>distance(p,drop)>=26&&(!target||distance(p,target)>.01));
+ const points=report.points.filter(p=>target?distance(p,target)>.01||distance(drop,target)>=surveyTolerance:distance(p,drop)>=26);
  if(points.length!==report.points.length)s.droneSurvey={...report,points};
 }
 export function step(s,dt,overboardRandom=Math.random){if(s.paused)return;if(s.tow){s.hour+=dt/45;if(moveTow(s,dt))finishTow(s);return;}if(stepOverboard(s,dt)){s.hour+=dt/45;return;}const start={x:s.x,y:s.y,heading:s.heading},prior=new Map([...(s.career?.fleet||[]),...(s.remotePlayers||[])].map(b=>[b.id,{x:b.x,y:b.y,heading:b.heading}]));stepSimulation(s,dt,overboardRandom);const hit=s.moored?null:resolveFleetContact(s,start,prior,dt);if(s.intelligentSetRunout>0)s.intelligentSetRunout=Math.max(0,s.intelligentSetRunout-Math.hypot(s.x-start.x,s.y-start.y));if(hit&&s.deckJob?.kind==='unload'&&s.deckJob.elapsed<s.deckJob.approach){s.deckJob=null;Object.assign(s,start,{speed:0});notify(s,'Berth occupied. Docking stopped; choose another berth.');return;}if(hit&&s.message!==`Hull contact with ${hit.name}. Maneuver clear.`)notify(s,`Hull contact with ${hit.name}. Maneuver clear.`);}
@@ -182,13 +207,14 @@ function stepSimulation(s,dt,overboardRandom){
  const power=s.fuel>0&&s.hull>0&&s.incident?.system!=='engine'?1:0,top=stats.top/(1+w.waves*.06);
  let command=s.desiredKnots||0;
  if(s.autopilot&&!deicing){
-  const ap=s.autopilot,target=ap.route?.[ap.index||0]||ap,dx=target.x-s.x,dy=target.y-s.y,d=Math.hypot(dx,dy),pickup=s.skipperMission?.kind==='pickupAll';
+  const ap=s.autopilot,target=ap.route?.[ap.index||0]||ap,dx=target.x-s.x,dy=target.y-s.y,d=Math.hypot(dx,dy),pickup=s.skipperMission?.kind==='pickupAll',survey=s.skipperMission?.kind==='droneSet';
   const hooked=!target.pickupId||!s.pots.some(p=>p.id===target.pickupId)||s.deckJob?.potId===target.pickupId;
-  if(d<18&&ap.route&&(ap.index||0)<ap.route.length-1&&hooked)ap.index++;
-  else if(!pickup&&d<(ap.arrivalRadius||14)){if(s.skipperMission?.kind==='home')s.skipperMission.stage='berth';else if(s.skipperMission?.kind!=='droneSet')s.skipperMission=null;s.autopilot=null;s.desiredKnots=0;command=0;s.rudder=0;if(s.skipperMission?.kind!=='droneSet')notify(s,'Autopilot: destination reached. Slowing down.');}
+  if(d<(target.surveyEntry?9:18)&&ap.route&&(ap.index||0)<ap.route.length-1&&hooked&&!target.surveyMark)ap.index++;
+  else if(!pickup&&!survey&&d<(ap.arrivalRadius||14)){if(s.skipperMission?.kind==='home')s.skipperMission.stage='berth';else if(s.skipperMission?.kind!=='droneSet')s.skipperMission=null;s.autopilot=null;s.desiredKnots=0;command=0;s.rudder=0;if(s.skipperMission?.kind!=='droneSet')notify(s,'Autopilot: destination reached. Slowing down.');}
   else {
    const error=Math.atan2(Math.sin(Math.atan2(dy,dx)-s.heading),Math.cos(Math.atan2(dy,dx)-s.heading));s.rudder=clamp(error/.55,-1,1);
-   command=pickup?command*Math.max(.25,Math.cos(error)):Math.min(Math.max(0,command),Math.sqrt(Math.max(0,d-(ap.arrivalRadius||14)*.8)*(s.skipperMission?.kind==='pot'?.12:.45))*1.94384)*Math.max(.25,Math.cos(error));
+   command=pickup||survey?command*Math.max(.25,Math.cos(error)):Math.min(Math.max(0,command),Math.sqrt(Math.max(0,d-(ap.arrivalRadius||14)*.8)*(s.skipperMission?.kind==='pot'?.12:.45))*1.94384)*Math.max(.25,Math.cos(error));
+   if(survey&&(target.surveyMark||target.surveyEntry&&d<100))command=Math.min(command,surveyKnots(s));
    if(pickup&&target.pickupId&&d<180)command=Math.min(command,potSpeedLimit(s)-.5);
    if(pickup&&ap.index===ap.route.length-1&&hooked){command=potSpeedLimit(s)-.5;s.rudder=0;}
   }
@@ -259,6 +285,7 @@ export function competingCatchMultiplier(pot,hour,peers=[]){
  const rivals=competitors.filter(p=>crabGroundAt(p,hour)?.id===ground.id&&p.pots.some(gear=>crabGroundAt(gear,hour)?.id===ground.id)).length;
  return .8**rivals;
 }
+const deployDuration=(stats,automatic)=>14/(stats.work*stats.deploy*(automatic?stats.autoSetRate:1));
 export function handlePot(s,potId=null,{automatic=false,lineRandom=randomCareer}={}){
  if(s.overboard||s.tow)return false;
  if(s.career?.fishing==='salmon')return handleNet(s);
@@ -286,7 +313,7 @@ export function handlePot(s,potId=null,{automatic=false,lineRandom=randomCareer}
  if(potId!==null)return false;
  if(s.deck<=0)return notify(s,'All pots are at sea. Return to a buoy to haul.');
  if(s.money<stats.baitCost)return notify(s,`You need ${stats.baitCost} kr for bait.`);
- crewActivity(s,'deploy');s.money-=stats.baitCost;s.deck--;s.deckJob={kind:'deploy',intelligent:!!s.career.intelligentAutoSet,baitCost:stats.baitCost,baitRank:stats.baitRank,layout:stats.hauler,elapsed:0,duration:14/(stats.work*stats.deploy*(automatic?stats.autoSetRate:1)),x:s.x,y:s.y};notify(s,'Deck crew rigging the line and lowering the pot.');
+ crewActivity(s,'deploy');s.money-=stats.baitCost;s.deck--;s.deckJob={kind:'deploy',intelligent:!!s.career.intelligentAutoSet,baitCost:stats.baitCost,baitRank:stats.baitRank,layout:stats.hauler,elapsed:0,duration:deployDuration(stats,automatic),x:s.x,y:s.y};notify(s,'Deck crew rigging the line and lowering the pot.');
 }
 export function canUndock(s){return !s.deckJob&&nearPort(s)&&Math.abs(s.speed)<1&&!!castOffPosition(s);}
 export function undock(s){if(s.deckJob||!nearPort(s)||Math.abs(s.speed)>=1)return false;const at=castOffPosition(s);if(!at)return false;const route=buildCastOffRoute(s,at);s.deckJob={kind:'undock',elapsed:0,duration:dockRouteDuration(route),x:s.x,y:s.y,startHeading:s.heading,targetX:at.x,targetY:at.y,targetHeading:at.heading,route};s.moored=null;s.speed=0;s.throttle=0;s.rudder=0;s.autopilot=null;crewActivity(s,'undock');notify(s,'Casting off. Crew letting go the mooring lines.');return true;}

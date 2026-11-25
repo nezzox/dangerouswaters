@@ -1,9 +1,9 @@
-import {iceLevel} from './vessel-ice.mjs?v=0.18.80';
-import {chooseBerth, nearestQuay, quayPoint, QUAY} from './harbor.mjs?v=0.18.80';
-import {MATTHEW_QUAY} from './world.mjs?v=0.18.80';
-import {ensureRareState,rareCount} from './rare-catch.mjs?v=0.18.80';
-import {INCIDENT_INTERVAL_SCALE,INCIDENT_SCHEDULE_VERSION} from './balance.mjs?v=0.18.80';
-import {SKILLS,PARTS,BOATS,SKILL_SYSTEMS,PART_SYSTEMS,boatById} from './catalog.mjs?v=0.18.80';
+import {iceLevel} from './vessel-ice.mjs?v=0.18.81';
+import {chooseBerth, nearestQuay, quayPoint, QUAY} from './harbor.mjs?v=0.18.81';
+import {MATTHEW_QUAY} from './world.mjs?v=0.18.81';
+import {ensureRareState,rareCount} from './rare-catch.mjs?v=0.18.81';
+import {INCIDENT_INTERVAL_SCALE,INCIDENT_SCHEDULE_VERSION} from './balance.mjs?v=0.18.81';
+import {SKILLS,PARTS,BOATS,SKILL_SYSTEMS,PART_SYSTEMS,boatById} from './catalog.mjs?v=0.18.81';
 const finite=(n,f=0)=>Number.isFinite(n)?n:f,clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 export const inHarbor=s=>Math.hypot(s.x-160,s.y-80)<230||Math.hypot(s.x-MATTHEW_QUAY.x,s.y-MATTHEW_QUAY.y)<230;
 export const shopReady=s=>inHarbor(s)&&(!s.career?.requiresDock||!!s.moored)&&Math.abs(s.speed)<1&&!s.deckJob&&!s.incident&&!s.tow&&!s.overboard;
@@ -30,7 +30,15 @@ export function vesselStats(s){
  serviceCost:Math.max(.4,1-v('service')*.04-part('workshop')*.05),roll:Math.max(.3,1-v('stability')*.05-part('stabilizer')*.07),spacing:[80,160,220].includes(c.potSpacing)?c.potSpacing:80,minSoak:2-(Math.max(1,v('autoHaul'))-1)*.2};
 }
 const result=(ok,message)=>({ok,message});
-export function buyItem(s,category,id){ensureCareer(s);const item=(category==='skills'?SKILLS:category==='parts'?PARTS:[]).find(x=>x.id===id);if(!item)return result(false,'Unknown item.');if(!shopReady(s))return result(false,'Stop in harbor and finish all work before purchasing.');const owned=category==='skills'?s.career.skills:s.career.parts,current=owned[item.key]||0;if(current!==item.rank-1)return result(false,current>=item.rank?'Already owned.':'Purchase the previous rank first.');if(item.key==='intelligentAutoSet'&&!s.career.skills.autoDeploy)return result(false,'Purchase Auto Set I first.');if(item.key==='nets'&&!vesselStats(s).salmon)return result(false,'A salmon-capable hull is required.');if(s.money<item.price)return result(false,'Insufficient funds.');s.money-=item.price;owned[item.key]=item.rank;s.capacity=vesselStats(s).capacity;if(category==='parts'&&item.key==='racks')s.deck+=4;return result(true,`${item.name} acquired.`);}
+// Crab knowledge is company-wide; the sounder has to be installed on this hull.
+export function droneRequirement(s){
+ const crab=(s.career?.skills?.crab??0)<5,sonar=(s.career?.parts?.sonar??0)<1;
+ if(crab&&sonar)return 'Requires Crab Grounds Knowledge V and Bottom Sounder I on this boat.';
+ if(crab)return 'Requires Crab Grounds Knowledge V.';
+ if(sonar)return 'Requires Bottom Sounder I on this boat.';
+ return '';
+}
+export function buyItem(s,category,id){ensureCareer(s);const item=(category==='skills'?SKILLS:category==='parts'?PARTS:[]).find(x=>x.id===id);if(!item)return result(false,'Unknown item.');if(!shopReady(s))return result(false,'Stop in harbor and finish all work before purchasing.');const owned=category==='skills'?s.career.skills:s.career.parts,current=owned[item.key]||0;if(current!==item.rank-1)return result(false,current>=item.rank?'Already owned.':'Purchase the previous rank first.');if(item.key==='intelligentAutoSet'&&!s.career.skills.autoDeploy)return result(false,'Purchase Auto Set I first.');const requirement=item.key==='droneSurvey'&&droneRequirement(s);if(requirement)return result(false,requirement);if(item.key==='nets'&&!vesselStats(s).salmon)return result(false,'A salmon-capable hull is required.');if(s.money<item.price)return result(false,'Insufficient funds.');s.money-=item.price;owned[item.key]=item.rank;s.capacity=vesselStats(s).capacity;if(category==='parts'&&item.key==='racks')s.deck+=4;return result(true,`${item.name} acquired.`);}
 export function toggleAutomation(s,key){ensureCareer(s);if(!['autoDeploy','autoHaul','intelligentAutoSet'].includes(key)||!s.career.skills[key])return result(false,'Purchase this skill in the harbor shop first.');if(key==='intelligentAutoSet'&&!s.career[key]&&!s.career.parts.sonar)return result(false,'Install a sonar before enabling Intelligent Auto Set.');s.career[key]=!s.career[key];if(key==='intelligentAutoSet'||key==='autoDeploy'&&s.career[key])s.intelligentSetRunout=0;if(key==='intelligentAutoSet'&&s.career[key])s.career.autoDeploy=false;if(key==='autoDeploy'&&s.career[key])s.career.intelligentAutoSet=false;return result(true,`${key==='intelligentAutoSet'?'Intelligent Auto Set':key==='autoDeploy'?'Auto set':'Auto haul'} ${s.career[key]?'enabled':'disabled'}.`);}
 export function installedVesselValue(vessel){
  return boatById(vessel.boat).price+PARTS.filter(p=>p.rank<=(vessel.parts?.[p.key]||0)).reduce((total,p)=>total+p.price,0)

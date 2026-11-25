@@ -62,7 +62,7 @@
 
 .skipper-actions{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:7px}.skipper-actions button{font:8px monospace;padding:9px 3px}
 
-#kofi-support{position:fixed;z-index:4;display:flex;align-items:center;gap:5px;width:98px;height:26px;padding:4px 7px;background:#0d1b22;color:#c8d5cf;border:1px solid var(--line);font:8px monospace;text-decoration:none;opacity:.5}#kofi-support svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}#kofi-support:focus-visible{outline:2px solid var(--amber)}
+#kofi-support{justify-content:flex-start;border:1px solid var(--line);color:var(--text);text-decoration:none}#kofi-support:hover{border-color:var(--amber)}#kofi-support svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}#kofi-support:focus-visible{outline:2px solid var(--amber)}
 
 #intelligent-auto-set{grid-column:1/-1}.fleet-head{display:flex;align-items:flex-start;justify-content:space-between;gap:15px}.fleet-head button{margin:0;white-space:nowrap}.fleet-service-auto{display:flex;align-items:center;gap:9px;margin-top:12px;font:11px/1.5 monospace}.fleet-upgrade{border-top:1px solid var(--line);margin-top:15px;padding-top:12px}.fleet-sale-confirm{border:1px solid var(--amber);padding:12px;margin-top:12px}
 
@@ -74,7 +74,7 @@
 
 .leaderboard{min-width:0;font:10px monospace}.leaderboard pre{white-space:pre-wrap;font:10px/1.6 monospace;color:#c7d8cf;max-height:180px;overflow:auto}#player-name-dialog input,#join-world-dialog input{display:block;margin:12px 0;padding:10px;background:#132a32;color:#fff;border:1px solid #628078}
 
-.side-instruments{position:fixed;z-index:3;right:306px;top:110px;width:250px;display:flex;flex-direction:column;gap:8px;max-height:calc(100dvh - var(--toolbar-height,69px) - 125px);overflow:auto;scrollbar-width:thin}.side-instruments .leaderboard{width:100%;padding:14px}.leaderboard-actions{display:grid;gap:6px}.leaderboard-actions .harbor-button,#owned-toggle{padding:8px 10px}.leaderboard-actions .harbor-button{width:100%;gap:5px;text-align:left}.world-controls{display:flex;align-items:center;gap:6px;margin:10px 0;font:9px monospace;letter-spacing:.3px;color:var(--muted);flex-wrap:wrap}.world-controls b{color:var(--text);letter-spacing:1px}.world-controls button{margin-left:auto;padding:5px;font:9px monospace}.world-controls small{font-size:8px}.chart-panel>.eyebrow{gap:5px;justify-content:space-between}.chart-panel>.eyebrow span{white-space:nowrap}.chart-tools{flex-wrap:wrap}.chart-tools button{white-space:normal}
+.side-instruments{position:fixed;z-index:3;right:306px;top:110px;width:250px;display:flex;flex-direction:column;gap:8px;max-height:calc(100dvh - var(--toolbar-height,69px) - 125px);overflow:auto;scrollbar-width:thin}.side-instruments .leaderboard{width:100%;padding:14px;flex:none}.leaderboard-actions{display:grid;gap:6px;flex:none}.leaderboard-actions .harbor-button,#owned-toggle{padding:8px 10px}.leaderboard-actions .harbor-button{width:100%;gap:5px;text-align:left}.world-controls{display:flex;align-items:center;gap:6px;margin:10px 0;font:9px monospace;letter-spacing:.3px;color:var(--muted);flex-wrap:wrap}.world-controls b{color:var(--text);letter-spacing:1px}.world-controls button{margin-left:auto;padding:5px;font:9px monospace}.world-controls small{font-size:8px}.chart-panel>.eyebrow{gap:5px;justify-content:space-between}.chart-panel>.eyebrow span{white-space:nowrap}.chart-tools{flex-wrap:wrap}.chart-tools button{white-space:normal}
 @media(max-height:950px){.side-instruments{top:85px;max-height:calc(100dvh - var(--toolbar-height,69px) - 100px)}}
 @media(max-width:1100px){.side-instruments{right:250px;width:230px}}
 @media(max-width:760px){.side-instruments{position:static;width:auto;max-height:none;overflow:visible}.side-instruments .leaderboard{padding:8px}.leaderboard-actions .harbor-button,#owned-toggle{padding:7px}.world-controls{font-size:8px}.world-controls button{margin-left:0;font-size:8px}}
@@ -103,7 +103,7 @@
 .weather-ice{font:8px/1.5 monospace;margin:2px 0}
 
 
-#drone-survey{grid-column:1/-1}#drone-survey[data-flying=true],#drone-markers button{color:#a3e8df;border-color:#5faaa4}#drone-markers{margin-bottom:5px;max-height:6rem;overflow-y:auto}
+#drone-survey,#drone-requirement{grid-column:1/-1}#drone-requirement{font:8px/1.4 monospace;color:var(--amber)}#drone-survey[data-flying=true]{color:#a3e8df;border-color:#5faaa4}
 
 .watch-weather{min-width:0;display:grid;gap:3px;text-align:right;letter-spacing:0;font:10px/1.2 monospace}
 .watch-weather-readings,.watch-weather-credit{display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:baseline;gap:3px 8px}

@@ -1,9 +1,9 @@
-import {RARE_CATCHES,rareValue,rareCount} from './rare-catch.mjs?v=0.18.80';
-import {boatPreview} from './boat-preview.mjs?v=0.18.80';
-import {translateText,localizeTree,toInternalMoney} from './i18n.mjs?v=0.18.80';
-import {SKILLS,PARTS,BOATS,boatById} from './catalog.mjs?v=0.18.80';
-import {buyItem,buyBoat,switchOwnedBoat,captainAvailable,vesselStats,tradeValue,inHarbor,shopReady,takeLoan,creditLimit} from './career.mjs?v=0.18.80';
-import {answerCaptain,answerFleetUpgrade,toggleFleetService,sellFleetVessel,fleetSaleValue,fleetStats,readFleetMessages} from './fleet.mjs?v=0.18.80';
+import {RARE_CATCHES,rareValue,rareCount} from './rare-catch.mjs?v=0.18.81';
+import {boatPreview} from './boat-preview.mjs?v=0.18.81';
+import {translateText,localizeTree,toInternalMoney} from './i18n.mjs?v=0.18.81';
+import {SKILLS,PARTS,BOATS,boatById} from './catalog.mjs?v=0.18.81';
+import {buyItem,droneRequirement,buyBoat,switchOwnedBoat,captainAvailable,vesselStats,tradeValue,inHarbor,shopReady,takeLoan,creditLimit} from './career.mjs?v=0.18.81';
+import {answerCaptain,answerFleetUpgrade,toggleFleetService,sellFleetVessel,fleetSaleValue,fleetStats,readFleetMessages} from './fleet.mjs?v=0.18.81';
 const kr=n=>`${Math.round(n).toLocaleString('en-US')} kr`;
 const node=(tag,text,className)=>{const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(className)el.className=className;return el;};
 export function createShop(getState,onChange){
@@ -42,8 +42,9 @@ export function createShop(getState,onChange){
   card.prepend(boatPreview(item,{lazy:true}));
  }
  if(category==='boats')card.append(node('p',`${item.capacity.toLocaleString('en-US')} kg hold · ${item.pots} pots · ${item.crew} crew · ${(item.top*1.94384).toFixed(1)} kn · ${item.tank} L`,'catalog-spec'));
- const action=button(owned&&category!=='boats'?'OWNED':category==='boats'?'REVIEW EXCHANGE':'BUY · '+kr(item.price),()=>{if(category==='boats'){selected=item;render();}else apply(buyItem(s,category,item.id));},(owned&&category!=='boats')||!shopReady(s)||(category!=='boats'&&(s.money<item.price||((category==='skills'?s.career.skills:s.career.parts)[item.key]||0)!==item.rank-1||item.key==='nets'&&!stats.salmon||item.key==='intelligentAutoSet'&&!s.career.skills.autoDeploy)));
- card.append(node('strong',kr(item.price),'catalog-price'),action);if(!owned&&item.rank>1&&category!=='boats')card.append(node('small','Requires the previous rank.'));grid.append(card);}
+ const requirement=item.key==='droneSurvey'?droneRequirement(s):'';
+ const action=button(owned&&category!=='boats'?'OWNED':category==='boats'?'REVIEW EXCHANGE':'BUY · '+kr(item.price),()=>{if(category==='boats'){selected=item;render();}else apply(buyItem(s,category,item.id));},(owned&&category!=='boats')||!shopReady(s)||(category!=='boats'&&(requirement||s.money<item.price||((category==='skills'?s.career.skills:s.career.parts)[item.key]||0)!==item.rank-1||item.key==='nets'&&!stats.salmon||item.key==='intelligentAutoSet'&&!s.career.skills.autoDeploy)));
+ card.append(node('strong',kr(item.price),'catalog-price'),action);if(requirement)card.append(node('small',requirement));if(!owned&&item.rank>1&&category!=='boats')card.append(node('small','Requires the previous rank.'));grid.append(card);}
  content.append(grid);if(!items.length)content.append(node('p','No matching items. Try another search.'));
  }
  function renderExchange(s,stats){const b=selected,value=tradeValue(s),section=node('section',undefined,'exchange');section.append(boatPreview(b),node('div','VESSEL ACQUISITION','eyebrow'),node('h3',b.name),node('p',b.description),node('p',`${stats.name} → ${b.name} · Hold ${stats.capacity} → ${b.capacity} kg · Crew ${stats.crew} → ${b.crew} · Pots ${stats.potCapacity} → ${b.pots} · Length ${stats.length.toFixed(1)} → ${b.length.toFixed(1)} m.`),node('p','Retrieve all pots/nets and unload catch before exchanging. Skills stay with your company. Installed parts and legacy upgrades stay with the old hull.','shop-warning'));
