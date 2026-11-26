@@ -1,6 +1,6 @@
-import {travelBoost} from './speed-curve.mjs?v=0.18.89';
-import {electricBurn} from './energy.mjs?v=0.18.89';
-import {FUEL_SCALE} from './balance.mjs?v=0.18.89';
+import {travelBoost} from './speed-curve.mjs?v=0.18.90';
+import {electricBurn} from './energy.mjs?v=0.18.90';
+import {FUEL_SCALE} from './balance.mjs?v=0.18.90';
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 export const fuelBurnRate=(throttle,fuelUse=1)=>(.012+clamp(Math.abs(throttle),0,1)*.09)*fuelUse*FUEL_SCALE;
 // Steady-speed estimate at the selected target, not a change to the fuel model.

@@ -1,4 +1,4 @@
-import {crabGroundAt} from './fishing-grounds.mjs?v=0.18.89';
+import {crabGroundAt,salmonAbundance} from './fishing-grounds.mjs?v=0.18.90';
 
 // In-game prices in SEK per kg, balanced around the previous 42 kr/kg base.
 const species=[
@@ -21,3 +21,5 @@ export function addSalmonCatch(holder,kg,point,hour){
  holder.salmonRate=(existing*salmonHoldRate(holder)+kg*price)/(existing+kg);
  holder.salmon=existing+kg;
 }
+
+export function salmonCatch(net,hour,stats){const soak=Math.max(0,hour-net.setAt),ground=net.legacyAbundance??salmonAbundance(net.x,net.y,hour);return Math.round((80+ground*190)*(1-Math.exp(-soak/1.2))*Math.exp(-Math.max(0,soak-5)*.15)*stats.salmonYield);}

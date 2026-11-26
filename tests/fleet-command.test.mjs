@@ -1,0 +1,111 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {createGame} from '../simulation.mjs';
+import {BOATS} from '../catalog.mjs';
+import {nearestWater} from '../world.mjs';
+import {BERTH} from '../harbor.mjs';
+import {buyBoat} from '../career.mjs';
+import * as fleet from '../fleet.mjs';
+import {restoreSeason,seasonJSON} from '../saves.mjs';
+import {playerPresence} from '../multiplayer.mjs';
+
+function fixture(){
+ const s=createGame();
+ const hull=BOATS.find(b=>b.salmon);
+ s.money=1e8;
+ assert(buyBoat(s,hull.id,'dispatch').ok);
+ const [b]=s.career.fleet;
+ Object.assign(s,{x:4200,y:1500,deck:6,lostPots:1,cargo:29,crabValue:3000,hour:42,worldHour:12,worldId:'ABC123',playerName:'Captain'});
+ s.career.parts={sonar:2};
+ s.pots=[{id:7,x:4200,y:1500,setAt:39,crabSpecies:'king'}];
+ Object.assign(b,{x:9300,y:4200,cargo:75,crabValue:8500,salmon:25,salmonRate:56,phase:'soak',started:true,timer:45,autoService:true});
+ b.pots=[{id:2,x:9400,y:4200,setAt:40,baitRank:3}];
+ return {s,b,hull};
+}
+test('at-sea takeover swaps captains in place, preserves each hold and gear, and survives a reload',()=>{
+ const {s,b,hull}=fixture(),cash=s.money;
+ const oldPot=s.pots[0],nextPot=b.pots[0];
+ assert(fleet.takeFleetCommand(s,b.id).ok);
+ const [old]=s.career.fleet;
+ assert.equal(s.career.boat,hull.id);
+ assert.deepEqual([s.x,s.y,s.cargo,s.crabValue,s.salmon,s.salmonRate],[9300,4200,75,8500,25,56]);
+ assert.equal(s.pots[0],nextPot);
+ assert.equal(s.deck,hull.pots-1);
+ assert.deepEqual([old.boat,old.x,old.y,old.cargo,old.crabValue,old.deck,old.lostPots],['nordvind',4200,1500,29,3000,6,1]);
+ assert.equal(old.pots[0],oldPot);
+ assert.equal(old.parts.sonar,2);
+ assert.equal(old.autoService,true);
+ assert.equal(old.phase,'haul');
+ assert.deepEqual([s.hour,s.worldHour,s.worldId,s.money],[42,12,'ABC123',cash]);
+ assert.deepEqual(playerPresence(s).fleet.map(v=>[v.x,v.y]),[[4200,1500]]);
+ const loaded=restoreSeason(JSON.parse(seasonJSON(s)));
+ assert(loaded);
+ assert(fleet.takeFleetCommand(loaded,old.id).ok);
+ assert.equal(loaded.career.boat,'nordvind');
+ assert.equal(loaded.deck,6);
+ assert.equal(loaded.pots[0].setAt,39);
+ assert.equal(loaded.career.fleet[0].id,b.id);
+ assert.equal(loaded.career.fleet[0].phase,'soak');
+ assert.equal(loaded.career.fleet[0].timer,45);
+ assert.equal(loaded.career.fleet[0].pots[0].setAt,40);
+ assert.equal(loaded.money,cash);
+});
+test('handoff is rejected without losing assets during deck work, emergency, or pending sale',()=>{
+ for(const action of [s=>s.deckJob={kind:'haul'}, s=>s.tow={},s=>s.overboard={},s=>s.incident={},(s,b)=>b.salePending=true]){
+  const {s,b}=fixture();
+  action(s,b);
+  const before=JSON.stringify(s);
+  assert.equal(fleet.takeFleetCommand(s,b.id).ok,false);
+  assert.equal(JSON.stringify(s),before);
+ }
+});
+test('the reassigned captain retrieves the original pot and returns it to that hull’s deck',()=>{
+ const {s,b}=fixture();
+ const oldPot=s.pots[0];
+ oldPot.haul=1000;
+ oldPot.legacyAbundance=.9;
+ assert(fleet.takeFleetCommand(s,b.id).ok);
+ const [old]=s.career.fleet;
+ fleet.tickFleet(s,1,{waves:0});
+ assert.equal(old.pots.length,0);
+ assert.equal(old.deck,7);
+ assert(old.cargo>29);
+ assert.equal(s.pots.length,1);
+ assert.equal(s.cargo,75);
+});
+test('a deployed salmon net follows its vessel and the next captain retrieves it',()=>{
+ const {s,b}=fixture();
+ assert(fleet.takeFleetCommand(s,b.id).ok);
+ const [old]=s.career.fleet;
+ s.pots=[];
+ Object.assign(s,nearestWater(s.x,s.y));
+ s.nets=[{id:4,x:s.x,y:s.y,setAt:40,haul:1000}];
+ assert(fleet.takeFleetCommand(s,old.id).ok);
+ const [salmonBoat]=s.career.fleet;
+ assert.equal(salmonBoat.phase,'netHaul');
+ assert.equal(salmonBoat.nets[0].id,4);
+ fleet.tickFleet(s,1,{waves:0});
+ assert.equal(salmonBoat.nets.length,0);
+ assert(salmonBoat.salmon>25);
+});
+test('a moored vessel stays at its berth through takeover and the AI casts off only after approval',()=>{
+ const {s,b}=fixture();
+ Object.assign(b,{...BERTH,moored:{...BERTH},cargo:0,crabValue:0,salmon:0,pots:[],phase:'service',autoService:false});
+ assert(fleet.takeFleetCommand(s,b.id).ok);
+ assert.deepEqual(s.moored,BERTH);
+ const [old]=s.career.fleet;
+ assert(fleet.takeFleetCommand(s,old.id).ok);
+ const [moored]=s.career.fleet;
+ fleet.tickFleet(s,1,{waves:0});
+ assert.deepEqual(moored.moored,BERTH);
+ assert(moored.request);
+ assert(!moored.castOff);
+ assert(fleet.answerCaptain(s,moored.id,true).ok);
+ fleet.tickFleet(s,1,{waves:0});
+ assert(moored.castOff);
+ const loaded=restoreSeason(JSON.parse(seasonJSON(s))),[restored]=loaded.career.fleet;
+ assert(restored.castOff);
+ for(let i=0;i<230&&restored.moored;i++)fleet.tickFleet(loaded,1,{waves:0});
+ assert(!restored.moored);
+ assert(Math.hypot(restored.x-BERTH.x,restored.y-BERTH.y)>10);
+});

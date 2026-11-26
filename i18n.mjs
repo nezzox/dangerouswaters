@@ -1,4 +1,4 @@
-import {CRAB_SPECIES} from './crab-species.mjs?v=0.18.89';
+import {CRAB_SPECIES} from './crab-species.mjs?v=0.18.90';
 // Saved money/prices remain in legacy SEK units. Fixed game conversion: 10 SEK = 1 USD.
 // Translation is applied at the presentation boundary; save data and simulation never change language.
 let language='en';
@@ -20,6 +20,17 @@ const sv={
  "Not enough room in the hold to haul this pot.":"Det finns inte tillräckligt med plats i lastrummet för den här tinan.",
  "The pot line snapped. The pot and its catch were lost.":"Linan brast. Tinan och fångsten gick förlorade.",
  "Stored vessels":"Upplagda båtar",
+ 'FONT · BIG':'TEXT · STOR','FONT · SMALL':'TEXT · LITEN',
+ 'Use smaller text':'Använd mindre text',
+ 'Switch between small and big text':'Växla mellan liten och stor text',
+ 'Now aboard':'Nu ombord på',
+ 'YOU ARE IN COMMAND':'DU FÖR BEFÄL',
+ 'Vessel is unavailable or being sold.':'Fartyget är inte tillgängligt eller är till salu.',
+ 'Finish deck work, repairs or the emergency before changing vessels.':'Avsluta däckarbetet, reparationen eller nödläget innan du byter fartyg.',
+ 'Wait until the captain is clear of the quay.':'Vänta tills kaptenen är ute från kajen.',
+ 'Wait for the survey drone to land.':'Vänta tills drönaren har landat.',
+ 'Finish or cancel waypoint travel before changing vessels.':'Avsluta eller avbryt färden till waypoints innan du byter fartyg.',
+ 'Wait for the prepaid upgrade to be installed.':'Vänta tills den förbetalda uppgraderingen har installerats.',
  "TAKE COMMAND":"TA ÖVER BÅTEN",
  "BUY & STORE CURRENT":"KÖP OCH BEHÅLL NUVARANDE",
  "BUY FOR FLEET":"KÖP TILL FLOTTAN",
