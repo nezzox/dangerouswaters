@@ -1,5 +1,6 @@
+import {createPlayerRadio} from './player-radio.mjs?v=0.18.85';
 import {firebaseConfig} from './multiplayer-firebase-config.mjs';
-import {positionInterval,vesselPosition,potChanges} from './multiplayer-pacing.mjs?v=0.18.84';
+import {positionInterval,vesselPosition,potChanges} from './multiplayer-pacing.mjs?v=0.18.85';
 
 let firebase;
 function connectFirebase(){
@@ -24,6 +25,7 @@ export function createFirebaseMultiplayer(presence){
  function reset(){
   generation++;
   if(room){
+   room.radio?.stop();
    for(const stop of room.stops)stop();
    for(const peer of room.links.values())closeLink(peer);
    void room.sdk.onDisconnect(room.mine).cancel().catch(()=>{});
@@ -172,6 +174,7 @@ export function createFirebaseMultiplayer(presence){
       .then(()=>{if(room===r){r.previous=null;status='online';syncLinks(r);}})
       .catch(()=>{});
     }));
+   r.radio=createPlayerRadio(sdk,path,()=>room===r&&status==='online',id=>r.members[id]?.name);
    status='online';
    return true;
   }catch{if(epoch===generation){reset();status='offline';}return false;}
@@ -220,7 +223,11 @@ export function createFirebaseMultiplayer(presence){
   if(Object.keys(changes).length)void r.sdk.update(r.mine,changes).catch(()=>{});
  }
  let lastTick=0,lastAttempt=-Infinity;
- return {get peers(){return peers;},get status(){return status;},reset,sync,tick(state,now){
+ return {get peers(){return peers;},get status(){return status;},
+  get radioCalls(){return room?.radio?.calls()||[];},
+  async sendRadio(target,text){if(!room?.radio)throw Error('unavailable');await room.radio.send(target,text);},
+  async dismissRadio(call){await room?.radio?.dismiss(call);},
+  reset,sync,tick(state,now){
   if(!room){if(!joining&&now-lastAttempt>=3000){lastAttempt=now;void sync(state,state.worldId===state.ownWorldId);}return;}
   if(now-lastTick<30)return;
   lastTick=now;

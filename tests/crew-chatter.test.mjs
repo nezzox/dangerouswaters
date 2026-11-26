@@ -67,3 +67,50 @@ test('a change of conditions hides an obsolete ambient line immediately',()=>{
  assert.equal(advance(tick,sample(s),60).line.topic,'calm');
  assert.equal(tick(sample(s,{wind:44,waves:5})),null);
 });
+
+test('the closest named player inside 600 m gets the territorial banter, not their fleet',()=>{
+ const s={...state(),x:0,y:0};
+ const far={id:'far',name:'Far Boat',x:600,y:0};
+ const near={id:'near',name:'North Star',x:0,y:599,fleet:[{name:'Deck Tender',x:0,y:2}]};
+ const closer={id:'closer',name:'June Gale',x:30,y:40};
+ const tick=createCrewChatter(()=>0),input=sample(s,sea,{peers:[far,near,closer]});
+ advance(tick,{...input,peers:[far]},59);
+ const line=tick(input);
+ assert.equal(line.topic,'rival');
+ assert.match(line.text,/June Gale/);
+ assert.match(line.text,/our patch/);
+ assert.equal(tick({...input,peers:[far,near]}),null,'the departed rival’s bubble should disappear');
+});
+
+test('harbor chatter alternates factual weight and income leaders, including a tied lead',()=>{
+ const s={...state(),x:0,y:0,moored:{}};
+ const near={id:'near',name:'June Gale',x:10,y:0,landed:40,earned:50};
+ const weight={id:'weight',name:'North Star',x:1000,y:0,landed:100,earned:20};
+ const income={id:'income',name:'Deep Run',x:2000,y:0,landed:20,earned:200};
+ const tick=createCrewChatter(()=>0);
+ const input=sample(s,sea,{peers:[near,weight,income],selfStanding:{name:'Us',landed:100,earned:100},isInHarbor:()=>true});
+ const a=advance(tick,input,60).line;
+ assert.equal(a.topic,'harborBoard');
+ assert.match(a.text,/June Gale/);
+ assert.match(a.text,/tied for the lead in landed weight/);
+ let b;for(let i=0;i<60;i++)b=tick(input);
+ assert.equal(b.topic,'harborBoard');
+ assert.match(b.text,/Deep Run leads in total earnings/);
+});
+
+test('zero harbor scores do not make up a leader, and storm warnings take priority at sea',()=>{
+ const s={...state(),x:0,y:0};
+ const peers=[{id:'near',name:'North Star',x:100,y:0,landed:0,earned:0}];
+ const harbor=advance(createCrewChatter(()=>0),sample(s,sea,{peers,isInHarbor:()=>true}),60).line;
+ assert.equal(harbor.topic,'harborRival');
+ assert.match(harbor.text,/North Star/);
+ assert.equal(advance(createCrewChatter(()=>0),sample(s,{...sea,wind:44},{peers}),60).line.topic,'storm');
+ assert.equal(advance(createCrewChatter(()=>0),sample(s,sea,{peers:[{...peers[0],x:600}]}),60).line.topic,'calm');
+});
+
+test('an unchanged line is readable for nine seconds without adding extra messages',()=>{
+ const s=state(),tick=createCrewChatter(()=>0),input=sample(s);
+ const first=advance(tick,input,60).line;
+ for(let i=0;i<8;i++)assert.equal(tick(input),first);
+ assert.equal(tick(input),null);
+});

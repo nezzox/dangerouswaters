@@ -45,6 +45,20 @@
             ".write": "auth != null && ((!newData.exists() && data.val() === auth.uid) || (newData.val() === auth.uid && (!data.exists() || data.val() === auth.uid) && root.child('worlds').child($world).child('members').child(auth.uid).exists()))"
           }
         },
+        "radio": {
+          "$target": {
+            ".read": "auth != null && auth.uid === $target",
+            "$sender": {
+              ".write": "auth != null && ((!newData.exists() && auth.uid === $target && data.exists()) || (newData.exists() && auth.uid === $sender && $sender !== $target && (!data.exists() || data.child('sentAt').val() <= now - 600000) && root.child('worlds').child($world).child('members').child($sender).exists() && root.child('worlds').child($world).child('members').child($target).exists()))",
+              ".validate": "newData.hasChildren(['id','name','text','sentAt'])",
+              "id": {".validate": "newData.isString() && newData.val().matches(/^[a-f0-9-]{36}$/)"},
+              "name": {".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 24 && newData.val() === root.child('worlds').child($world).child('members').child($sender).child('name').val()"},
+              "text": {".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 280"},
+              "sentAt": {".validate": "newData.isNumber() && newData.val() <= now && newData.val() >= now - 5000"},
+              "$other": {".validate": false}
+            }
+          }
+        },
         "signals": {
           "$target": {
             ".read": "auth != null && auth.uid === $target",

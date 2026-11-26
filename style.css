@@ -91,6 +91,7 @@
 
 .chart-areas{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
 
+.ground-sort{display:flex;align-items:center;gap:6px;margin-top:6px}.ground-sort select{min-width:0;max-width:100%;flex:1;font:inherit;color:inherit;background:#11272e;border:1px solid #587b78;border-radius:3px;padding:4px}
 #ground-reports{display:grid;gap:3px;margin-top:6px;max-height:min(150px,24dvh);overflow-y:auto;overscroll-behavior-y:contain}
 #chart-dialog #ground-reports{max-height:min(250px,30dvh)}
 #ground-reports button{font:9px/1.35 monospace;text-align:left;white-space:pre-line;padding:4px 6px;overflow-wrap:anywhere}
@@ -115,5 +116,18 @@
 #crew-bubble{position:fixed;z-index:2;left:var(--crew-x);top:var(--crew-y);width:min(226px,70vw);transform:translate(-50%,-100%);padding:9px 12px 10px;background:#11282ff5;color:#f4efe4;border:1px solid #9cafa580;border-radius:9px;box-shadow:0 5px 22px #060e17a8;pointer-events:none;font:13px/1.35 Arial,sans-serif}
 #crew-bubble::after{content:"";position:absolute;left:var(--crew-tail,50%);top:100%;width:0;height:0;transform:translateX(-50%);border:6px solid transparent;border-top-color:#9cafa5}
 #crew-bubble span{display:block;margin-bottom:3px;color:#e7bc82;font:9px/1.2 monospace;letter-spacing:.09em;text-transform:uppercase}
-#crew-bubble p{margin:0}
+#crew-bubble p{margin:0;overflow-wrap:anywhere}
 @media(max-width:760px){#crew-bubble{z-index:5;width:min(208px,64vw);font-size:12px}}
+
+/* An incoming radio call stays interactive without grabbing the helm's keyboard focus. */
+#radio-incoming{position:fixed;z-index:9;top:clamp(6rem,22vh,12rem);left:50%;transform:translateX(-50%);width:min(32rem,calc(100vw - 32px));max-height:65dvh;overflow:auto;padding:16px 20px;color:var(--text);background:#10272ff7;border:1px solid var(--amber);border-radius:14px 14px 14px 3px;box-shadow:0 12px 40px #02070be0}
+#radio-incoming .eyebrow{display:flex;justify-content:flex-start;gap:8px;padding-bottom:8px;margin-bottom:8px;color:var(--amber);border-bottom:1px solid var(--line)}
+#radio-from,#radio-received{overflow-wrap:anywhere}
+#radio-received{margin:8px 0 15px;white-space:pre-wrap;font:16px/1.45 Arial,sans-serif}
+.radio-buttons{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+#radio-dialog{width:min(31rem,calc(100vw - 32px))}
+#radio-form{display:grid;gap:8px}
+#radio-form h2{margin:0 0 8px;color:var(--amber)}
+#radio-form select,#radio-form textarea{min-width:0;width:100%;padding:8px;background:#132a32;color:var(--text);border:1px solid #628078;font:inherit}
+#radio-form textarea{resize:vertical;max-height:35dvh}
+#radio-status{min-height:1.25em;margin:0;color:var(--amber)}

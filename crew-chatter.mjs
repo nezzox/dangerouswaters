@@ -1,4 +1,4 @@
-import {POT_CAPACITY} from './pot-soak.mjs?v=0.18.84';
+import {POT_CAPACITY} from './pot-soak.mjs?v=0.18.85';
 
 // Each pair is two independently authored lines in the same situation and voice.
 // A short optional lead-in adds cadence. No general-purpose random sentence mashups.
@@ -71,6 +71,15 @@ const bank={
  cruise:['dry',
  'We’re making our way along now.|Just the run between jobs for a bit.|Feels like a long way out when you look around.|There’s a lot of water between stops out here.|Nothing but the run ahead for a while.|We’ve got some sea to cover yet.|We’re out here properly now.|It’s a steady stretch of water for the moment.',
  'I’ll keep watching from this side.|Might as well get the gear ready for later.|I’ll take it steady till the next job.|I’m keeping an eye out for the buoys.|I’ll be ready when there’s work to do.|It’s a good time to check the next mark.|I’m all ears if you need a hand.|We’ll see what the next stretch brings.'],
+ rival:['dry',
+ '{rival} is on our patch again.|Look who found our fishing spot: {rival}.|Is that {rival} crowding our buoys?|There’s {rival}, right where we were going.|Even out here, {rival} finds a way to fish next door.|{rival} must have bought the same chart.|Looks like {rival} has taken an interest in our string.|Plenty of water out here, and {rival} picks this bit.',
+ 'Typical. We turn, they turn.|Next they’ll want our bait recipe.|Should we charge for the guided tour?|Can’t blame them for having good taste.|I hope they leave us a few crab.|Apparently a secret spot needs a bigger ocean.|I’d wave, but they might copy that too.|The crab haven’t picked a side yet.'],
+ harborRival:['dry',
+ 'Looks like {rival} made it in too.|There’s {rival} coming through the harbor.|Wonder how {rival} did on that last run.|Spotted {rival} by the docks.|{rival} finally traded the swell for the quay.|That’s {rival}, back in one piece.|It’s a busy harbor when {rival} is in.|There goes {rival}. Bet their crew wants coffee too.',
+ 'We’ll get the real story when they weigh in.|Nothing like dock talk before the first tally.|I bet the fish get bigger every time they tell it.|We’ll see what the board looks like after unload.|Save the bragging for when the scales settle.|Everybody’s a good captain when the boat’s tied up.|I’ll take a coffee before I take a fishing tip.|The quay’s got room for both of us.'],
+ harborBoard:['dry',
+ 'There’s {rival}. Look at the board.|That’s {rival} by the docks.|{rival} made it in. Any news from the scales?|Look who’s back in port: {rival}.|Spotted {rival}. I just checked the board.|That’s {rival}, back from another run.|{rival} is in. Heard the latest dock talk?|There goes {rival}. Here’s where the board stands.',
+ '{standing} I had to check twice.|Last I saw, {standing}|{standing} That won’t go unnoticed.|Did you see? {standing}|The latest from the quay: {standing}|{standing} Plenty of season left, though.|Word at the docks is right for once: {standing}|{standing} No wonder everyone’s watching the board.'],
  repairs:['wary',
  'Something aboard needs attention.|We’ve got a problem to deal with first.|There’s a repair on the list now.|The gear isn’t the only thing needing a hand today.|We’ve got a fault to sort out.|This isn’t the time to ignore a problem.|The boat’s asking for a little attention.|We’re dealing with something other than fishing now.',
  'Let’s give whoever’s on it some room.|I’d rather take a moment and get it right.|Let me know if they need another pair of hands.|We can worry about the catch after it’s fixed.|I hope they’ve got what they need aboard.|Good time to keep the workload down.|Let’s hear from the crew before we push on.|Better to deal with it than work around it.'],
@@ -83,17 +92,36 @@ const bank={
 };
 export const crewTopics=Object.keys(bank);
 for(const pair of Object.values(bank)){pair[1]=pair[1].split('|');pair[2]=pair[2].split('|');}
-export function crewLine(topic,index){
+export function crewLine(topic,index,{rival='North Star',standing='Deep Run leads in total earnings.'}={}){
  const [voice,first,last]=bank[topic],lead=voices[voice][index>>6];
- return lead+first[index&7]+' '+last[(index>>3)&7];
+ return (lead+first[index&7]+' '+last[(index>>3)&7]).replace(/\{(rival|standing)\}/g,(_,key)=>key==='rival'?rival:standing);
+}
+
+function rivalWithin(s,peers){
+ let rival=null,closest=600;
+ for(const p of peers){
+  const distance=Math.hypot(p.x-s.x,p.y-s.y);
+  if(p.name&&distance<closest){rival=p;closest=distance;}
+ }
+ return rival;
+}
+function standingFor(self,peers,key,label){
+ let name='',best=0,tied=false;
+ for(const row of self?[self,...peers]:peers){
+  const score=row[key];
+  if(!row.name||!Number.isFinite(score)||score<=0)continue;
+  if(score>best){name=row.name;best=score;tied=false;}
+  else if(score===best)tied=true;
+ }
+ return name?`${name} ${tied?'is tied for the lead':'leads'} in ${label}.`:'';
 }
 
 export function createCrewChatter(random=Math.random){
- let season,world,elapsed,next,idleAt,lastHaul,lost,event=null,bubble=null,expires=0,previous={};
+ let season,world,elapsed,next,idleAt,lastHaul,lost,event=null,bubble=null,expires=0,previous={},harborMetric=0;
  const gap=()=>60+Math.floor(random()*51);
- function tick({state:s,weather:w,active,dt,flight=false,tank=100,electric=false}){
+ function tick({state:s,weather:w,active,dt,flight=false,tank=100,electric=false,peers=[],selfStanding=null,isInHarbor}){
   if(s!==season||s.worldId!==world){
-   season=s;world=s.worldId;elapsed=idleAt=0;next=gap();lastHaul=s.lastHaul;lost=s.lostPots||0;event=bubble=null;previous={};
+   season=s;world=s.worldId;elapsed=idleAt=0;next=gap();lastHaul=s.lastHaul;lost=s.lostPots||0;event=bubble=null;previous={};harborMetric=0;
   }
   if(!active||s.paused||s.overboard||s.tow){
    lastHaul=s.lastHaul;lost=s.lostPots||0;event=bubble=null;return null;
@@ -113,23 +141,31 @@ export function createCrewChatter(random=Math.random){
   if((s.lostPots||0)>lost){event={topic:'lineLost',until:elapsed+90};if(bubble?.result)bubble=null;}
   lost=s.lostPots||0;
   if(event&&(elapsed>event.until||s.moored||job==='unload'))event=null;
+  const rival=rivalWithin(s,peers);
+  const harborRival=rival&&(s.moored||isInHarbor?.(s));
+  const ranking=metric=>metric%2===0?standingFor(selfStanding,peers,'landed','landed weight'):standingFor(selfStanding,peers,'earned','total earnings');
+  const standing=harborRival&&(ranking(harborMetric)||ranking(harborMetric+1));
+  const rivalTopic=rival&&(harborRival?(standing?'harborBoard':'harborRival'):'rival');
   const topic=s.incident?'repairs': job==='deice'?'icing':
    job==='unload'&&s.deckJob.elapsed>=s.deckJob.approach&&(s.cargo>0||s.salmon>0)?'landing':
-   job==='unload'||s.skipperMission?.kind==='home'?'harbor':s.moored?'docked':
+   job==='unload'||s.skipperMission?.kind==='home'?'harbor':s.moored?(rivalTopic||'docked'):
    w.wind>=35||w.waves>=4?'storm':!electric&&s.fuel>0&&s.fuel/tank<=.16?'lowFuel':
    flight?'survey':s.skipperMission?.kind==='droneSet'?'surveySet':
    event?.topic||(job==='deploy'?'setting':job==='haul'?'hauling':
-    job==='netSet'||job==='netHaul'?'nets':
+    job==='netSet'||job==='netHaul'?'nets':rivalTopic||(
     w.snow>=.35?'snow':w.temperature<=0?'cold':w.fog>=.65?'fog':w.rain>=.55?'rain':
-    elapsed-idleAt>=110?'idle':w.wind<=13&&w.waves<=1.2?'calm':Math.abs(s.speed)>=.6?'cruise':null);
+    elapsed-idleAt>=110?'idle':w.wind<=13&&w.waves<=1.2?'calm':Math.abs(s.speed)>=.6?'cruise':null));
   if(bubble&&(elapsed>=expires||topic!==bubble.topic&&(!bubble.result||['storm','icing','repairs','docked','harbor','landing'].includes(topic))))bubble=null;
+  if(bubble?.rival&&rival?.id!==bubble.rival.id)bubble=null;
   if(elapsed>=next&&topic){
    let index=Math.floor(random()*512);
    // Keep the opening sentence fresh, not merely a different interjection.
    if((index&7)===(previous[topic]&7)&&topic in previous)index^=1;
    previous[topic]=index;
-   bubble={topic,text:crewLine(topic,index),result:topic===event?.topic};
-   expires=elapsed+7;next=elapsed+gap();
+   const encounter=topic===rivalTopic;
+   bubble={topic,text:crewLine(topic,index,encounter?{rival:rival.name,standing}:undefined),result:topic===event?.topic,rival:encounter?rival:null};
+   if(topic==='harborBoard')harborMetric++;
+   expires=elapsed+9;next=elapsed+gap();
    if(bubble.result)event=null;
   }
   return bubble;

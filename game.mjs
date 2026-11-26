@@ -1,50 +1,50 @@
-import {createCrewChatter} from './crew-chatter.mjs?v=0.18.84';
-import {DRONE_RADIUS,DRONE_DURATION,droneCameraFollow,dronePose,scanCrab} from './drone-survey.mjs?v=0.18.84';
-import {deckSign} from './vessel-profile.mjs?v=0.18.84';
-import {canStand} from './deck-layout.mjs?v=0.18.84';
-import {drawPrecipitation} from './precipitation.mjs?v=0.18.84';
-import {replaceLostPots,LOST_POT_PRICE} from './simulation.mjs?v=0.18.84';
-import {shopReady} from './career.mjs?v=0.18.84';
-import {salmonMarket} from './salmon-market.mjs?v=0.18.84';
-import {OVERBOARD_NOTICE,settleOverboard,dispatchReplacement} from './man-overboard.mjs?v=0.18.84';
-import {seaLane} from './navigation.mjs?v=0.18.84';
-import {newWorldCode,newPlayerToken,cleanPlayerName,createMultiplayer,createPeerSmoother,createWorldClock} from './multiplayer.mjs?v=0.18.84';
-import {startWaypointTravel,advanceWaypointTravel} from './time-to-waypoint.mjs?v=0.18.84';
-import {CRAB_SPECIES,crabSpeciesName} from './crab-species.mjs?v=0.18.84';
-import {LIGHTING_PROFILES} from './light-upgrades.mjs?v=0.18.84';
-import {claimFirstBoatGrant,firstBoatNotice} from './first-boat.mjs?v=0.18.84';
-import {crabPriceAt,crabHoldValue} from './catch-value.mjs?v=0.18.84';
-import {watchDonations,appendDonation} from './donation-feed.mjs?v=0.18.84';
-import {DONATION_FEED_URL} from './donation-config.mjs?v=0.18.84';
-import {watchUpdates,formatUpdateNotice} from './update-check.mjs?v=0.18.84';
-import {energyPrice} from './energy.mjs?v=0.18.84';
-import {createMessageQueue} from './message-queue.mjs?v=0.18.84';
-import {visibleFleet} from './fleet-visuals.mjs?v=0.18.84';
-import {transitionWeather} from './weather-transition.mjs?v=0.18.84';
-import {ownedUpgrades,createRadioFeed,createLastHaul} from './hud-status.mjs?v=0.18.84';
-import {createIntro} from './intro.mjs?v=0.18.84';
-import {fleetNoticeCount} from './fleet.mjs?v=0.18.84';
-import {redeemDeveloperCode} from './developer-code.mjs?v=0.18.84';
-import {potSoakStage} from './pot-soak.mjs?v=0.18.84';
-import {createLiveWeather} from './live-weather.mjs?v=0.18.84';
-import {dockingStage,PORT_QUAYS,nearestQuay} from './harbor.mjs?v=0.18.84';
-import {fuelEconomy,fuelToGround} from './fuel-economy.mjs?v=0.18.84';
-import {scanSonar,drawSonar} from './sonar.mjs?v=0.18.84';
-import {rareCount,rareValue} from './rare-catch.mjs?v=0.18.84';
-import {clipChartWater} from './chart-water.mjs?v=0.18.84';
-import {groundsAt,groundReport,crabHotspot,groundMotion} from './fishing-grounds.mjs?v=0.18.84';
-import {createSoundscape} from './soundscape.mjs?v=0.18.84';
-import {WORLD_LAND,WORLD_CENTER,WORLD_BOUNDS,PLACES,worldToGeo,clearWater,ST_PAUL_DIESEL} from './world.mjs?v=0.18.84';
-import {getLanguage,setLanguage,translateText,localizeTree} from './i18n.mjs?v=0.18.84';
-import {createShop} from './shop.mjs?v=0.18.84';
-import {restoreSeason,seasonJSON} from './saves.mjs?v=0.18.84';
-import {vesselStats,toggleAutomation,droneRequirement} from './career.mjs?v=0.18.84';
-import {pickupAllPots,skipperCommand,createGame,step,notify,startDroneSet,cancelDroneSet,conditions,depthAt,PORT,distance,nearPort,handlePot,dock,undock,canUndock,service,beginTow,towDestination,towFee,atDieselStation,getUnstuck,clamp,potAction,POT_RANGE,jobProgress,setAutopilot,autopilotRouteStart,applyAutopilotRoute,setRudder,potBearing,workingSide} from './simulation.mjs?v=0.18.84';
-import {createOcean,drawFallback} from './ocean.mjs?v=0.18.84';
-import {createScene} from './scene.mjs?v=0.18.84';
-import {drawGroundMotion,createChartView,chartPoint,chartWorld,panChart,zoomChart,followVessel,fitPots,updateChartFollow} from './chart.mjs?v=0.18.84';
-import {createWake} from './wake.mjs?v=0.18.84';
-import {advanceVoyage} from './voyage.mjs?v=0.18.84';
+import {createCrewChatter} from './crew-chatter.mjs?v=0.18.85';
+import {DRONE_RADIUS,DRONE_DURATION,droneCameraFollow,dronePose,scanCrab} from './drone-survey.mjs?v=0.18.85';
+import {deckSign} from './vessel-profile.mjs?v=0.18.85';
+import {canStand} from './deck-layout.mjs?v=0.18.85';
+import {drawPrecipitation} from './precipitation.mjs?v=0.18.85';
+import {replaceLostPots,LOST_POT_PRICE} from './simulation.mjs?v=0.18.85';
+import {shopReady} from './career.mjs?v=0.18.85';
+import {salmonMarket} from './salmon-market.mjs?v=0.18.85';
+import {OVERBOARD_NOTICE,settleOverboard,dispatchReplacement} from './man-overboard.mjs?v=0.18.85';
+import {seaLane} from './navigation.mjs?v=0.18.85';
+import {newWorldCode,newPlayerToken,cleanPlayerName,createMultiplayer,createPeerSmoother,createWorldClock} from './multiplayer.mjs?v=0.18.85';
+import {startWaypointTravel,advanceWaypointTravel} from './time-to-waypoint.mjs?v=0.18.85';
+import {CRAB_SPECIES,crabSpeciesName} from './crab-species.mjs?v=0.18.85';
+import {LIGHTING_PROFILES} from './light-upgrades.mjs?v=0.18.85';
+import {claimFirstBoatGrant,firstBoatNotice} from './first-boat.mjs?v=0.18.85';
+import {crabPriceAt,crabHoldValue} from './catch-value.mjs?v=0.18.85';
+import {watchDonations,appendDonation} from './donation-feed.mjs?v=0.18.85';
+import {DONATION_FEED_URL} from './donation-config.mjs?v=0.18.85';
+import {watchUpdates,formatUpdateNotice} from './update-check.mjs?v=0.18.85';
+import {energyPrice} from './energy.mjs?v=0.18.85';
+import {createMessageQueue} from './message-queue.mjs?v=0.18.85';
+import {visibleFleet} from './fleet-visuals.mjs?v=0.18.85';
+import {transitionWeather} from './weather-transition.mjs?v=0.18.85';
+import {ownedUpgrades,createRadioFeed,createLastHaul} from './hud-status.mjs?v=0.18.85';
+import {createIntro} from './intro.mjs?v=0.18.85';
+import {fleetNoticeCount} from './fleet.mjs?v=0.18.85';
+import {redeemDeveloperCode} from './developer-code.mjs?v=0.18.85';
+import {potSoakStage} from './pot-soak.mjs?v=0.18.85';
+import {createLiveWeather} from './live-weather.mjs?v=0.18.85';
+import {dockingStage,PORT_QUAYS,nearestQuay} from './harbor.mjs?v=0.18.85';
+import {fuelEconomy,fuelToGround} from './fuel-economy.mjs?v=0.18.85';
+import {scanSonar,drawSonar} from './sonar.mjs?v=0.18.85';
+import {rareCount,rareValue} from './rare-catch.mjs?v=0.18.85';
+import {clipChartWater} from './chart-water.mjs?v=0.18.85';
+import {groundsAt,groundReport,sortGroundReports,crabHotspot,groundMotion} from './fishing-grounds.mjs?v=0.18.85';
+import {createSoundscape} from './soundscape.mjs?v=0.18.85';
+import {WORLD_LAND,WORLD_CENTER,WORLD_BOUNDS,PLACES,worldToGeo,clearWater,ST_PAUL_DIESEL} from './world.mjs?v=0.18.85';
+import {getLanguage,setLanguage,formatMoney,translateText,localizeTree} from './i18n.mjs?v=0.18.85';
+import {createShop} from './shop.mjs?v=0.18.85';
+import {restoreSeason,seasonJSON} from './saves.mjs?v=0.18.85';
+import {vesselStats,toggleAutomation,droneRequirement} from './career.mjs?v=0.18.85';
+import {pickupAllPots,skipperCommand,createGame,step,notify,startDroneSet,cancelDroneSet,conditions,depthAt,PORT,distance,nearPort,handlePot,dock,undock,canUndock,service,beginTow,towDestination,towFee,atDieselStation,getUnstuck,clamp,potAction,POT_RANGE,jobProgress,setAutopilot,autopilotRouteStart,applyAutopilotRoute,setRudder,potBearing,workingSide} from './simulation.mjs?v=0.18.85';
+import {createOcean,drawFallback} from './ocean.mjs?v=0.18.85';
+import {createScene} from './scene.mjs?v=0.18.85';
+import {drawGroundMotion,createChartView,chartPoint,chartWorld,panChart,zoomChart,followVessel,fitPots,updateChartFollow} from './chart.mjs?v=0.18.85';
+import {createWake} from './wake.mjs?v=0.18.85';
+import {advanceVoyage} from './voyage.mjs?v=0.18.85';
 let sonarFrame='';const radioFeed=createRadioFeed(),messageQueue=createMessageQueue();let ownedSignature='';const lastHaulDisplay=createLastHaul();
 const wake=createWake();
 const $=id=>document.getElementById(id),canvas=$('world'),ctx=canvas.getContext('2d'),sea=$('ocean'),chart=$('chart'),map=chart.getContext('2d');
@@ -75,7 +75,7 @@ addEventListener('beforeunload',save);
 function togglePause(){if(!started||state.tow||$('harbor').open||$('career').open||$('chart-dialog').open)return;state.paused=!state.paused;keys.clear();save();updateUI();}
 function keyboardCode(e){return ({a:'KeyA',d:'KeyD',w:'KeyW',s:'KeyS',x:'KeyX',e:'KeyE',u:'KeyU'})[e.key?.toLowerCase()]||e.code||e.key;}
 function centerRudder(){for(const code of ['KeyA','KeyD','ArrowLeft','ArrowRight'])keys.delete(code);setRudder(state,0);}
-addEventListener('keydown',e=>{const code=keyboardCode(e);if(state.tow||$('owned-dialog').open||$('intro').open||$('code-dialog').open||$('save-confirm').open||$('message-popup').open||$('refuel-prompt').open)return;if(($('career').open||$('harbor').open||$('chart-dialog').open)&&code!=='Escape')return;if(code!=='Escape'&&(e.target.closest('select,textarea,input:not([type=range]),[contenteditable=true]')||(e.target.closest('button')&&code==='Enter')))return;if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(code))e.preventDefault();if(e.repeat)return;if(code==='Escape'){if($('chart-dialog').open){e.preventDefault();$('chart-dialog').close();}else if($('career').open)$('career').close();else if($('harbor').open)$('harbor').close();else togglePause();return;}if(!started||state.paused||$('harbor').open||$('career').open)return;keys.add(code);if(['KeyA','KeyD','ArrowLeft','ArrowRight'].includes(code))setRudder(state,state.rudder*35+(['KeyA','ArrowLeft'].includes(code)?-2:2));if(code==='KeyX')centerRudder();if(code==='Space'){handlePot(state);save();}if(code==='KeyE'){dock(state);save();}if(code==='KeyU')castOffFromControls();});
+addEventListener('keydown',e=>{const code=keyboardCode(e);if(state.tow||$('owned-dialog').open||$('radio-dialog').open||$('intro').open||$('code-dialog').open||$('save-confirm').open||$('message-popup').open||$('refuel-prompt').open)return;if(($('career').open||$('harbor').open||$('chart-dialog').open)&&code!=='Escape')return;if(code!=='Escape'&&(e.target.closest('select,textarea,input:not([type=range]),[contenteditable=true]')||(e.target.closest('button')&&code==='Enter')))return;if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(code))e.preventDefault();if(e.repeat)return;if(code==='Escape'){if($('chart-dialog').open){e.preventDefault();$('chart-dialog').close();}else if($('career').open)$('career').close();else if($('harbor').open)$('harbor').close();else togglePause();return;}if(!started||state.paused||$('harbor').open||$('career').open)return;keys.add(code);if(['KeyA','KeyD','ArrowLeft','ArrowRight'].includes(code))setRudder(state,state.rudder*35+(['KeyA','ArrowLeft'].includes(code)?-2:2));if(code==='KeyX')centerRudder();if(code==='Space'){handlePot(state);save();}if(code==='KeyE'){dock(state);save();}if(code==='KeyU')castOffFromControls();});
 addEventListener('keyup',e=>keys.delete(keyboardCode(e))); addEventListener('blur',()=>keys.clear());
 if(sandbox)document.querySelector('.intro-foot').textContent='ISOLATED CAREER CHECK · NO SAVING';
 $('start').textContent=saved?'CONTINUE YOUR SEASON →':'TAKE COMMAND →';
@@ -128,7 +128,7 @@ function requestWaypoint(target,append){
  function launch(start,end,grid,complete){
   let worker;
   try{
-   worker=new Worker(new URL('./waypoint-worker.mjs?v=0.18.84',import.meta.url),{type:'module'});
+   worker=new Worker(new URL('./waypoint-worker.mjs?v=0.18.85',import.meta.url),{type:'module'});
    waypointWorkers.add(worker);
    const done=route=>{
     if(!waypointWorkers.delete(worker))return;
@@ -241,7 +241,7 @@ function planTow(){
   save();updateUI();
  }
  for(const grid of grids)try{
-  const worker=new Worker(new URL('./waypoint-worker.mjs?v=0.18.84',import.meta.url),{type:'module'});
+  const worker=new Worker(new URL('./waypoint-worker.mjs?v=0.18.85',import.meta.url),{type:'module'});
   workers.add(worker);
   const done=route=>{
    if(!workers.delete(worker))return;
@@ -330,14 +330,14 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden)audio?.upda
 const stopDonations=watchDonations({url:DONATION_FEED_URL,receive:text=>appendDonation(state,text)});addEventListener('pagehide',event=>{if(!event.persisted)stopDonations();},{once:true});
 const stopUpdateChecks=watchUpdates({currentVersion:new URL(import.meta.url).searchParams.get('v'),notify:(version,notes)=>messageQueue.enqueue({kind:'update',version,notes,text:formatUpdateNotice(version,notes,getLanguage())})});addEventListener('pagehide',event=>{if(!event.persisted)stopUpdateChecks();},{once:true});
 function showQueuedMessage(){messageQueue.collect(state);if(!started||document.querySelector('dialog[open]'))return;if(state.tow?.phase==='film'){
- intro.start({source:'./tow.mp4?v=0.18.84',onFinish:()=>{state.tow.phase='planning';save();updateUI();}});return;
+ intro.start({source:'./tow.mp4?v=0.18.85',onFinish:()=>{state.tow.phase='planning';save();updateUI();}});return;
 }
 if(state.tow?.phase==='planning'){planTow();return;}
 if(state.tow)return;
 if(state.specialCatchFilm){
- intro.start({source:'./special-catch.mp4?v=0.18.84',onFinish:()=>{state.specialCatchFilm=false;save();updateUI();}});return;
+ intro.start({source:'./special-catch.mp4?v=0.18.85',onFinish:()=>{state.specialCatchFilm=false;save();updateUI();}});return;
 }
-if(state.overboard?.phase==='film'){save();intro.start({source:state.crewLosses>1?'./another-lost.mp4?v=0.18.84':'./man-overboard.mp4?v=0.18.84',onFinish:()=>{settleOverboard(state);save();updateUI();}});return;}
+if(state.overboard?.phase==='film'){save();intro.start({source:state.crewLosses>1?'./another-lost.mp4?v=0.18.85':'./man-overboard.mp4?v=0.18.85',onFinish:()=>{settleOverboard(state);save();updateUI();}});return;}
 if(state.overboard?.phase==='notice'){activeMessageKind='overboard';keys.clear();$('message-popup-title').textContent='MAN OVERBOARD';$('message-popup-text').textContent=OVERBOARD_NOTICE;localizeTree($('message-popup'));$('message-popup').showModal();$('message-popup-ok').focus();return;}if(state.career.firstBoatReward==='pending'&&!firstBoatAcknowledgement){firstBoatWasPaused=state.paused;state.paused=true;save();$('intro').setAttribute('aria-label',translateText('First boat celebration'));$('intro-video').setAttribute('aria-label',translateText('First boat celebration video'));intro.start({source:'./new-boat.mp4',onFinish:()=>{firstBoatAcknowledgement=true;state.paused=firstBoatWasPaused;messageQueue.enqueue({kind:'firstBoat',text:firstBoatNotice(getLanguage())});updateUI();}});return;}const entry=messageQueue.next();if(!entry)return;activeMessageKind=entry.kind;keys.clear();if(entry.kind==='update')save();$('message-popup-title').textContent=entry.kind==='firstBoat'?'YOUR FIRST BOAT':entry.kind==='update'?'GAME UPDATE AVAILABLE':entry.kind==='incident'?'REPAIR & VESSEL ALERT':'FLEET RADIO';$('message-popup-text').textContent=entry.kind==='update'&&entry.version?formatUpdateNotice(entry.version,entry.notes,getLanguage()):entry.text;localizeTree($('message-popup'));$('message-popup').showModal();$('message-popup-ok').focus();}
 let offeredMooring=state.moored;
 const refuelPrompt=$('refuel-prompt');
@@ -376,6 +376,68 @@ function offerDockRefuel(){
  if(vesselStats(state).tank-state.fuel<1&&!state.lostPots)return;
  updateDockOptions();keys.clear();refuelPrompt.showModal();
 }
+const radioDialog=$('radio-dialog'),radioTarget=$('radio-target'),radioDraft=$('radio-draft'),incomingRadio=$('radio-incoming');
+let shownRadio=null,replyingTo=null,sendingRadio=false,radioRoster='';
+function syncRadioTargets(){
+ const online=multiplayer.status==='online';
+ const peers=online?multiplayer.peers.filter(p=>p.name):[];
+ const signature=JSON.stringify([getLanguage(),peers.map(({id,name})=>[id,name])]);
+ if(signature!==radioRoster){
+  radioRoster=signature;
+  const selected=replyingTo?.sender??radioTarget.value;
+  radioTarget.replaceChildren(new Option(translateText('Select a vessel'),''),...peers.map(p=>{
+   const duplicate=peers.some(other=>other.id!==p.id&&other.name===p.name);
+   return new Option(duplicate?`${p.name} · ${p.id.slice(-4)}`:p.name,p.id);
+  }));
+  radioTarget.value=peers.some(p=>p.id===selected)?selected:'';
+ }
+ radioTarget.disabled=sendingRadio||!!replyingTo;
+ $('radio-send').disabled=sendingRadio||!radioTarget.value||!radioDraft.value.trim();
+ return online?peers.length:0;
+}
+function openRadio(call=null){
+ if(sendingRadio)return;
+ keys.clear();replyingTo=call;radioDraft.value='';radioTarget.value='';
+ const count=syncRadioTargets();
+ if(call&&[...radioTarget.options].some(o=>o.value===call.sender))radioTarget.value=call.sender;
+ $('radio-status').textContent=count?'':'No other vessels online in this world.';
+ radioDialog.showModal();syncRadioTargets();
+ (radioTarget.value?radioDraft:radioTarget).focus();
+}
+$('radio-toggle').onclick=()=>openRadio();
+$('radio-cancel').onclick=()=>radioDialog.close();
+radioDialog.addEventListener('close',()=>{keys.clear();refreshRadio();});
+radioTarget.onchange=radioDraft.oninput=syncRadioTargets;
+$('radio-form').onsubmit=async event=>{
+ event.preventDefault();
+ const target=radioTarget.value,text=radioDraft.value.trim(),original=replyingTo;
+ if(sendingRadio||!target||!text||original&&original.sender!==target)return;
+ sendingRadio=true;syncRadioTargets();$('radio-status').textContent='Sending radio call…';
+ try{
+  await multiplayer.sendRadio(target,text);
+  if(original)void multiplayer.dismissRadio(original).catch(()=>{});
+  if(radioDialog.open)radioDialog.close();
+ }catch{
+  $('radio-status').textContent='Could not send. The vessel may be offline or have an unanswered call from you.';
+ }finally{sendingRadio=false;syncRadioTargets();}
+};
+$('radio-reply').onclick=()=>{if(shownRadio)openRadio(shownRadio);};
+$('radio-dismiss').onclick=()=>{
+ if(!shownRadio)return;
+ void multiplayer.dismissRadio(shownRadio).catch(()=>{});
+ refreshRadio();
+};
+function refreshRadio(){
+ if(radioDialog.open)syncRadioTargets();
+ const online=multiplayer.status==='online';
+ const call=started&&online&&!state.tow&&!state.overboard&&!document.querySelector('dialog[open]')?multiplayer.radioCalls[0]:null;
+ incomingRadio.hidden=!call;
+ shownRadio=call;
+ if(!call)return;
+ if($('radio-from').textContent!==call.name)$('radio-from').textContent=call.name;
+ if($('radio-received').textContent!==call.text)$('radio-received').textContent=call.text;
+ $('radio-reply').disabled=sendingRadio||!multiplayer.peers.some(p=>p.id===call.sender);
+}
 function updateUI(){
  showMusicControl();
  const towing=!!state.tow;
@@ -383,6 +445,7 @@ function updateUI(){
 
  showQueuedMessage();
  offerDockRefuel();
+ refreshRadio();
  updateSonar();
  const stats=vesselStats(state);state.electricDrive=stats.powertrain==='electric';$('scene').setAttribute('aria-label',`Three-dimensional view of the sea and ${stats.name}`);canvas.setAttribute('aria-label',`Sea and fishing vessel ${stats.name}`);$('speed-target').max=Math.ceil(stats.top*1.94384);$('vessel-name').textContent='F/V '+stats.name.toUpperCase();$('watermark-name').textContent='F/V '+stats.name.toUpperCase();$('vessel-type').textContent=`${stats.length.toFixed(1)} M · ${stats.type.toUpperCase()} · ${stats.crew} CREW`;
  const w=conditions(state),heading=((state.heading*180/Math.PI+90)%360+360)%360;
@@ -432,34 +495,47 @@ function drawDroneChart(point,scale){
  }
  map.restore();
 }
-function drawChart(){
- const reports=$('ground-reports');
- if(reports.closest('details').open){
-  const language=getLanguage(),stats=vesselStats(state),weather=conditions(state);
-  for(const ground of groundsAt(watchHour())){
-   let button=reports.querySelector(`[data-ground-id="${ground.id}"]`);
-   if(!button){
-    button=document.createElement('button');
-    button.type='button';button.dataset.groundId=ground.id;
-    button.addEventListener('click',()=>{
-     const current=groundsAt(watchHour()).find(g=>String(g.id)===button.dataset.groundId);
-     if(!current)return;
-     chartView.follow=false;chartView.x=current.x;chartView.y=current.y;
-     chartView.scale=Math.min(chart.width/(current.rx*3),chart.height/(current.ry*3));
-     drawChart();chart.scrollIntoView({block:'nearest'});
-    });
-    reports.append(button);
-   }
-   const salmon=salmonMarket(ground);
-   const crab=groundReport(ground,'crab',Math.max(1,state.career.skills.crab||0),watchHour());
-   const fish=groundReport(ground,'salmon',Math.max(1,state.career.skills.salmon||0),watchHour());
-   const fuel=fuelToGround(state,ground,stats,weather);
-   const units=stats.powertrain==='electric'?'kWh':'L';
-   const estimate=fuel===null?'':` · ≈${Math.ceil(fuel).toLocaleString(language==='sv'?'sv-SE':'en-US')} ${units} ${language==='sv'?'fågelvägen':'direct'}`;
-   const text=`${ground.name} · ${crabSpeciesName(ground.species,language)} ${crab.low}–${crab.high}% · ${money(crabPriceAt({...ground,crabSpecies:ground.species,groundId:ground.id},state.hour))}/kg\n${salmon[language]} ${fish.low}–${fish.high}% · ${money(salmon.price)}/kg${estimate}`;
-   if(button.textContent!==text)button.textContent=text;
+const groundReports=$('ground-reports'),groundSort=$('ground-sort');
+groundReports.closest('details').addEventListener('toggle',drawGroundReports);
+groundSort.addEventListener('change',()=>{drawGroundReports();groundReports.scrollTop=0;});
+function drawGroundReports(){
+ if(!groundReports.closest('details').open)return;
+ const language=getLanguage(),stats=vesselStats(state),weather=conditions(state),hour=watchHour();
+ const rows=groundsAt(hour).map(ground=>{
+  const salmon=salmonMarket(ground);
+  return {ground,salmonName:salmon[language],salmonPrice:salmon.price,
+   crabPrice:crabPriceAt({...ground,crabSpecies:ground.species,groundId:ground.id},state.hour),
+   crab:groundReport(ground,'crab',Math.max(1,state.career.skills.crab||0),hour),
+   salmon:groundReport(ground,'salmon',Math.max(1,state.career.skills.salmon||0),hour)};
+ });
+ const buttons=new Map([...groundReports.children].map(b=>[b.dataset.groundId,b]));
+ const focused=document.activeElement;
+ let next=groundReports.firstElementChild;
+ for(const {ground,crab,salmon,salmonName,crabPrice,salmonPrice} of sortGroundReports(rows,groundSort.value)){
+  let button=buttons.get(String(ground.id));
+  if(!button){
+   button=document.createElement('button');
+   button.type='button';button.dataset.groundId=ground.id;
+   button.addEventListener('click',()=>{
+    const current=groundsAt(watchHour()).find(g=>String(g.id)===button.dataset.groundId);
+    if(!current)return;
+    chartView.follow=false;chartView.x=current.x;chartView.y=current.y;
+    chartView.scale=Math.min(chart.width/(current.rx*3),chart.height/(current.ry*3));
+    drawChart();chart.scrollIntoView({block:'nearest'});
+   });
   }
+  if(button!==next)groundReports.insertBefore(button,next);
+  next=button.nextElementSibling;
+  const fuel=fuelToGround(state,ground,stats,weather);
+  const units=stats.powertrain==='electric'?'kWh':'L';
+  const estimate=fuel===null?'':` · ≈${Math.ceil(fuel).toLocaleString(language==='sv'?'sv-SE':'en-US')} ${units} ${language==='sv'?'fågelvägen':'direct'}`;
+  const text=`${ground.name} · ${crabSpeciesName(ground.species,language)} ${crab.low}–${crab.high}% · ${formatMoney(Math.round(crabPrice),language)}/kg\n${salmonName} ${salmon.low}–${salmon.high}% · ${formatMoney(Math.round(salmonPrice),language)}/kg${estimate}`;
+  if(button.textContent!==text)button.textContent=text;
  }
+ if(focused!==document.activeElement&&groundReports.contains(focused))focused.focus({preventScroll:true});
+}
+function drawChart(){
+ drawGroundReports();
  $('chart-focus-pots').disabled=!state.pots.length;updateChartFollow(chartView,state);$('chart-center').setAttribute('aria-pressed',String(chartView.follow));
  const cw=chart.width,ch=chart.height,scale=chartView.scale,point=(x,y)=>chartPoint(chartView,x,y,cw,ch);map.fillStyle='#11272e';map.fillRect(0,0,cw,ch);map.strokeStyle='#28424a';map.lineWidth=.5;const spacing=scale>.25?100:scale>.02?1000:scale>.001?10000:scale>.0002?100000:500000,lo=chartWorld(chartView,0,0,cw,ch),hi=chartWorld(chartView,cw,ch,cw,ch);
  for(let x=Math.floor(lo.x/spacing)*spacing;x<hi.x;x+=spacing){const p=point(x,0);map.beginPath();map.moveTo(p.x,0);map.lineTo(p.x,ch);map.stroke();}for(let y=Math.floor(lo.y/spacing)*spacing;y<hi.y;y+=spacing){const p=point(0,y);map.beginPath();map.moveTo(0,p.y);map.lineTo(cw,p.y);map.stroke();}
@@ -550,11 +626,13 @@ $('leaderboard-sort').onclick=()=>{
  leaderboardSort=leaderboardSort==='earned'?'landed':'earned';
  $('leaderboard-sort').textContent=translateText(leaderboardSort==='earned'?'MONEY':'WEIGHT');
 };
+const ownStanding=()=>({name:state.playerName,landed:state.totalLanded||state.landed||0,earned:state.totalEarned||0});
 const crewChatter=createCrewChatter(),crewBubble=$('crew-bubble'),crewBubbleText=crewBubble.querySelector('p');
 function updateCrewBubble(w,wallDt,flight){
  const active=started&&!document.hidden&&!state.paused&&!waypointTravel&&!document.querySelector('dialog[open]');
  const stats=active?vesselStats(state):null;
- const speech=crewChatter({state,weather:w,active,dt:Math.min(wallDt,1),flight:!!flight,tank:stats?.tank,electric:stats?.powertrain==='electric'});
+ const peers=active&&multiplayer.status==='online'?multiplayer.peers:[];
+ const speech=crewChatter({state,weather:w,active,dt:Math.min(wallDt,1),flight:!!flight,tank:stats?.tank,electric:stats?.powertrain==='electric',peers,selfStanding:peers.length?ownStanding():null,isInHarbor:nearPort});
  if(!speech){crewBubble.hidden=true;return;}
  const p=scene3D?scene3D.project(state.x,state.y,5.8):pos(state.x,state.y);
  const y=p.y-(scene3D?18:42);
@@ -571,7 +649,7 @@ function frame(now){if(started&&state.playerName){ensureWorldIdentity();multipla
  state.worldHour=worldClock.update(state.worldId,host,now);const remoteVessels=multiplayer.peers.flatMap(p=>[p,...(p.fleet||[]).map(b=>({...b,id:p.id+'-fleet-'+b.id}))]);state.remotePlayers=peerSmoother.update(remoteVessels,now).map(p=>({...p,id:'remote-'+p.id,parts:{},engine:0,hold:0,gear:0,color:'#d496ee'}));const close=state.remotePlayers.find(p=>!p.id.includes('-fleet-')&&Math.hypot(p.x-state.x,p.y-state.y)<160);
 if(!state.paused&&close&&!nearbyGreetings.has(close.id)){nearbyGreetings.set(close.id,now);if(soundOn)audio?.greet();}
 for(const id of nearbyGreetings.keys())if(!state.remotePlayers.some(p=>p.id===id&&Math.hypot(p.x-state.x,p.y-state.y)<190))nearbyGreetings.delete(id);
-state.hoseTarget=close&&!state.paused&&!state.deckJob&&!state.incident&&now-(nearbyGreetings.get(close.id)??-Infinity)<3200?close:null;$('world-id').textContent=state.worldId;const rows=[{name:state.playerName,landed:state.totalLanded||state.landed||0,earned:state.totalEarned||0},...multiplayer.peers];const board=rows.sort((a,b)=>(b[leaderboardSort]||0)-(a[leaderboardSort]||0)).map(p=>`${p.name} · ${Math.round(p.landed)} kg · ${translateText(money(p.earned))}`).join('\n');if($('leaderboard-list').textContent!==board)$('leaderboard-list').textContent=board;$('world-status').textContent=multiplayer.status;}if(waypointTravel){const before=waypointTravel.elapsed,result=advanceWaypointTravel(state,waypointTravel);clock+=result.elapsed-before;if(result.done){waypointTravel=null;state.message=result.reason==='arrived'?'Next waypoint reached.':result.reason==='fuel'?'Not enough fuel to skip to the waypoint.':'Cannot skip: check the vessel or route.';save();updateUI();}}backgroundLast=now;weatherPoll+=1;if(weatherPoll===1||weatherPoll%60===0)void liveWeather.update(state);const wallDt=Math.max(0,(now-last)/1000),dt=Math.min(wallDt,.1);last=now;let elapsed=0;fps+=(1/Math.max(wallDt,.001)-fps)*.03;
+state.hoseTarget=close&&!state.paused&&!state.deckJob&&!state.incident&&now-(nearbyGreetings.get(close.id)??-Infinity)<3200?close:null;$('world-id').textContent=state.worldId;const rows=[ownStanding(),...multiplayer.peers];const board=rows.sort((a,b)=>(b[leaderboardSort]||0)-(a[leaderboardSort]||0)).map(p=>`${p.name} · ${Math.round(p.landed)} kg · ${translateText(money(p.earned))}`).join('\n');if($('leaderboard-list').textContent!==board)$('leaderboard-list').textContent=board;$('world-status').textContent=multiplayer.status;}if(waypointTravel){const before=waypointTravel.elapsed,result=advanceWaypointTravel(state,waypointTravel);clock+=result.elapsed-before;if(result.done){waypointTravel=null;state.message=result.reason==='arrived'?'Next waypoint reached.':result.reason==='fuel'?'Not enough fuel to skip to the waypoint.':'Cannot skip: check the vessel or route.';save();updateUI();}}backgroundLast=now;weatherPoll+=1;if(weatherPoll===1||weatherPoll%60===0)void liveWeather.update(state);const wallDt=Math.max(0,(now-last)/1000),dt=Math.min(wallDt,.1);last=now;let elapsed=0;fps+=(1/Math.max(wallDt,.001)-fps)*.03;
  if(started&&!state.paused&&canStepVoyage()){if(!waypointTravel){if(!state.tow&&(keys.has('KeyW')||keys.has('ArrowUp')))state.desiredKnots=clamp((state.desiredKnots||0)+dt*2,-3,Math.ceil(vesselStats(state).top*1.94384));if(keys.has('KeyS')||keys.has('ArrowDown'))state.desiredKnots=clamp((state.desiredKnots||0)-dt*2.5,-3,Math.ceil(vesselStats(state).top*1.94384));const helm=(keys.has('KeyD')||keys.has('ArrowRight')?1:0)-(keys.has('KeyA')||keys.has('ArrowLeft')?1:0);if(helm)setRudder(state,state.rudder*35+helm*dt*12);}elapsed=advanceVoyage(state,wake,dt,timeSpeed);}
  clock+=started?elapsed:dt;
  advanceDrone(Math.min(wallDt,.25));const displayDrone=droneFlight?dronePose(droneFlight,droneDock()):null;

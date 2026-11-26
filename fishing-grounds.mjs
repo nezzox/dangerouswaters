@@ -1,4 +1,4 @@
-import {FISHING_GROUNDS,clearWater,isLand,inWorld,nearestWater} from './world.mjs?v=0.18.84';
+import {FISHING_GROUNDS,clearWater,isLand,inWorld,nearestWater} from './world.mjs?v=0.18.85';
 // Gameplay approximation: deterministic slow migration, at most 37.5 m/game hour.
 // Tracks reverse along proven water-only segments instead of jumping across islands.
 const HOURS=36,STEP=900;
@@ -32,3 +32,11 @@ export function crabHotspot(g,rank,hour=0){return rank>=5?{...crabCore(g),potent
 export function groundMotion(g,rank,hour=0){if(!(rank>=4))return null;const track=tracks[g.id];if(!track)return null;const time=Math.max(0,Number.isFinite(hour)?hour:0)/HOURS,index=Math.floor(time)%(track.points.length-1),a=track.points[index],b=track.points[index+1],dx=b.x-a.x,dy=b.y-a.y,length=Math.hypot(dx,dy);return length>.001?{x:dx/length,y:dy/length}:null;}
 
 export function crabGroundAt(point,hour=0){let best=null,score=Infinity;for(const g of groundsAt(hour)){const dx=point.x-g.x,dy=point.y-g.y,c=Math.cos(g.angle),s=Math.sin(g.angle),q=((c*dx+s*dy)/g.rx)**2+((-s*dx+c*dy)/g.ry)**2;if(q<=1&&q<score){best=g;score=q;}}return best;}
+
+export function sortGroundReports(reports,mode){
+ const [species,metric]=mode.split('-');
+ if(species!=='crab'&&species!=='salmon')return reports;
+ // The sum of the displayed bounds has the same order as their midpoint.
+ const score=metric==='price'?r=>r[species+'Price']:r=>r[species].low+r[species].high;
+ return [...reports].sort((a,b)=>score(b)-score(a));
+}
