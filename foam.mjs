@@ -1,4 +1,4 @@
-import {seaHeight,directionalSpectrum,seaField} from './sea-spectrum.mjs?v=0.18.85';
+import {seaHeight,directionalSpectrum,seaField,seaAmplitude} from './sea-spectrum.mjs?v=0.18.86';
 const clamp=(x,a,b)=>Math.max(a,Math.min(b,x)),hash=(x,z)=>{const n=Math.sin(x*127.1+z*311.7)*43758.5453;return n-Math.floor(n);};
 // Raised, broken foam ribbons ride on the same swell as the boat. Not a fluid solver.
 export function buildFoam(wake,boat,weather,time){const data=[];
@@ -10,7 +10,7 @@ export function buildFoam(wake,boat,weather,time){const data=[];
  }
  for(let i=0;i<(wake?.points.length||0);i+=3){const p=wake.points[i],age=wake.time-p.born;if(age>24||Math.hypot(p.x-boat.x,p.z-boat.y)>100)continue;const fx=Math.cos(p.heading),fz=Math.sin(p.heading),spread=2+age*p.energy*.34,fade=Math.exp(-age*.11)*p.energy/7;for(const side of [-1,1])ribbon(p.x-fz*spread*side,p.z+fx*spread*side,fx,fz,4+age*.2,.3+age*.01,.035+p.energy*.006,fade,i*1.7);if(i%4===0)ribbon(p.x,p.z,fx,fz,3,.65,.025,fade*.32,i);}
  // Long, advecting crest strands replace the former square grid of inflated patches.
- if(weather.waves>1.8){const severity=clamp((weather.waves-1.8)/4,0,1);for(const [i,s] of directionalSpectrum(weather).slice(0,2).entries()){const dx=s.kx/s.k,dz=s.kz/s.k,tx=-dz,tz=dx,center=boat.x*dx+boat.y*dz,alongCenter=boat.x*tx+boat.y*tz;const base=(Math.PI/2-s.phase+time*s.omega)/s.k,spacing=2*Math.PI/s.k,first=Math.floor((center-75-base)/spacing),last=Math.ceil((center+75-base)/spacing);for(let wave=first;wave<=last;wave++){const across=base+wave*spacing;for(let segment=Math.floor((alongCenter-75)/16);segment<Math.ceil((alongCenter+75)/16);segment++){const seed=hash(wave+i*17,segment);if(seed<.5)continue;const along=segment*16+seed*5,px=dx*across+tx*along,pz=dz*across+tz*along,field=seaField(px,pz,time,weather.waves,weather),fade=severity*clamp((field.compression-.12)*2.5,0,.7)*clamp(field.height/(.08+weather.waves*.51),0,1);ribbon(px,pz,tx,tz,3+seed*7,.35+seed*.25,.035+severity*.02,fade,seed*12);}}}}
+ if(weather.waves>1.8){const severity=clamp((weather.waves-1.8)/4,0,1);for(const [i,s] of directionalSpectrum(weather).slice(0,2).entries()){const dx=s.kx/s.k,dz=s.kz/s.k,tx=-dz,tz=dx,center=boat.x*dx+boat.y*dz,alongCenter=boat.x*tx+boat.y*tz;const base=(Math.PI/2-s.phase+time*s.omega)/s.k,spacing=2*Math.PI/s.k,first=Math.floor((center-75-base)/spacing),last=Math.ceil((center+75-base)/spacing);for(let wave=first;wave<=last;wave++){const across=base+wave*spacing;for(let segment=Math.floor((alongCenter-75)/16);segment<Math.ceil((alongCenter+75)/16);segment++){const seed=hash(wave+i*17,segment);if(seed<.5)continue;const along=segment*16+seed*5,px=dx*across+tx*along,pz=dz*across+tz*along,field=seaField(px,pz,time,weather.waves,weather),fade=severity*clamp((field.compression-.12)*2.5,0,.7)*clamp(field.height/seaAmplitude(weather.waves),0,1);ribbon(px,pz,tx,tz,3+seed*7,.35+seed*.25,.035+severity*.02,fade,seed*12);}}}}
 
  return new Float32Array(data);
 }

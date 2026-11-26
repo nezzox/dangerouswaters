@@ -1,4 +1,4 @@
-import {POT_CAPACITY} from './pot-soak.mjs?v=0.18.85';
+import {POT_CAPACITY} from './pot-soak.mjs?v=0.18.86';
 
 // Each pair is two independently authored lines in the same situation and voice.
 // A short optional lead-in adds cadence. No general-purpose random sentence mashups.

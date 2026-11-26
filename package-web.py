@@ -11,8 +11,11 @@ release = json.loads((root / 'release-notes.json').read_text())
 assert release['version'] == version, 'Update release-notes.json for the new version'
 (root / 'version.json').write_text(json.dumps(release, ensure_ascii=False) + '\n')
 files = [root / 'version.json', root / 'index.html', root / 'style.css', root / '.nojekyll', root / 'intro.mp4', root / 'new-boat.mp4', root / 'man-overboard.mp4', root / 'special-catch.mp4', root / 'another-lost.mp4', root / 'tow.mp4', *sorted(root.glob('*.mjs'))]
+audio = ['calm-sea-01.mp3', 'calm-sea-02.mp3', 'medium-sea-01.mp3', 'medium-sea-02.mp3', 'heavy-sea-01.mp3']
+assert set(re.findall(r"'([a-z0-9-]+\.mp3)'", (root / 'weather-music.mjs').read_text())) == set(audio)
+files.extend(root / name for name in audio)
 for path in files:
-    if path.suffix == '.mp4':
+    if path.suffix in {'.mp4', '.mp3'}:
         continue
     for target in re.findall(r'''(?:from\s+|src=|href=)["'](\.?\.?/)?([^"']+\.(?:mjs|css))(?:\?[^"']*)?["']''', path.read_text()):
         assert (path.parent / ''.join(target)).is_file(), (path.name, target)
