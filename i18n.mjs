@@ -1,4 +1,4 @@
-import {CRAB_SPECIES} from './crab-species.mjs?v=0.18.90';
+import {CRAB_SPECIES} from './crab-species.mjs?v=0.18.91';
 // Saved money/prices remain in legacy SEK units. Fixed game conversion: 10 SEK = 1 USD.
 // Translation is applied at the presentation boundary; save data and simulation never change language.
 let language='en';
@@ -104,6 +104,11 @@ const sv={
 
  'SKIP VIDEO →':'HOPPA ÖVER VIDEO →','First boat celebration':'Första båtköpet','First boat celebration video':'Film för första båtköpet','has been published.':'har publicerats.','Press Ctrl+F5 to load the update. Your current season is saved before this message.':'Tryck Ctrl+F5 för att ladda uppdateringen. Din säsong sparas innan detta meddelande visas.',
  "YOUR FIRST BOAT":"DIN FÖRSTA BÅT",
+ "CRAB AVG. IN HOLD":"KRABBSNITT OMBORD",
+ "LOCAL CRAB PRICE":"LOKALT KRABBPRIS",
+ "Average landed price of the crab you have caught, before loan repayment.":"Genomsnittligt landningspris för krabban ombord, före låneavdrag.",
+ "Estimated local crab price if hauled now, before loan repayment.":"Uppskattat lokalt krabbpris vid upptagning nu, före låneavdrag.",
+ "Crab prices are estimates for each ground now, not the average for crab already aboard.":"Krabbpriserna gäller respektive fiskeområde just nu, inte snittet för krabban ombord.",
  "CRAB PRICE":"KRABBPRIS",
  "KG CRAB":"KG KRABBA",
  "TO DESTINATION":"TILL MÅLET",

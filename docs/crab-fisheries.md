@@ -33,3 +33,5 @@ Sources reviewed 2026-11-21:
 - https://www.adfg.alaska.gov/index.cfm?adfg=CommercialByFisheryshellfish.shellfishcatch_exvessel_crab (explains ex-vessel purchasing data)
 
 ADF&G is credited for its underlying data. Conversions, region placement and game balancing are our interpretation; ADF&G is not responsible for errors or deficiencies in this reproduction or interpretation.
+
+Fishing Intelligence quotes the current gross price at each fishing ground. In multiplayer it uses the shared world clock, the same as haul valuation. Cargo & Finances shows a local estimate when no crab is aboard and otherwise a weight-adjusted average of the catch booked at haul time. Both quotes include the current vessel's sale bonuses and exclude loan repayment or rare-catch bonuses. Moving grounds and distance from port can affect what an individual haul earns; a market change does not reprice crab already in the hold.

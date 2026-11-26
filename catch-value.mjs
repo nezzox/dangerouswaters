@@ -1,6 +1,6 @@
-import {crabGroundAt} from './fishing-grounds.mjs?v=0.18.90';
-import {CRAB_SPECIES} from './crab-species.mjs?v=0.18.90';
-import {geoToWorld} from './world.mjs?v=0.18.90';
+import {crabGroundAt} from './fishing-grounds.mjs?v=0.18.91';
+import {CRAB_SPECIES} from './crab-species.mjs?v=0.18.91';
+import {geoToWorld} from './world.mjs?v=0.18.91';
 const harbor=geoToWorld(-166.524,53.9034);
 // Gameplay reward for longer voyages: base rate inside 20 km, up to 5x at 1,620 km.
 const marketHours=10*24;
@@ -28,6 +28,14 @@ export function crabPriceAt(point,hour=point.worldHour??point.hour??point.setAt?
  return crabMarketRate(species,hour)*(1+4*progress**.75)*crabGroundPriceFactor(point.groundId??ground?.id,hour);
 }
 export function crabHoldValue(holder){const base=Math.max(0,holder.cargo||0)*65;return Number.isFinite(holder.crabValue)?Math.max(0,Math.min(Math.max(0,holder.cargo||0)*1400,holder.crabValue)):base;}
+// Quotes are gross: vessel bonuses apply, while debt and rare-catch settlement are separate.
+export function crabGroundQuote(state,ground,priceBonus=1){
+ return crabPriceAt({...ground,crabSpecies:ground.species,groundId:ground.id},state.worldHour??state.hour)*priceBonus;
+}
+export function crabCargoQuote(state,priceBonus=1){
+ const rate=state.cargo>0?crabHoldValue(state)/state.cargo:crabPriceAt(state,state.worldHour??state.hour);
+ return rate*priceBonus;
+}
 export function addCrabCatch(holder,kg,point,hour){const value=crabHoldValue(holder);holder.cargo+=kg;holder.crabValue=value+kg*crabPriceAt(point,hour);}
 export function landCrab(holder,kg){const amount=Math.min(Math.max(0,kg),holder.cargo),value=holder.cargo?crabHoldValue(holder)*amount/holder.cargo:0;holder.crabValue=Math.max(0,crabHoldValue(holder)-value);holder.cargo-=amount;return value;}
 

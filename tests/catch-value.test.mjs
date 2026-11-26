@@ -23,3 +23,36 @@ test('market rotates species ranks and individual ground prices at ten-day bound
  assert.notEqual(crabMarketRate('golden',240)*10,recorded);
  assert(Math.abs(landCrab(holder,10)-recorded)<1e-8);
 });
+
+test('shared fishing quotes and recorded haul prices use the same market day',async()=>{
+ const {crabGroundQuote}=await import('../catch-value.mjs');
+ const {groundsAt}=await import('../fishing-grounds.mjs');
+ const s=createGame();s.hour=239;s.worldHour=240;
+ const ground=groundsAt(s.worldHour).find(g=>g.species==='golden');
+ assert(ground);
+ const pot={...ground,groundId:ground.id,crabSpecies:ground.species,setAt:200,groundSetAt:s.worldHour};
+ addCrabCatch(s,18,pot,s.worldHour);
+ assert.equal(crabGroundQuote(s,ground),crabHoldValue(s)/s.cargo);
+ assert.notEqual(crabGroundQuote({...s,worldHour:undefined},ground),crabGroundQuote(s,ground));
+});
+
+test('cargo quotes show the recorded weighted average with the same bonus as landing',async()=>{
+ const {crabCargoQuote,crabGroundQuote}=await import('../catch-value.mjs');
+ const {dock,step}=await import('../simulation.mjs');
+ const {vesselStats}=await import('../career.mjs');
+ const {groundsAt}=await import('../fishing-grounds.mjs');
+ const s=createGame();Object.assign(s,{x:160,y:80,paused:false,hour:482,worldHour:482});
+ s.career.nextIncident=1e9;s.career.skills.price=5;s.career.parts.chiller=4;
+ const stats=vesselStats(s),ground=groundsAt(s.worldHour)[0];
+ const price=crabGroundQuote(s,ground,stats.priceBonus);
+ assert.equal(crabCargoQuote(s,stats.priceBonus),crabPriceAt(s,s.worldHour)*stats.priceBonus);
+ addCrabCatch(s,10,{...ground,groundId:ground.id,crabSpecies:ground.species},s.worldHour);
+ assert(Math.abs(crabCargoQuote(s,stats.priceBonus)-price)<1e-9);
+ addCrabCatch(s,20,{x:s.x,y:s.y},s.worldHour);
+ const totalQuote=crabCargoQuote(s,stats.priceBonus)*s.cargo;
+ assert.notEqual(totalQuote/s.cargo,price);
+ const initial=s.money;
+ dock(s);assert.equal(s.deckJob?.kind,'unload');
+ for(let i=0;i<400&&s.deckJob;i++)step(s,1,()=>1);
+ assert(Math.abs(s.money-initial-totalQuote)<1e-8);
+});
