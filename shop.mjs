@@ -1,9 +1,9 @@
-import {RARE_CATCHES,rareValue,rareCount} from './rare-catch.mjs?v=0.18.83';
-import {boatPreview} from './boat-preview.mjs?v=0.18.83';
-import {translateText,localizeTree,toInternalMoney} from './i18n.mjs?v=0.18.83';
-import {SKILLS,PARTS,BOATS,boatById} from './catalog.mjs?v=0.18.83';
-import {buyItem,droneRequirement,buyBoat,switchOwnedBoat,captainAvailable,vesselStats,tradeValue,inHarbor,shopReady,takeLoan,creditLimit} from './career.mjs?v=0.18.83';
-import {answerCaptain,answerFleetUpgrade,toggleFleetService,sellFleetVessel,fleetSaleValue,fleetStats,readFleetMessages} from './fleet.mjs?v=0.18.83';
+import {RARE_CATCHES,rareValue,rareCount} from './rare-catch.mjs?v=0.18.84';
+import {boatPreview} from './boat-preview.mjs?v=0.18.84';
+import {translateText,localizeTree,toInternalMoney} from './i18n.mjs?v=0.18.84';
+import {SKILLS,PARTS,BOATS,boatById} from './catalog.mjs?v=0.18.84';
+import {buyItem,droneRequirement,buyBoat,switchOwnedBoat,captainAvailable,vesselStats,tradeValue,inHarbor,shopReady,takeLoan,creditLimit} from './career.mjs?v=0.18.84';
+import {answerCaptain,answerFleetUpgrade,toggleFleetService,sellFleetVessel,fleetSaleValue,fleetStats,readFleetMessages} from './fleet.mjs?v=0.18.84';
 const kr=n=>`${Math.round(n).toLocaleString('en-US')} kr`;
 const node=(tag,text,className)=>{const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(className)el.className=className;return el;};
 export function createShop(getState,onChange){

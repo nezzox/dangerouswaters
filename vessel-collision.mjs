@@ -1,4 +1,4 @@
-import {vesselStats} from './career.mjs?v=0.18.83';
+import {vesselStats} from './career.mjs?v=0.18.84';
 // Convex, tapered hull footprint. No collision with buoy range rings or map icons.
 function hull(p,stats){const c=Math.cos(p.heading),s=Math.sin(p.heading);return (stats.rampBow?[[ -.5,-.42],[.55,-.5],[.55,.5],[-.5,.42]]:[[-.5,-.42],[.28,-.5],[.55,0],[.28,.5],[-.5,.42]]).map(([x,y])=>({x:p.x+c*x*stats.length-s*y*stats.beam,y:p.y+s*x*stats.length+c*y*stats.beam}));}
 export function hullContact(a,as,b,bs){const ap=hull(a,as),bp=hull(b,bs);let depth=Infinity,normal=null;for(const poly of [ap,bp])for(let i=0;i<poly.length;i++){const p=poly[i],q=poly[(i+1)%poly.length],length=Math.hypot(q.x-p.x,q.y-p.y),axis={x:-(q.y-p.y)/length,y:(q.x-p.x)/length},aa=ap.map(p=>p.x*axis.x+p.y*axis.y),bb=bp.map(p=>p.x*axis.x+p.y*axis.y),plus=Math.max(...bb)-Math.min(...aa),minus=Math.max(...aa)-Math.min(...bb),overlap=Math.min(plus,minus);if(overlap<=0)return null;if(overlap<depth){depth=overlap;normal=plus<minus?axis:{x:-axis.x,y:-axis.y};}}return {depth,normal};}

@@ -1,8 +1,11 @@
 export const OVERBOARD_NOTICE="The Dangerous Waters has claimed one of your crew. You're obligated to pay for the funeral and a severance to his family.";
 export const OVERBOARD_COST=150000;
 
-export function rollOverboard(state,side,random=Math.random){
- if(state.overboard||random()>=1/2500)return false;
+export function rollOverboard(state,side,random=Math.random,{wind=0,waves=0}={}){
+ // Game balance: keep the calm baseline and cap each weather contribution.
+ const exposure=(value,calm,rough)=>Math.max(0,Math.min(1,(value-calm)/(rough-calm)));
+ const risk=(1+2*exposure(wind,10,42)+2*exposure(waves,.5,5.5))/2500;
+ if(state.overboard||random()>=risk)return false;
  state.crewLosses=(state.crewLosses||0)+1;
  state.overboard={phase:'fall',elapsed:0,side:side<0?-1:1};
  state.speed=state.throttle=state.desiredKnots=state.rudder=0;
