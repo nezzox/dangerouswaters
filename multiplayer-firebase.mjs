@@ -1,6 +1,6 @@
-import {createPlayerRadio} from './player-radio.mjs?v=0.18.87';
+import {createPlayerRadio} from './player-radio.mjs?v=0.18.88';
 import {firebaseConfig} from './multiplayer-firebase-config.mjs';
-import {positionInterval,vesselPosition,potChanges} from './multiplayer-pacing.mjs?v=0.18.87';
+import {positionInterval,vesselPosition,potChanges} from './multiplayer-pacing.mjs?v=0.18.88';
 
 let firebase;
 function connectFirebase(){
@@ -19,6 +19,12 @@ const unpack=(packed,boat,sentAt)=>Array.isArray(packed)&&packed.length===3&&pac
  {...boat,x:packed[0],y:packed[1],heading:packed[2],positionSample:packed,sentAt}:boat;
 const decodePots=entries=>Object.entries(entries||{}).flatMap(([id,p])=>
  Array.isArray(p)&&p.every(Number.isFinite)?[{id:Number(id),x:p[0],y:p[1]}]:[]);
+
+// Read the watch from the authoritative Firebase member, not a delayed position packet.
+export function firebaseHostClock(room,online){
+ if(!room?.hostId||room.hostId===room.sdk.uid)return null;
+ return {id:room.hostId,hour:online?room.members[room.hostId]?.hour:undefined};
+}
 
 export function createFirebaseMultiplayer(presence){
  let room=null,joining=null,status='offline',generation=0,peers=[];
@@ -154,7 +160,8 @@ export function createFirebaseMultiplayer(presence){
    await Promise.all([sdk.onDisconnect(mine).remove(),sdk.onDisconnect(position).remove()]);
    if(epoch!==generation)return false;
    room=r;
-   r.isHost=(snap.exists()?snap.val():(await sdk.get(host)).val())===sdk.uid;
+   r.hostId=snap.exists()?snap.val():(await sdk.get(host)).val();
+   r.isHost=r.hostId===sdk.uid;
    await sdk.set(mine,metadata({...presence(state),isHost:r.isHost}));
    if(room!==r)return false;
    r.stops.push(sdk.onValue(ref('members'),snap=>{r.members=snap.val()||{};syncLinks(r);refresh(r);}),
@@ -223,7 +230,7 @@ export function createFirebaseMultiplayer(presence){
   if(Object.keys(changes).length)void r.sdk.update(r.mine,changes).catch(()=>{});
  }
  let lastTick=0,lastAttempt=-Infinity;
- return {get peers(){return peers;},get status(){return status;},
+ return {get peers(){return peers;},get status(){return status;},get clockHost(){return firebaseHostClock(room,status==='online');},
   get radioCalls(){return room?.radio?.calls()||[];},
   async sendRadio(target,text){if(!room?.radio)throw Error('unavailable');await room.radio.send(target,text);},
   async dismissRadio(call){await room?.radio?.dismiss(call);},
