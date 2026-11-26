@@ -21,3 +21,17 @@ test('a returning guest holds the last host time rather than jumping to local da
  assert.equal(clock.update('WORLD2',{id:'owner'},2600),undefined);
  assert.equal(clock.update('WORLD2',null,2700),undefined);
 });
+
+test('an existing world with its owner absent elects the same active clock for all guests',()=>{
+ const first={hour:7},second={hour:14};
+ const a={hostId:'owner',sdk:{uid:'alpha'},members:{zulu:second,alpha:first}};
+ const b={hostId:'owner',sdk:{uid:'zulu'},members:{alpha:first,zulu:second}};
+ assert.equal(firebaseHostClock(a,true),null);
+ assert.deepEqual(firebaseHostClock(b,true),{id:'alpha',hour:7});
+ assert.deepEqual(firebaseHostClock(b,false),{id:'alpha',hour:undefined});
+ b.members.owner={hour:18};
+ assert.deepEqual(firebaseHostClock(b,true),{id:'owner',hour:18});
+ delete b.members.owner;
+ delete b.members.alpha;
+ assert.equal(firebaseHostClock(b,true),null);
+});

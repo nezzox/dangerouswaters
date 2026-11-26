@@ -1,6 +1,6 @@
-import {createPlayerRadio} from './player-radio.mjs?v=0.18.88';
+import {createPlayerRadio} from './player-radio.mjs?v=0.18.89';
 import {firebaseConfig} from './multiplayer-firebase-config.mjs';
-import {positionInterval,vesselPosition,potChanges} from './multiplayer-pacing.mjs?v=0.18.88';
+import {positionInterval,vesselPosition,potChanges} from './multiplayer-pacing.mjs?v=0.18.89';
 
 let firebase;
 function connectFirebase(){
@@ -20,10 +20,19 @@ const unpack=(packed,boat,sentAt)=>Array.isArray(packed)&&packed.length===3&&pac
 const decodePots=entries=>Object.entries(entries||{}).flatMap(([id,p])=>
  Array.isArray(p)&&p.every(Number.isFinite)?[{id:Number(id),x:p[0],y:p[1]}]:[]);
 
-// Read the watch from the authoritative Firebase member, not a delayed position packet.
+// The Firebase room owner is preferred. If absent, every client chooses the
+// same active member from presence, without changing room ownership or rules.
+const validHour=member=>Number.isFinite(member?.hour)&&member.hour>=0;
+function worldClockLeader(room){
+ const {hostId,members}=room;
+ if(validHour(members[hostId]))return hostId;
+ return Object.keys(members).filter(id=>validHour(members[id])).sort()[0]??hostId;
+}
 export function firebaseHostClock(room,online){
- if(!room?.hostId||room.hostId===room.sdk.uid)return null;
- return {id:room.hostId,hour:online?room.members[room.hostId]?.hour:undefined};
+ if(!room?.hostId)return null;
+ const id=room.clockLeader??worldClockLeader(room);
+ if(id===room.sdk.uid)return null;
+ return {id,hour:online?room.members[id]?.hour:undefined};
 }
 
 export function createFirebaseMultiplayer(presence){
@@ -164,7 +173,7 @@ export function createFirebaseMultiplayer(presence){
    r.isHost=r.hostId===sdk.uid;
    await sdk.set(mine,metadata({...presence(state),isHost:r.isHost}));
    if(room!==r)return false;
-   r.stops.push(sdk.onValue(ref('members'),snap=>{r.members=snap.val()||{};syncLinks(r);refresh(r);}),
+   r.stops.push(sdk.onValue(ref('members'),snap=>{r.members=snap.val()||{};r.clockLeader=worldClockLeader(r);syncLinks(r);refresh(r);}),
     sdk.onChildAdded(ref('positions'),snap=>{r.positions[snap.key]=snap.val();refresh(r);}),
     sdk.onChildChanged(ref('positions'),snap=>{r.positions[snap.key]=snap.val();refresh(r);}),
     sdk.onChildRemoved(ref('positions'),snap=>{delete r.positions[snap.key];refresh(r);}),
@@ -212,7 +221,7 @@ export function createFirebaseMultiplayer(presence){
   if(!r.booking&&(p.berth||r.berth))void bookBerth(r,state,p.berth);
   const changes={},fields=['name','boat','lights','isHost','landed','earned'];
   for(const key of fields)if(p[key]!==previous?.[key])changes[key]=p[key];
-  if(now-r.lastMeta>=(r.isHost?1000:3000)||!previous){
+  if(now-r.lastMeta>=(r.isHost||r.clockLeader===r.sdk.uid?1000:3000)||!previous){
    r.lastMeta=now;
    Object.assign(changes,{x:p.x,y:p.y,heading:p.heading,hour:p.hour});
   }

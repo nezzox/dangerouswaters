@@ -1,50 +1,50 @@
-import {createCrewChatter} from './crew-chatter.mjs?v=0.18.88';
-import {DRONE_RADIUS,DRONE_DURATION,droneCameraFollow,dronePose,scanCrab} from './drone-survey.mjs?v=0.18.88';
-import {deckSign} from './vessel-profile.mjs?v=0.18.88';
-import {canStand} from './deck-layout.mjs?v=0.18.88';
-import {drawPrecipitation} from './precipitation.mjs?v=0.18.88';
-import {replaceLostPots,LOST_POT_PRICE} from './simulation.mjs?v=0.18.88';
-import {shopReady} from './career.mjs?v=0.18.88';
-import {salmonMarket} from './salmon-market.mjs?v=0.18.88';
-import {OVERBOARD_NOTICE,settleOverboard,dispatchReplacement} from './man-overboard.mjs?v=0.18.88';
-import {seaLane} from './navigation.mjs?v=0.18.88';
-import {newWorldCode,newPlayerToken,cleanPlayerName,createMultiplayer,createPeerSmoother,createWorldClock} from './multiplayer.mjs?v=0.18.88';
-import {startWaypointTravel,advanceWaypointTravel} from './time-to-waypoint.mjs?v=0.18.88';
-import {CRAB_SPECIES,crabSpeciesName} from './crab-species.mjs?v=0.18.88';
-import {LIGHTING_PROFILES} from './light-upgrades.mjs?v=0.18.88';
-import {claimFirstBoatGrant,firstBoatNotice} from './first-boat.mjs?v=0.18.88';
-import {crabPriceAt,crabHoldValue} from './catch-value.mjs?v=0.18.88';
-import {watchDonations,appendDonation} from './donation-feed.mjs?v=0.18.88';
-import {DONATION_FEED_URL} from './donation-config.mjs?v=0.18.88';
-import {watchUpdates,formatUpdateNotice} from './update-check.mjs?v=0.18.88';
-import {energyPrice} from './energy.mjs?v=0.18.88';
-import {createMessageQueue} from './message-queue.mjs?v=0.18.88';
-import {visibleFleet} from './fleet-visuals.mjs?v=0.18.88';
-import {transitionWeather} from './weather-transition.mjs?v=0.18.88';
-import {ownedUpgrades,createRadioFeed,createLastHaul} from './hud-status.mjs?v=0.18.88';
-import {createIntro} from './intro.mjs?v=0.18.88';
-import {fleetNoticeCount} from './fleet.mjs?v=0.18.88';
-import {redeemDeveloperCode} from './developer-code.mjs?v=0.18.88';
-import {potSoakStage} from './pot-soak.mjs?v=0.18.88';
-import {createLiveWeather} from './live-weather.mjs?v=0.18.88';
-import {dockingStage,PORT_QUAYS,nearestQuay} from './harbor.mjs?v=0.18.88';
-import {fuelEconomy,fuelToGround} from './fuel-economy.mjs?v=0.18.88';
-import {scanSonar,drawSonar} from './sonar.mjs?v=0.18.88';
-import {rareCount,rareValue} from './rare-catch.mjs?v=0.18.88';
-import {clipChartWater} from './chart-water.mjs?v=0.18.88';
-import {groundsAt,groundReport,sortGroundReports,crabHotspot,groundMotion} from './fishing-grounds.mjs?v=0.18.88';
-import {createSoundscape} from './soundscape.mjs?v=0.18.88';
-import {daylightAt,WORLD_LAND,WORLD_CENTER,WORLD_BOUNDS,PLACES,worldToGeo,clearWater,ST_PAUL_DIESEL} from './world.mjs?v=0.18.88';
-import {getLanguage,setLanguage,formatMoney,translateText,localizeTree} from './i18n.mjs?v=0.18.88';
-import {createShop} from './shop.mjs?v=0.18.88';
-import {restoreSeason,seasonJSON} from './saves.mjs?v=0.18.88';
-import {vesselStats,toggleAutomation,droneRequirement} from './career.mjs?v=0.18.88';
-import {pickupAllPots,skipperCommand,createGame,step,notify,startDroneSet,cancelDroneSet,conditions,depthAt,PORT,distance,nearPort,handlePot,dock,undock,canUndock,service,beginTow,towDestination,towFee,atDieselStation,getUnstuck,clamp,potAction,POT_RANGE,jobProgress,setAutopilot,autopilotRouteStart,applyAutopilotRoute,setRudder,potBearing,workingSide} from './simulation.mjs?v=0.18.88';
-import {createOcean,drawFallback} from './ocean.mjs?v=0.18.88';
-import {createScene} from './scene.mjs?v=0.18.88';
-import {drawGroundMotion,createChartView,chartPoint,chartWorld,panChart,zoomChart,followVessel,fitPots,updateChartFollow} from './chart.mjs?v=0.18.88';
-import {createWake} from './wake.mjs?v=0.18.88';
-import {advanceVoyage} from './voyage.mjs?v=0.18.88';
+import {createCrewChatter} from './crew-chatter.mjs?v=0.18.89';
+import {DRONE_RADIUS,DRONE_DURATION,droneCameraFollow,dronePose,scanCrab} from './drone-survey.mjs?v=0.18.89';
+import {deckSign} from './vessel-profile.mjs?v=0.18.89';
+import {canStand} from './deck-layout.mjs?v=0.18.89';
+import {drawPrecipitation} from './precipitation.mjs?v=0.18.89';
+import {replaceLostPots,LOST_POT_PRICE} from './simulation.mjs?v=0.18.89';
+import {shopReady} from './career.mjs?v=0.18.89';
+import {salmonMarket} from './salmon-market.mjs?v=0.18.89';
+import {OVERBOARD_NOTICE,settleOverboard,dispatchReplacement} from './man-overboard.mjs?v=0.18.89';
+import {seaLane} from './navigation.mjs?v=0.18.89';
+import {newWorldCode,newPlayerToken,cleanPlayerName,createMultiplayer,createPeerSmoother,createWorldClock} from './multiplayer.mjs?v=0.18.89';
+import {startWaypointTravel,advanceWaypointTravel} from './time-to-waypoint.mjs?v=0.18.89';
+import {CRAB_SPECIES,crabSpeciesName} from './crab-species.mjs?v=0.18.89';
+import {LIGHTING_PROFILES} from './light-upgrades.mjs?v=0.18.89';
+import {claimFirstBoatGrant,firstBoatNotice} from './first-boat.mjs?v=0.18.89';
+import {crabPriceAt,crabHoldValue} from './catch-value.mjs?v=0.18.89';
+import {watchDonations,appendDonation} from './donation-feed.mjs?v=0.18.89';
+import {DONATION_FEED_URL} from './donation-config.mjs?v=0.18.89';
+import {watchUpdates,formatUpdateNotice} from './update-check.mjs?v=0.18.89';
+import {energyPrice} from './energy.mjs?v=0.18.89';
+import {createMessageQueue} from './message-queue.mjs?v=0.18.89';
+import {visibleFleet} from './fleet-visuals.mjs?v=0.18.89';
+import {transitionWeather} from './weather-transition.mjs?v=0.18.89';
+import {ownedUpgrades,createRadioFeed,createLastHaul} from './hud-status.mjs?v=0.18.89';
+import {createIntro} from './intro.mjs?v=0.18.89';
+import {fleetNoticeCount} from './fleet.mjs?v=0.18.89';
+import {redeemDeveloperCode} from './developer-code.mjs?v=0.18.89';
+import {potSoakStage} from './pot-soak.mjs?v=0.18.89';
+import {createLiveWeather} from './live-weather.mjs?v=0.18.89';
+import {dockingStage,PORT_QUAYS,nearestQuay} from './harbor.mjs?v=0.18.89';
+import {fuelEconomy,fuelToGround} from './fuel-economy.mjs?v=0.18.89';
+import {scanSonar,drawSonar} from './sonar.mjs?v=0.18.89';
+import {rareCount,rareValue} from './rare-catch.mjs?v=0.18.89';
+import {clipChartWater} from './chart-water.mjs?v=0.18.89';
+import {groundsAt,groundReport,sortGroundReports,crabHotspot,groundMotion} from './fishing-grounds.mjs?v=0.18.89';
+import {createSoundscape} from './soundscape.mjs?v=0.18.89';
+import {daylightAt,WORLD_LAND,WORLD_CENTER,WORLD_BOUNDS,PLACES,worldToGeo,clearWater,ST_PAUL_DIESEL} from './world.mjs?v=0.18.89';
+import {getLanguage,setLanguage,formatMoney,translateText,localizeTree} from './i18n.mjs?v=0.18.89';
+import {createShop} from './shop.mjs?v=0.18.89';
+import {restoreSeason,seasonJSON} from './saves.mjs?v=0.18.89';
+import {vesselStats,toggleAutomation,droneRequirement} from './career.mjs?v=0.18.89';
+import {pickupAllPots,skipperCommand,createGame,step,notify,startDroneSet,cancelDroneSet,conditions,depthAt,PORT,distance,nearPort,handlePot,dock,undock,canUndock,service,beginTow,towDestination,towFee,atDieselStation,getUnstuck,clamp,potAction,POT_RANGE,jobProgress,setAutopilot,autopilotRouteStart,applyAutopilotRoute,setRudder,potBearing,workingSide} from './simulation.mjs?v=0.18.89';
+import {createOcean,drawFallback} from './ocean.mjs?v=0.18.89';
+import {createScene} from './scene.mjs?v=0.18.89';
+import {drawGroundMotion,createChartView,chartPoint,chartWorld,panChart,zoomChart,followVessel,fitPots,updateChartFollow} from './chart.mjs?v=0.18.89';
+import {createWake} from './wake.mjs?v=0.18.89';
+import {advanceVoyage} from './voyage.mjs?v=0.18.89';
 let sonarFrame='';const radioFeed=createRadioFeed(),messageQueue=createMessageQueue();let ownedSignature='';const lastHaulDisplay=createLastHaul();
 const wake=createWake();
 const $=id=>document.getElementById(id),canvas=$('world'),ctx=canvas.getContext('2d'),sea=$('ocean'),chart=$('chart'),map=chart.getContext('2d');
@@ -129,7 +129,7 @@ function requestWaypoint(target,append){
  function launch(start,end,grid,complete){
   let worker;
   try{
-   worker=new Worker(new URL('./waypoint-worker.mjs?v=0.18.88',import.meta.url),{type:'module'});
+   worker=new Worker(new URL('./waypoint-worker.mjs?v=0.18.89',import.meta.url),{type:'module'});
    waypointWorkers.add(worker);
    const done=route=>{
     if(!waypointWorkers.delete(worker))return;
@@ -242,7 +242,7 @@ function planTow(){
   save();updateUI();
  }
  for(const grid of grids)try{
-  const worker=new Worker(new URL('./waypoint-worker.mjs?v=0.18.88',import.meta.url),{type:'module'});
+  const worker=new Worker(new URL('./waypoint-worker.mjs?v=0.18.89',import.meta.url),{type:'module'});
   workers.add(worker);
   const done=route=>{
    if(!workers.delete(worker))return;
@@ -350,14 +350,14 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden)audio?.upda
 const stopDonations=watchDonations({url:DONATION_FEED_URL,receive:text=>appendDonation(state,text)});addEventListener('pagehide',event=>{if(!event.persisted)stopDonations();},{once:true});
 const stopUpdateChecks=watchUpdates({currentVersion:new URL(import.meta.url).searchParams.get('v'),notify:(version,notes)=>messageQueue.enqueue({kind:'update',version,notes,text:formatUpdateNotice(version,notes,getLanguage())})});addEventListener('pagehide',event=>{if(!event.persisted)stopUpdateChecks();},{once:true});
 function showQueuedMessage(){messageQueue.collect(state);if(!started||document.querySelector('dialog[open]'))return;if(state.tow?.phase==='film'){
- intro.start({source:'./tow.mp4?v=0.18.88',onFinish:()=>{state.tow.phase='planning';save();updateUI();}});return;
+ intro.start({source:'./tow.mp4?v=0.18.89',onFinish:()=>{state.tow.phase='planning';save();updateUI();}});return;
 }
 if(state.tow?.phase==='planning'){planTow();return;}
 if(state.tow)return;
 if(state.specialCatchFilm){
- intro.start({source:'./special-catch.mp4?v=0.18.88',onFinish:()=>{state.specialCatchFilm=false;save();updateUI();}});return;
+ intro.start({source:'./special-catch.mp4?v=0.18.89',onFinish:()=>{state.specialCatchFilm=false;save();updateUI();}});return;
 }
-if(state.overboard?.phase==='film'){save();intro.start({source:state.crewLosses>1?'./another-lost.mp4?v=0.18.88':'./man-overboard.mp4?v=0.18.88',onFinish:()=>{settleOverboard(state);save();updateUI();}});return;}
+if(state.overboard?.phase==='film'){save();intro.start({source:state.crewLosses>1?'./another-lost.mp4?v=0.18.89':'./man-overboard.mp4?v=0.18.89',onFinish:()=>{settleOverboard(state);save();updateUI();}});return;}
 if(state.overboard?.phase==='notice'){activeMessageKind='overboard';keys.clear();$('message-popup-title').textContent='MAN OVERBOARD';$('message-popup-text').textContent=OVERBOARD_NOTICE;localizeTree($('message-popup'));$('message-popup').showModal();$('message-popup-ok').focus();return;}if(state.career.firstBoatReward==='pending'&&!firstBoatAcknowledgement){firstBoatWasPaused=state.paused;state.paused=true;save();$('intro').setAttribute('aria-label',translateText('First boat celebration'));$('intro-video').setAttribute('aria-label',translateText('First boat celebration video'));intro.start({source:'./new-boat.mp4',onFinish:()=>{firstBoatAcknowledgement=true;state.paused=firstBoatWasPaused;messageQueue.enqueue({kind:'firstBoat',text:firstBoatNotice(getLanguage())});updateUI();}});return;}const entry=messageQueue.next();if(!entry)return;activeMessageKind=entry.kind;keys.clear();if(entry.kind==='update')save();$('message-popup-title').textContent=entry.kind==='firstBoat'?'YOUR FIRST BOAT':entry.kind==='update'?'GAME UPDATE AVAILABLE':entry.kind==='incident'?'REPAIR & VESSEL ALERT':'FLEET RADIO';$('message-popup-text').textContent=entry.kind==='update'&&entry.version?formatUpdateNotice(entry.version,entry.notes,getLanguage()):entry.text;localizeTree($('message-popup'));$('message-popup').showModal();$('message-popup-ok').focus();}
 let offeredMooring=state.moored;
 const refuelPrompt=$('refuel-prompt');
