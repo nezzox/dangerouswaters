@@ -1,6 +1,6 @@
-import {createPlayerRadio} from './player-radio.mjs?v=0.18.86';
+import {createPlayerRadio} from './player-radio.mjs?v=0.18.87';
 import {firebaseConfig} from './multiplayer-firebase-config.mjs';
-import {positionInterval,vesselPosition,potChanges} from './multiplayer-pacing.mjs?v=0.18.86';
+import {positionInterval,vesselPosition,potChanges} from './multiplayer-pacing.mjs?v=0.18.87';
 
 let firebase;
 function connectFirebase(){

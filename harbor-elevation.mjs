@@ -1,5 +1,5 @@
 import {DEM} from './harbor-dem-data.mjs';
-import {geoToWorld} from './world.mjs?v=0.18.86';
+import {geoToWorld} from './world.mjs?v=0.18.87';
 
 const nw=geoToWorld(DEM.west,DEM.north),se=geoToWorld(DEM.east,DEM.south);
 let heights;

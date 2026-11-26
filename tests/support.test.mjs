@@ -11,16 +11,17 @@ test('the support link sits with the harbor controls below, not inside, the lead
  assert(!html.includes('id="drone-markers"'));
 });
 
-test('scrollable HUD tracks the responsive toolbar height',async()=>{
+test('responsive HUD tracks the toolbar, weather header and deck hint',async()=>{
  const saved={document:globalThis.document,ResizeObserver:globalThis.ResizeObserver};
- let height=70,resize,property;
- const footer={getBoundingClientRect:()=>({height})};
- globalThis.document={querySelector:()=>footer,documentElement:{style:{setProperty(name,value){property=[name,value];}}}};
- globalThis.ResizeObserver=class{constructor(fn){resize=fn;}observe(target){assert.equal(target,footer);}};
+ const sizes={'footer':70,'header':96,'#pot-action':38},callbacks=new Map(),values=new Map();
+ const elements=Object.fromEntries(Object.keys(sizes).map(selector=>[selector,{selector,getBoundingClientRect:()=>({height:sizes[selector]})}]));
+ globalThis.document={querySelector:selector=>elements[selector],documentElement:{style:{setProperty(name,value){values.set(name,value);}}}};
+ globalThis.ResizeObserver=class{constructor(fn){this.resize=fn;}observe(target){callbacks.set(target.selector,this.resize);}};
  try{
-  await import('../support.mjs?test-toolbar');
-  assert.deepEqual(property,['--toolbar-height','70px']);
-  height=100;resize();
-  assert.deepEqual(property,['--toolbar-height','100px']);
+  await import('../support.mjs?test-hud');
+  assert.deepEqual([...values],[['--toolbar-height','70px'],['--hud-header-height','96px'],['--pot-action-height','38px']]);
+  sizes.footer=108.5;sizes.header=114;sizes['#pot-action']=52;
+  for(const resize of callbacks.values())resize();
+  assert.deepEqual([...values],[['--toolbar-height','109px'],['--hud-header-height','114px'],['--pot-action-height','52px']]);
  }finally{Object.assign(globalThis,saved);}
 });

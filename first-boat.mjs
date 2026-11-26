@@ -1,4 +1,4 @@
-import {formatMoney} from './i18n.mjs?v=0.18.86';
+import {formatMoney} from './i18n.mjs?v=0.18.87';
 export const FIRST_BOAT_GRANT=500000; // 50,000 USD in the save's SEK units.
 export function claimFirstBoatGrant(s){if(s.career?.firstBoatReward!=='pending')return false;s.money+=FIRST_BOAT_GRANT;s.career.firstBoatReward='claimed';return true;}
 export function firstBoatNotice(language='en'){const amount=formatMoney(FIRST_BOAT_GRANT,language);return language==='sv'?`Grattis till din första köpta båt! Nu är du ute på farligt vatten på riktigt. Hamnchefen har ordnat en startfond på ${amount} och tycker att du ska använda den till uppgraderingar. Tryck OK för att ta emot pengarna.`:`Congratulations on your first purchased boat! Now you are sailing dangerous waters for real. The harbormaster has arranged a starting fund of ${amount} and recommends spending it on upgrades. Press OK to receive the money.`;}
