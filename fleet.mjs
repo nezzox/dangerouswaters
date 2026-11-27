@@ -1,20 +1,20 @@
-import {addSalmonCatch,salmonHoldRate,salmonCatch} from './salmon-market.mjs?v=0.18.91';
-import {crabHoldValue,addCrabCatch,captureCrabSpecies} from './catch-value.mjs?v=0.18.91';
-import {PARTS,boatById} from './catalog.mjs?v=0.18.91';
-import {solarCharge,electricBurn,energyPrice} from './energy.mjs?v=0.18.91';
-import {recoverFleetContact} from './fleet-recovery.mjs?v=0.18.91';
-import {nearbyGreeting} from './fleet-greetings.mjs?v=0.18.91';
-import {potCatchAt} from './pot-soak.mjs?v=0.18.91';
-import {prepareRareCatch,awardRareCatch,rareValue} from './rare-catch.mjs?v=0.18.91';
-import {FUEL_SCALE,SEA_WEAR_SCALE} from './balance.mjs?v=0.18.91';
-import {groundsAt,crabHotspot} from './fishing-grounds.mjs?v=0.18.91';
-import {nearestWater,clearWater} from './world.mjs?v=0.18.91';
-import {planSeaRoute,seaLane} from './navigation.mjs?v=0.18.91';
-import {vesselStats,settleLanding,tradeValue,inHarbor} from './career.mjs?v=0.18.91';
-import {nextPotNumber} from './pot-numbers.mjs?v=0.18.91';
-import {iceLevel} from './vessel-ice.mjs?v=0.18.91';
-import {buildCastOffRoute,dockRouteDuration,dockingPose} from './harbor.mjs?v=0.18.91';
-import {hullContact} from './vessel-collision.mjs?v=0.18.91';
+import {addSalmonCatch,salmonHoldRate,salmonCatch} from './salmon-market.mjs?v=0.18.92';
+import {crabHoldValue,addCrabCatch,captureCrabSpecies} from './catch-value.mjs?v=0.18.92';
+import {PARTS,boatById} from './catalog.mjs?v=0.18.92';
+import {solarCharge,electricBurn,energyPrice} from './energy.mjs?v=0.18.92';
+import {recoverFleetContact} from './fleet-recovery.mjs?v=0.18.92';
+import {nearbyGreeting} from './fleet-greetings.mjs?v=0.18.92';
+import {potCatchAt} from './pot-soak.mjs?v=0.18.92';
+import {prepareRareCatch,awardRareCatch,rareValue} from './rare-catch.mjs?v=0.18.92';
+import {FUEL_SCALE,SEA_WEAR_SCALE} from './balance.mjs?v=0.18.92';
+import {groundsAt,crabHotspot} from './fishing-grounds.mjs?v=0.18.92';
+import {nearestWater,clearWater} from './world.mjs?v=0.18.92';
+import {planSeaRoute,seaLane} from './navigation.mjs?v=0.18.92';
+import {vesselStats,settleLanding,tradeValue,inHarbor} from './career.mjs?v=0.18.92';
+import {nextPotNumber} from './pot-numbers.mjs?v=0.18.92';
+import {iceLevel} from './vessel-ice.mjs?v=0.18.92';
+import {buildCastOffRoute,dockRouteDuration,dockingPose} from './harbor.mjs?v=0.18.92';
+import {hullContact} from './vessel-collision.mjs?v=0.18.92';
 
 const hullFields=['x','y','heading','engine','hold','gear','capacity','deck','fuel','hull','ice','lostPots',
  'pots','nets','cargo','crabValue','salmon','salmonRate','rareHold','droneSurvey','moored','lights'];
